@@ -79,14 +79,16 @@ public class IfSysAutoTestService extends Domain {
 	 * @param interFaceInfo
 	 */
 	public void autoTest(InterFaceInfo interFaceInfo) {
-		if(interFaceInfo.getId()==68){
-			System.out.println("hhehe");
-		}
 		// 获取接口访问的完整地址
 		String url = getAddressUrl(interFaceInfo.getAddressUrl(), interFaceInfo.getIfUrl());
 		// 调用接口所有的测试用例
-
 		for (IfSysMock mock : interFaceInfo.getMockList()) {
+			//判断接口是否有被依赖
+			List<IfSysRefer> listRef=ifSysReferService.getReferByRefMockId(mock.getId());
+			//如果用例被其他用例依赖了 则进入下一次循环 
+			if(listRef!=null&&listRef.size()!=0){
+				continue;
+			}
 			// 设置接口访问的完整地址
 			mock.setAddressUrl(url);
 			// 1、获取该测试用例调用时依赖的其他用例的调用列表
@@ -123,7 +125,7 @@ public class IfSysAutoTestService extends Domain {
 			String postData = refmock.getRequestJson();
 			// 实际请求后，返回的报文（返回码和返回实体）
 			try {
-				httpClientService.httpPost(refmock.getAddressUrl(), postData,cookieStore);
+					httpClientService.httpPost(refmock.getAddressUrl(), postData,cookieStore);
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
 			}

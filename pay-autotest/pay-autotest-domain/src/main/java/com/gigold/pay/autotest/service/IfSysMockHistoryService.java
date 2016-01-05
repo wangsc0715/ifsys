@@ -7,7 +7,6 @@
  */
 package com.gigold.pay.autotest.service;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,9 +45,13 @@ public class IfSysMockHistoryService extends Domain {
 	public boolean addIfSysMockHistory(IfSysMockHistory ifSysMockHistory) {
 		boolean flag = false;
 		try {
-			int count = ifSysMockHistoryDAO.addIfSysMockHistory(ifSysMockHistory);
-			if (count > 0) {
-				flag = true;
+			List<IfSysMockHistory> list = ifSysMockHistoryDAO.getmockhistoryByJrnAndMockId(ifSysMockHistory);
+			//如果当前批次还没有相应的用例测试记录 就新增一条
+			if (list!= null &&list.size() == 0) {
+				int count = ifSysMockHistoryDAO.addIfSysMockHistory(ifSysMockHistory);
+				if (count > 0) {
+					flag = true;
+				}
 			}
 		} catch (Exception e) {
 			debug("调用 addIfSysMockHistory 数据库异常");
@@ -57,7 +60,7 @@ public class IfSysMockHistoryService extends Domain {
 		return flag;
 	}
 
-	public  List<IfSysMockHistory> getNewestReslutOf(int limit){
+	public List<IfSysMockHistory> getNewestReslutOf(int limit) {
 		List<IfSysMockHistory> list = null;
 		try {
 			list = ifSysMockHistoryDAO.getNewestReslutOf(limit);

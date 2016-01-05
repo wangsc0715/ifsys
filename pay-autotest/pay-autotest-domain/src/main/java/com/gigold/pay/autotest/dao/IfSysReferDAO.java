@@ -70,6 +70,17 @@ public interface IfSysReferDAO {
 	public IfSysRefer getReferById(int id);
 	/**
 	 * 
+	 * Title: getReferByrefMockId<br/>
+	 * Description: 根据被依赖ID获取被依赖用例<br/>
+	 * @author xiebin
+	 * @date 2016年1月5日上午11:24:55
+	 *
+	 * @param refMockId
+	 * @return
+	 */
+	public List<IfSysRefer> getReferByRefMockId(int refMockId);
+	/**
+	 * 
 	 * Title: updateMockRefer<br/>
 	 * Description: <br/>
 	 * @author xiebin

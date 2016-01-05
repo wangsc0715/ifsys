@@ -41,4 +41,17 @@ public interface IfSysMockHistoryDAO {
 	 * @return
 	 */
 	public List<IfSysMockHistory> getNewestReslutOf(int limit);
+	/**
+	 * 
+	 * Title: getmockhistoryByJrnAndMockId<br/>
+	 * Description: 根据批次号和mockID获取用例历史记录<br/>
+	 * @author xiebin
+	 * @date 2016年1月5日下午12:35:00
+	 *
+	 * @param ifSysMockHistory
+	 * @return
+	 */
+	public List<IfSysMockHistory> getmockhistoryByJrnAndMockId(IfSysMockHistory ifSysMockHistory);
+	
+	
 }

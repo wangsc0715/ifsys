@@ -39,6 +39,23 @@
         #{testResult})
     ]]>
 	</insert>
+	
+	<!-- 根据批次号和mockID获取用例历史记录 -->
+	<select id="getmockhistoryByJrnAndMockId" parameterType="com.gigold.pay.autotest.bo.IfSysMockHistory" resultMap="ifSysMockHistoryResultMap" >
+        <![CDATA[
+			
+    SELECT ID,
+      MOCK_ID,
+      IF_ID,
+      TEST_RESULT,
+      JRN
+     FROM T_IF_MOCK_HISTORY
+     where JRN=#{jrn}
+     and MOCK_ID=#{mockId}
+     and STATUS='Y'
+    	]]>
+	</select>
+	
 
 	<select id="getNewestReslutOf" parameterType="int" resultMap="ifSysMockHistoryResultMap" >
         <![CDATA[

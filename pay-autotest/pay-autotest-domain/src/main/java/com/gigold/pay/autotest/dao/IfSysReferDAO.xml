@@ -88,7 +88,7 @@
 		]]>
 	</select>
 
-	<!-- 更具ID获取测试用例的依赖 -->
+	<!-- 根据ID获取测试用例的依赖 -->
 	<select id="getReferById" parameterType="int" resultMap="ifSysRefResultMap">
      <![CDATA[ 
         select 
@@ -99,6 +99,20 @@
         from  T_IF_REFER
         where STATUS='Y'
         and ID=#{id}
+      ]]>
+	</select>
+	
+	<!-- 根据被依赖ID获取被依赖用例 -->
+	<select id="getReferByRefMockId" parameterType="int" resultMap="ifSysRefResultMap">
+     <![CDATA[ 
+        select 
+        ID,
+        MOCK_ID,
+        REFER_MOCK_ID,
+        ORD_NUM
+        from  T_IF_REFER
+        where STATUS='Y'
+        and REFER_MOCK_ID=#{refMockId}
       ]]>
 	</select>
 

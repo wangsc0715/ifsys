@@ -247,6 +247,8 @@
         ii.IF_URL,
         sys.ADDRESS_URL,
 		am.RSP_CODE_ID,
+		(select rc.RSP_CODE from T_IF_RETRUN_CODE rc where
+		rc.ID=am.RSP_CODE_ID) RSP_CODE,
 		am.REQUEST_JSON,
 		am.RESPONSE_JSON,
 		am.REAL_RSP_CODE,
@@ -257,8 +259,6 @@
         and ii.IF_SYS_ID=sys.ID
         and am.ID=#{mockId}
         and am.STATUS='Y' 
-
-		 
       ]]>
 	</select>
 

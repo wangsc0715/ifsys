@@ -140,4 +140,25 @@ public class IfSysReferService extends Domain {
 		}
 		return flag;
 	}
+	
+	/**
+	 * 
+	 * Title: getReferByrefMockId<br/>
+	 * Description: 根据被依赖ID获取被依赖用例<br/>
+	 * @author xiebin
+	 * @date 2016年1月5日上午11:26:33
+	 *
+	 * @param refMockId
+	 * @return
+	 */
+	public List<IfSysRefer> getReferByRefMockId(int refMockId){
+		List<IfSysRefer> list = null;
+		try {
+			list =ifSysReferDAO.getReferByRefMockId(refMockId);
+		} catch (Exception e) {
+			e.printStackTrace();
+            debug("调用 getReferByrefMockId 数据库发送异常");
+		}
+		return list;
+	}
 }
