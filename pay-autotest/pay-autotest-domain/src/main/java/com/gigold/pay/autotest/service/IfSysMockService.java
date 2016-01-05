@@ -125,7 +125,28 @@ public class IfSysMockService {
 		}
 		return flag;
 	}
-	
+	/**
+	 * 
+	 * Title: initIfSysMock<br/>
+	 * Description: 初始化测试数据 每次自动化测试之前都清理一次测试结果<br/>
+	 * @author xiebin
+	 * @date 2015年12月31日下午5:24:51
+	 *
+	 * @return
+	 */
+	public boolean initIfSysMock(){
+		boolean flag = false;
+		try {
+			int count = 0;
+				count = ifSysMockDao.initIfSysMock();
+			if (count > 0) {
+				flag = true;
+			}
+		} catch (Exception e) {
+			flag = false;
+		}
+		return flag;
+	}
 	
 	/**
 	 * 

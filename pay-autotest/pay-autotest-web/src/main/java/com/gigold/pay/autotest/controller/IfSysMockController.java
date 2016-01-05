@@ -295,7 +295,7 @@ public class IfSysMockController extends BaseController {
 				return reDto;
 			}
 			// 初始化测试数据
-			initMockData(interFaceInfo);
+			//initMockData(interFaceInfo);
 			// 获取接口测试数据
 			List<IfSysMock> list = ifSysMockService.getMockInfoByIfId(ifId);
 			interFaceInfo.setMockList(list);

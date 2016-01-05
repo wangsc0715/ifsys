@@ -144,6 +144,16 @@
 		where ID =#{id}
 	</update>
 
+
+<!-- 初始化测试数据 每次自动化测试之前都清理一次测试结果-->
+	<update id="initIfSysMock" >
+		update T_IF_AUTO_MOCK
+		set REAL_RSP_CODE='',
+		REAL_RESPONSE_JSON='',
+		TEST_RESULT=''
+	</update>
+
+
 	<!-- 根据ID删除模拟数据 -->
 	<update id="deleteIfSysMockById" parameterType="int">
 		update

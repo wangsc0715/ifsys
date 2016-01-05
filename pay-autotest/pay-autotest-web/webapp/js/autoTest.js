@@ -132,7 +132,7 @@ $(function() {
 	});
 	
 	
-		//点击删除测试数据
+		//点击删除依赖用例数据
 	$(document).on("click",".mockDelBtn",function(){
 		var curEle = $(this).parent().parent();
 		var sendData = {};
@@ -274,6 +274,7 @@ $(function() {
 		var $ele = $(this).parent().parent();
 		var sendData = {};
 		sendData.id = $ele.find(".hideInp").attr("data-id");
+		if(sendData.id){
 		gigold.pay.interFace.ajaxHandler({
 			"url": "autotest/deleteifsysmockbyid.do",
 			"data": JSON.stringify(sendData),
@@ -283,6 +284,9 @@ $(function() {
 				}
 			}
 		});
+		}else{
+			$($ele).remove();
+		}
 	});
 
 	//加载接口信息
@@ -646,5 +650,9 @@ function addCodMod(data) {
 	htmlStr += '<button type="button" class="am-btn am-btn-danger delBtn">删除</button>';
 	htmlStr += '</div></div>';
 	var rspBoxs = $(document).find(".rspBox");
-	$(rspBoxs[0]).before(htmlStr);
+	if(rspBoxs.length==0){
+		$(".modalCd").html(htmlStr);;
+	}else{
+		$(rspBoxs[0]).before(htmlStr);
+	}
 }

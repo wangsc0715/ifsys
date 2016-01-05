@@ -141,6 +141,7 @@ public interface IfSysMockDAO {
 	 * @return
 	 */
 	public int updateIfSysMock(IfSysMock ifSysMock);
+	public int initIfSysMock();
 	/**
 	 * 
 	 * Title: deleteIfSysMockById<br/>
