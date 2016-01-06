@@ -107,14 +107,21 @@ pre{
 	height:600px;
 	border-radius:5px !important;
 }
+.scollBox h4{
+	border:1px solid #aaa;
+	background-color: #f5f5f5;
+	margin-top:2px;
+	padding:5px 0 5px 0;
+}
 #doc-modal{
 	width:80%;
 	left:33%;
 }
 .rspBox{
-	border:1px solid #aaa;
-	padding:30px;
-	margin:20px;
+	border:1px solid #ddd;
+}
+.rspDivBox{
+	margin:30px;
 }
 .rspBox span{
 	color: #009CDA;
