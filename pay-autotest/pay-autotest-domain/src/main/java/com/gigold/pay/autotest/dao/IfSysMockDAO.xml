@@ -15,6 +15,9 @@
 		<result property="realResponseJson" column="REAL_RESPONSE_JSON" />
 		<result property="testResult" column="TEST_RESULT" />
 		<result property="caseName" column="CASE_NAME" />
+		<result property="checkJson" column="CHECK_JSON" />
+		<result property="rspRefJson" column="RSP_REF_JSON" />
+		<result property="isCase" column="IS_CASE" />
 
 		<!-- 额外的接口信息数据 @chenkuan 2015.12.08 -->
 		<result property="ifName" column="IF_NAME" />
@@ -49,10 +52,14 @@
 		RSP_CODE_ID,
 		RSP_CODE,
 		CASE_NAME,
+		CHECK_JSON,
+		RSP_REF_JSON,
 		RSP_CODE_DESC from
 		(select au.ID,
 		au.IF_ID,
 		au.CASE_NAME,
+		au.CHECK_JSON,
+		au.RSP_REF_JSON,
 		(select IF_NAME from T_IF_INTERFACE ii where ii.ID=au.IF_ID ) IF_NAME,
 		(select IF_SYS_ID from T_IF_INTERFACE ii where ii.ID=au.IF_ID )
 		IF_SYS_ID,
@@ -103,6 +110,8 @@
         (
          IF_ID,
          CASE_NAME,
+		 CHECK_JSON,
+		 RSP_REF_JSON,
          RSP_CODE_ID,
          REQUEST_JSON,
          RESPONSE_JSON
@@ -110,6 +119,8 @@
         values(
         #{ifId},
         #{caseName},
+        #{checkJson},
+        #{rspRefJson},
         #{rspCodeId},
         #{requestJson},
         #{responseJson})
@@ -124,6 +135,15 @@
 			</if>
 			<if test="caseName!=null and caseName!=''">
 				CASE_NAME=#{caseName},
+			</if>
+			<if test="checkJson!=null and checkJson!=''">
+				CHECK_JSON=#{checkJson},
+			</if>
+			<if test="rspRefJson!=null and rspRefJson!=''">
+				RSP_REF_JSON=#{rspRefJson},
+			</if>
+			<if test="isCase!=null and isCase!=''">
+				IS_CASE=#{isCase},
 			</if>
 			<if test="requestJson!=null and requestJson!=''">
 				REQUEST_JSON=#{requestJson},
@@ -176,6 +196,8 @@
 		au.IF_ID,
 		au.RSP_CODE_ID,
 		au.CASE_NAME,
+		au.CHECK_JSON,
+		au.RSP_REF_JSON,
 		(select rc.RSP_CODE from T_IF_RETRUN_CODE rc where rc.ID=au.RSP_CODE_ID) RSP_CODE,
         (select rc.RSP_CODE_DESC from T_IF_RETRUN_CODE rc where rc.ID=au.RSP_CODE_ID) RSP_CODE_DESC,
 		au.REQUEST_JSON,
@@ -199,6 +221,8 @@
 		(select RSP_CODE_DESC from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE_DESC,
 		(select RSP_CODE from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE,
 		REQUEST_JSON,
+		CHECK_JSON,
+		RSP_REF_JSON,
 		RESPONSE_JSON,
 		REAL_RSP_CODE,
 		REAL_RESPONSE_JSON,
@@ -217,6 +241,8 @@
 		select ID,
 		IF_ID,
 		RSP_CODE_ID,
+		CHECK_JSON,
+		RSP_REF_JSON,
 		REQUEST_JSON,
 		RESPONSE_JSON,
 		REAL_RSP_CODE,
@@ -249,6 +275,8 @@
 		am.RSP_CODE_ID,
 		(select rc.RSP_CODE from T_IF_RETRUN_CODE rc where
 		rc.ID=am.RSP_CODE_ID) RSP_CODE,
+		am.CHECK_JSON,
+		am.RSP_REF_JSON,
 		am.REQUEST_JSON,
 		am.RESPONSE_JSON,
 		am.REAL_RSP_CODE,
@@ -261,6 +289,30 @@
         and am.STATUS='Y' 
       ]]>
 	</select>
+	
+	<!-- 根据mockId获取被依赖用例信息  xiebin-->
+	<select id="getRefMockInfoByMockId" parameterType="int" resultMap="ifSysMockResultMap">
+     <![CDATA[ 
+	select 
+		am.ID,
+		am.IF_ID,
+		am.RSP_CODE_ID,
+		am.CHECK_JSON,
+		am.RSP_REF_JSON,
+		am.REQUEST_JSON,
+		am.RESPONSE_JSON,
+		am.REAL_RSP_CODE,
+		am.REAL_RESPONSE_JSON,
+		am.TEST_RESULT
+        from T_IF_AUTO_MOCK am ,T_IF_REFER ii
+        where am.ID=ii.MOCK_ID
+        and am.ID=#{mockId}
+        and am.STATUS='Y' 
+        and ii.STATUS='Y'
+      ]]>
+	</select>
+	
+	
 
 	<!-- 根据筛选条件获取测试数据信息 chenkuan @2015-12-08 -->
 	<select id="filterMocksByStatus" parameterType="String"

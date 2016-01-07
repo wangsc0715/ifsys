@@ -19,11 +19,11 @@ import com.gigold.pay.autotest.bo.IfSysMock;
 import com.gigold.pay.autotest.bo.IfSysRefer;
 import com.gigold.pay.autotest.bo.InterFaceInfo;
 import com.gigold.pay.autotest.httpclient.HttpClientService;
-import com.gigold.pay.autotest.jrn.JrnGeneratorService;
-import com.gigold.pay.framework.base.SpringContextHolder;
+import com.gigold.pay.autotest.util.AutoTestUtil;
 import com.gigold.pay.framework.core.Domain;
 import com.gigold.pay.framework.util.common.StringUtil;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -67,6 +67,60 @@ public class IfSysAutoTestService extends Domain {
 		mock.setTestResult(testResulte);
 		ifSysMockService.writeBackRealRsp(mock,testResulte,responseJson,relRspCode);
 	}
+	/**
+	 * 
+	 * Title: getTestAfterMock<br/>
+	 * Description: <br/>
+	 * @author xiebin
+	 * @date 2016年1月7日下午6:13:20
+	 *
+	 * @param responseJson
+	 * @param mock
+	 * @return
+	 */
+	public IfSysMock getTestAfterMock(String responseJson,IfSysMock mock){
+		JSONObject jsonObject;
+		try {
+			jsonObject = JSONObject.fromObject(responseJson);
+		} catch (Exception e) {
+			jsonObject = new JSONObject();
+		}
+		String relRspCode = String.valueOf(jsonObject.get("rspCd"));
+		String testResulte;
+		// 1-正常 0-失败 -1-请求或响应存在其他异常
+		if (relRspCode.equals(mock.getRspCode())) {// 返回码与预期一致
+			testResulte ="1";
+		} else if (StringUtil.isNotEmpty(relRspCode)&&(!relRspCode.equals("null"))) {// 返回码与预期不一致,但不为空
+			testResulte ="0";
+		} else { // 返回码与预期不一致,或为空,或为其他
+			testResulte="-1";
+		}
+		mock.setTestResult(testResulte);
+		mock.setRealResponseJson(responseJson);
+		mock.setRspCode(relRspCode);
+		//被依赖的用例需要标识为 N
+		mock.setIsCase("N");
+		return mock;
+	}
+	
+	/**
+	 * 
+	 * Title: writeBackRefCaseContent<br/>
+	 * Description: 回写被依赖的用例测试结果<br/>
+	 * @author xiebin
+	 * @date 2016年1月7日下午6:01:15
+	 *
+	 * @param mock
+	 * @param responseJson
+	 */
+	public void writeBackRefCaseContent(IfSysMock mock, String responseJson) {
+       try{
+		ifSysMockService.writeBackRefCase(getTestAfterMock(responseJson,mock));
+       }catch(Exception e){
+    	   debug("调用 writeBackRefCase 异常"+e.getMessage());
+       }
+	}
+	
 
 	/**
 	 * 
@@ -83,7 +137,7 @@ public class IfSysAutoTestService extends Domain {
 		String url = getAddressUrl(interFaceInfo.getAddressUrl(), interFaceInfo.getIfUrl());
 		// 调用接口所有的测试用例
 		for (IfSysMock mock : interFaceInfo.getMockList()) {
-			//判断接口是否有被依赖
+			//判断用例是否有被依赖
 			List<IfSysRefer> listRef=ifSysReferService.getReferByRefMockId(mock.getId());
 			//如果用例被其他用例依赖了 则进入下一次循环 
 			if(listRef!=null&&listRef.size()!=0){
@@ -123,12 +177,23 @@ public class IfSysAutoTestService extends Domain {
 			 */
 			// 期望请求报文
 			String postData = refmock.getRequestJson();
+			
+			if(StringUtil.isBlank(postData)){
+				debug("用例请求报文为空----"+refmock.getCaseName());
+				return;
+			}
+			
+			//先处理请求报文
+			postData=preHanlderReuestBody(postData,refmock);
 			// 实际请求后，返回的报文（返回码和返回实体）
+			String responseJson = "";
 			try {
-					httpClientService.httpPost(refmock.getAddressUrl(), postData,cookieStore);
+				responseJson=httpClientService.httpPost(refmock.getAddressUrl(), postData,cookieStore);
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
 			}
+			
+			writeBackRefCaseContent(refmock,responseJson);
 
 		}
 	}
@@ -146,18 +211,69 @@ public class IfSysAutoTestService extends Domain {
 	public void invokCase(IfSysMock mock,CookieStore cookieStore) {
 		// 期望请求报文
 		String postData = mock.getRequestJson();
+		if(StringUtil.isBlank(postData)){
+			debug("用例请求报文为空----"+mock.getCaseName());
+			return;
+		}
+		//先处理请求报文
+		postData=preHanlderReuestBody(postData,mock);
 		// 实际请求后，返回的报文（返回码和返回实体）
 		String responseJson = "";
 		try {
 			responseJson = httpClientService.httpPost(mock.getAddressUrl(), postData,cookieStore);
 		} catch (Exception e) {
 			responseJson = "";
-			debug("调用失败 调用目标测试用例过程中出现异常");
+			debug("调用失败 调用目标测试用例过程中出现异常:"+e.getMessage());
 		}
 		// 实际结果回写
 		writeBackContent(mock, responseJson);
 	}
 
+	/**
+	 * 
+	 * Title: preHanlderReuestBody<br/>
+	 * Description: 处理请求报文 前置<br/>
+	 * @author xiebin
+	 * @date 2016年1月7日下午5:52:28
+	 *
+	 * @param postData
+	 * @param mock
+	 * @return
+	 */
+	public String preHanlderReuestBody(String postData, IfSysMock mock) {
+		// 如果需要的话需要先完善请求报文
+		if (!StringUtil.isBlank(mock.getCheckJson())) {
+			// 1、需要自动生成数据
+			String checkJoson = mock.getCheckJson();
+			JSONObject jo = JSONObject.fromObject(checkJoson);
+			JSONArray jsArry = jo.getJSONArray("caseInfo");
+			for (int j = 0; j < jsArry.size(); j++) {
+				JSONObject joInfo = jsArry.getJSONObject(j);
+				String name = joInfo.getString("name");
+				String reg = joInfo.getString("name");
+				String length = joInfo.getString("length");
+				// 调用公用方法 根据reg length等条件生成数据
+				String fieldvalue = AutoTestUtil.proTestDataByReg(reg, length);
+				postData = postData.replace("#{" + name + "}", fieldvalue);
+			}
+		}
+		// 2、需要依赖其他用例生成请求报文的
+		// 获取该用例所有被依赖的用例的信息
+		List<IfSysMock> refMockList = ifSysMockService.getRefMockInfoByMockId(mock.getId());
+		for (IfSysMock re : refMockList) {
+			String refjson = re.getRspRefJson();
+			if (!StringUtil.isBlank(refjson)) {
+				String rspBody = re.getRealResponseJson();
+				// 根据refjson 替换 postData
+				postData = AutoTestUtil.proTestDataByRspBody(postData, refjson, rspBody);
+			}
+		}
+
+		return postData;
+	}
+	
+	
+	
 	/**
 	 * 
 	 * Title: autoTest<br/>

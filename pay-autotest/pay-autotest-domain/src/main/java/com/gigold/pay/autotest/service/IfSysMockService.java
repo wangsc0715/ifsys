@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import com.gigold.pay.autotest.annotation.IfSysMockHistoryAnnotation;
 import com.gigold.pay.autotest.bo.IfSysMock;
 import com.gigold.pay.autotest.dao.IfSysMockDAO;
-import com.gigold.pay.autotest.util.ForMatJSONStr;
+import com.gigold.pay.framework.core.Domain;
 /**
  * Title: IfSysMockService<br/>
  * Description: <br/>
@@ -26,8 +26,10 @@ import com.gigold.pay.autotest.util.ForMatJSONStr;
  *
  */
 @Service
-public class IfSysMockService {
+public class IfSysMockService extends Domain {
 
+	/** serialVersionUID */
+	private static final long serialVersionUID = 1L;
 	@Autowired
 	IfSysMockDAO ifSysMockDao;
 
@@ -287,6 +289,29 @@ public class IfSysMockService {
 		}
 		return list;
 	}
+	/**
+	 * 
+	 * Title: getRefMockInfoByMockId<br/>
+	 * Description: 根据mockId获取被依赖用例信息<br/>
+	 * @author xiebin
+	 * @date 2016年1月7日下午3:34:39
+	 *
+	 * @param mockId
+	 * @return
+	 */
+	public List<IfSysMock> getRefMockInfoByMockId(int  mockId) {
+		List<IfSysMock> list= null;
+		try {
+			list = ifSysMockDao.getRefMockInfoByMockId(mockId);
+		} catch (Exception e) {
+			debug("根据mockId获取被依赖用例信息 getRefMockInfoByMockId 调用异常"+e.getMessage());
+			list = null;
+		}
+		return list;
+	}
+	
+	
+	
 	
 	/**
 	 *
@@ -399,8 +424,30 @@ public class IfSysMockService {
 		}
 		return flag;
 	}
-	
-	
+	/**
+	 * 
+	 * Title: writeBackRealRsp<br/>
+	 * Description: 回写被依赖的用例测试结果<br/>
+	 * @author xiebin
+	 * @date 2016年1月7日下午5:59:36
+	 *
+	 * @param ifSysMock
+	 * @param testResulte
+	 * @param realRspJson
+	 * @param realRspCode
+	 * @return
+	 */
+	public boolean writeBackRefCase(IfSysMock ifSysMock) {
+		boolean flag = false;
+ 		try {
+			if (ifSysMockDao.writeBack(ifSysMock) > 0) {
+				flag = true;
+			}
+		} catch (Exception e) {
+			flag = false;
+		}
+		return flag;
+	}
 	
 	public List<IfSysMock> queryMockByPage(IfSysMock ifsysmock){
 			List<IfSysMock> list=null;
