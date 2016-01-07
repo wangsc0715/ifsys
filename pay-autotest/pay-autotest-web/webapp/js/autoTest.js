@@ -230,8 +230,8 @@ $(function() {
 	//点击修改按钮进入可编辑状态
 	$(document).on("click", ".upDaBtn", function() {
 		var $ele = $(this).parent().parent();
-		$ele.find("pre").attr("contenteditable", "true")
-		$ele.find("pre")[0].focus();
+		$ele.find("textarea").removeAttr("readonly");
+		$ele.find("textarea")[0].focus();
 		$ele.find(".addRspBtn").removeClass("am-disabled");
 	});
 
@@ -248,7 +248,6 @@ $(function() {
 
 		sendData.requestJson = $ele.find(".reqJson").html();
 		sendData.responseJson = $ele.find(".rspJson").html();
-		console.log(sendData);
 		gigold.pay.interFace.ajaxHandler({
 			"url": "autotest/updateifsysmock.do",
 			"data": JSON.stringify(sendData),
@@ -262,6 +261,7 @@ $(function() {
 					$ele.find(".rspCdP").find(".rspCd").html(data.ifSysMock.rspCode);
 					$ele.find(".rspCdP").find(".rspCdDesc").html(data.ifSysMock.rspCodeDesc);
 					$ele.find(".relyBtn").removeAttr("disabled");
+					$ele.find("textarea").attr("readonly","readonly");
 				}
 			}
 		});
@@ -341,7 +341,8 @@ $(function() {
 					var size = data.interFaceInfo.mockList.length;
 					$(".operName").html(data.interFaceInfo.ifName);
 					$.each(data.interFaceInfo.mockList, function(index, mock) {
-						htmlStr += '<h4 class="am-panel-title" data-am-collapse="{target:\'#id'+index+'\'}">'+mock.rspCode+'</h4>';
+						htmlStr += '<h4 class="am-panel-title" data-am-collapse="{target:\'#id'+index+'\'}">('+mock.id+')'+mock.caseName;
+						htmlStr += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;('+mock.rspCodeDesc+')'+mock.rspCode+'</h4>';
 						htmlStr += '<div class="rspBox am-panel-collapse am-collapse" id=id'+index+'><div class="rspDivBox">';
 						htmlStr += '<input type="hidden" class="hideInp" data-id="' + mock.id + '" data-ifId="' + mock.ifId + '" data-operName="' + data.interFaceInfo.ifName + '" data-rspCd="' + mock.rspCode + '" />';
 						htmlStr += '<p><span class="rspCd">' + mock.rspCode + ':</span>';
@@ -349,8 +350,8 @@ $(function() {
 						htmlStr +='<button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary">依赖</button></p><hr />';
 						htmlStr += '<p><span >('+mock.id+')用例名称:<input name="caseName" value="'+mock.caseName+'"</span></p>';
 						htmlStr += '<div class="am-g">';
-						htmlStr += '<div class="am-u-sm-6"><p><span >入参:</span><pre class="reqJson">' + mock.requestJson + '</pre></p></div>';
-						htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><pre class="rspJson">' + mock.responseJson + '</pre></p></div></div>';
+						htmlStr += '<div class="am-u-sm-6"><p><span >入参:</span><textarea readonly class="reqJson">' + mock.requestJson + '</textarea></p></div>';
+						htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><textarea readonly class="rspJson">' + mock.responseJson + '</textarea></p></div></div>';
 						htmlStr += '<div class="bianjiBtn">';
 						htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
 						htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn am-disabled">保存</button>';
@@ -635,7 +636,8 @@ function addCodMod(data) {
 	var ids = Math.ceil(Math.random()*10123);
 	var listss = data.list;
 	var htmlStr = "";
-	htmlStr += '<h4 class="am-panel-title" data-am-collapse="{target:\'#id'+ids+'\'}">返回码</h4>';
+	htmlStr += '<h4 class="am-panel-title" data-am-collapse="{target:\'#id'+ids+'\'}">(用例id)用例名称';
+	htmlStr += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(返回信息)返回码</h4>';
 	htmlStr += '<div class="rspBox am-panel-collapse am-collapse" id=id'+ids+'><div class="rspDivBox">';
 	htmlStr += '<input type="hidden" class="hideInp" data-id="" data-ifId="" />'
 	htmlStr += '<p class="rspCdP"><select data-am-selected id="">';
@@ -647,8 +649,8 @@ function addCodMod(data) {
 	htmlStr += '<code class="rspCdDesc"></code><button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary" disabled>依赖</button></p><hr />';
 	htmlStr += '<p><span >用例名称:<input name="caseName" value=""</span></p>';
 	htmlStr += '<div class="am-g">';
-	htmlStr += '<div class="am-u-sm-6"><p><span >入参:</span><pre class="reqJson" contenteditable="true"></pre></p></div>';
-	htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><pre class="rspJson" contenteditable="true"></pre></p></div></div>';
+	htmlStr += '<div class="am-u-sm-6"><p><span >入参:</span><textarea class="reqJson" contenteditable="true"></textarea></p></div>';
+	htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><textarea class="rspJson" contenteditable="true"></textarea></p></div></div>';
 	htmlStr += '<div class="bianjiBtn">';
 	htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
 	htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn">保存</button>';
