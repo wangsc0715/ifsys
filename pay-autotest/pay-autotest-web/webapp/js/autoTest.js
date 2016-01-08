@@ -246,8 +246,8 @@ $(function() {
 		sendData.caseName = $ele.find("input[name=caseName]").val();
 		var rspCode = $ele.find("option:selected").text();
 
-		sendData.requestJson = $ele.find(".reqJson").html();
-		sendData.responseJson = $ele.find(".rspJson").html();
+		sendData.requestJson = $ele.find(".reqJson").val();
+		sendData.responseJson = $ele.find(".rspJson").val();
 		gigold.pay.interFace.ajaxHandler({
 			"url": "autotest/updateifsysmock.do",
 			"data": JSON.stringify(sendData),

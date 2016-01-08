@@ -35,7 +35,9 @@ public class IfSysMock {
 	private String realRspCode;
 	private String realResponseJson;
 	private String caseName;
-
+	private String checkJson; //用例数据自动生成规则描述 json格式 有格式要求
+	private String rspRefJson;//描述依赖其他用例的字段取值情况，多个字段之间用英文逗号隔开
+    private String isCase;//标识该用例是作为依赖，还是作为单独的用例  Y：用例 ；N：依赖
 	private String jrn;
 
 	//所属接口信息
@@ -57,6 +59,52 @@ public class IfSysMock {
 	
 	private int ifSysId;
 	private int ifProId;
+
+	
+	
+	
+	
+	/**
+	 * @return the isCase
+	 */
+	public String getIsCase() {
+		return isCase;
+	}
+
+	/**
+	 * @param isCase the isCase to set
+	 */
+	public void setIsCase(String isCase) {
+		this.isCase = isCase;
+	}
+
+	/**
+	 * @return the checkJson
+	 */
+	public String getCheckJson() {
+		return checkJson;
+	}
+
+	/**
+	 * @param checkJson the checkJson to set
+	 */
+	public void setCheckJson(String checkJson) {
+		this.checkJson = checkJson;
+	}
+
+	/**
+	 * @return the rspRefJson
+	 */
+	public String getRspRefJson() {
+		return rspRefJson;
+	}
+
+	/**
+	 * @param rspRefJson the rspRefJson to set
+	 */
+	public void setRspRefJson(String rspRefJson) {
+		this.rspRefJson = rspRefJson;
+	}
 
 	public String getPreCodeDesc() {
 		return preCodeDesc;

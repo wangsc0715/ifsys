@@ -129,6 +129,17 @@ public interface IfSysMockDAO {
 	 * @return
 	 */
 	public List<IfSysMock> filterAllTestedMocks();
+	/**
+	 * 
+	 * Title: getRefMockInfoByMockId<br/>
+	 * Description: 根据mockId获取被依赖用例信息 <br/>
+	 * @author xiebin
+	 * @date 2016年1月7日下午3:32:10
+	 *
+	 * @param mockId
+	 * @return
+	 */
+	public List<IfSysMock> getRefMockInfoByMockId(int mockId);
 	
 	/**
 	 * 
