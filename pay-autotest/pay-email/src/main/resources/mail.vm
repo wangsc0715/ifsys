@@ -22,7 +22,7 @@
         .odd{background:#ECEAFF}
         .evn{background:#fff}
         .step{color:grey;display:none;}
-        .casetd:hover .step{display:block;color:black;transition:color 1s ease}
+        .casetd:hover .step{display:block;}
     </style>
 </head>
 <body style='width:100%'>

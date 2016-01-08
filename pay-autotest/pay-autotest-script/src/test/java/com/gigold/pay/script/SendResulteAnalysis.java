@@ -65,10 +65,10 @@ public class SendResulteAnalysis {
 	@Test
 	public void work() {
 		System.out.println("开始调用接口");
-		//autoTest();
+		autoTest();
 		System.out.println("调用接口结束");
         sendMail();
-        //testAutoTest();
+        testAutoTest();
         System.out.println("work");
 	}
 
