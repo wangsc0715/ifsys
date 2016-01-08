@@ -275,6 +275,7 @@
 		am.RSP_CODE_ID,
 		(select rc.RSP_CODE from T_IF_RETRUN_CODE rc where
 		rc.ID=am.RSP_CODE_ID) RSP_CODE,
+		am.CASE_NAME,
 		am.CHECK_JSON,
 		am.RSP_REF_JSON,
 		am.REQUEST_JSON,

@@ -21,6 +21,8 @@
         .flexJson{width:300px;}
         .odd{background:#ECEAFF}
         .evn{background:#fff}
+        .step{color:grey;display:none;}
+        .casetd:hover .step{display:block;color:black;transition:color 1s ease}
     </style>
 </head>
 <body style='width:100%'>
@@ -83,14 +85,21 @@
                     </td>
                 #end
                 <td class='$!{resultStyle}'>$!{result}</td>
-                <td>($!mock.getId()) $!mock.getCaseName()</td>
+
+                <td class="casetd">#set($idx = 1)
+                    #foreach($step in $StepsMap.get("$mock.getId()"))
+                        <span class="step">$idx. ($!step.getId()) $!step.getCaseName()</span>
+                        #set($idx = $idx+1)
+                    #end
+                    -> ($!mock.getId()) $!mock.getCaseName()
+                </td>
+
                 <td style='text-align:right'>$!mock.getPreCodeDesc() ($!mock.getRspCode())</td>
                 <td class='$!rspCodeStyle'>($!mock.getRealRspCode()) $!mock.getRspCodeDesc()</td>
                 #if($isFirst == "true")
                     #set($isFirst = "false")
                     <td rowspan="$IfMocksize" title='$!mockListOfIf[0].getIfDESC()'>
                         ($!mock.getIfPROTOCOL()) $!mock.getIfURL()
-
                     </td>
                 #end
                 ##<td class='flexJson'>预期:<pre>$!mock.getResponseJson()</pre></td>
