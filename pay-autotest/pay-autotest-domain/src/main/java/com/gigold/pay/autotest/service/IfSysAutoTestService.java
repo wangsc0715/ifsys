@@ -250,7 +250,7 @@ public class IfSysAutoTestService extends Domain {
 			for (int j = 0; j < jsArry.size(); j++) {
 				JSONObject joInfo = jsArry.getJSONObject(j);
 				String name = joInfo.getString("name");
-				String reg = joInfo.getString("name");
+				String reg = joInfo.getString("reg");
 				String length = joInfo.getString("length");
 				// 调用公用方法 根据reg length等条件生成数据
 				String fieldvalue = AutoTestUtil.proTestDataByReg(reg, length);
