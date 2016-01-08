@@ -66,10 +66,10 @@ public class SendResulteAnalysis {
 	@Test
 	public void work() {
 		System.out.println("开始调用接口");
-		autoTest();
+		//autoTest();
 		System.out.println("调用接口结束");
         sendMail();
-        testAutoTest();
+        //testAutoTest();
         System.out.println("work");
 	}
 
@@ -85,18 +85,24 @@ public class SendResulteAnalysis {
 
         // 返回所有测试过的结果
         List<IfSysMock> resulteMocks = ifSysMockService.filterMocksByFailed();
+        // 根据用例 - 步骤对应表
         if(resulteMocks.isEmpty()){
             System.out.print("没有查询到错误的结果集");
         }else {
             // 1.测试结果按接口分类
+            Map<String,ArrayList> Steps = new HashMap<>();// 每个用例的步骤表
             Map<String,List<IfSysMock>> rstItfces = new TreeMap<>();
             for(IfSysMock ifSysMock:resulteMocks){
-                // 判断结果分类中是否已经初始化过了,若没有则初始化
+                // 首先,判断结果分类中是否已经初始化过了,若没有则初始化
                 String key  = String.valueOf(ifSysMock.getIfId());
+                String mockId  = String.valueOf(ifSysMock.getId());
                 if(!rstItfces.containsKey(key)){
                     rstItfces.put(key,new ArrayList<IfSysMock>()); // 键值格式为{"12":[1,2,3,4]}
                 }
-                // 增加mock
+                // 然后,初始化每个用例的步骤表 键值格式为 {"186":[1,2,3,4]}
+                Steps.put(mockId,ifSysMockService.getAllReferByMockId(ifSysMock.getId()));
+                System.out.printf(String.valueOf(Steps.size()));
+                // 最后,增加mock
                 rstItfces.get(key).add(ifSysMock);
             }
 
@@ -124,12 +130,13 @@ public class SendResulteAnalysis {
                         Collections.sort(observers.get(key), new Comparator<List<IfSysMock>>() {
                             @Override
                             public int compare(List<IfSysMock> o1, List<IfSysMock> o2) {
-                                return o1.get(0).getIfId() -o2.get(0).getIfId();
+                                return o1.get(0).getIfId() - o2.get(0).getIfId();
                             }
                         });
                     }
                 }
             }
+
 
             // 3.发件
             for(String emailNuname:observers.keySet()){
@@ -148,6 +155,7 @@ public class SendResulteAnalysis {
                 Map<String,Object> model = new HashMap<>();
                 model.put("ifOfmockSetList", ifOfmockSetList);
                 model.put("userName", userName);
+                model.put("Steps", Steps);//每个用例的步骤表
 
                 if(email.equals("chenkuan@gigold.com")||email.equals("chenhl@gigold.com")||email.equals("liuzg@gigold.com")||email.equals("xiebin@gigold.com"))
                 mailSenderService.sendWithTemplateForHTML(model);
