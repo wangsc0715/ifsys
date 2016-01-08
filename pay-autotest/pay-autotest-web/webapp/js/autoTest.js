@@ -248,6 +248,9 @@ $(function() {
 
 		sendData.requestJson = $ele.find(".reqJson").val();
 		sendData.responseJson = $ele.find(".rspJson").val();
+		sendData.checkJson = $ele.find(".checkJson").val();
+		sendData.rspRefJson = $ele.find(".rspRefJson").val();
+		console.log(sendData);
 		gigold.pay.interFace.ajaxHandler({
 			"url": "autotest/updateifsysmock.do",
 			"data": JSON.stringify(sendData),
@@ -352,6 +355,8 @@ $(function() {
 						htmlStr += '<div class="am-g">';
 						htmlStr += '<div class="am-u-sm-6"><p><span >入参:</span><textarea readonly class="reqJson">' + mock.requestJson + '</textarea></p></div>';
 						htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><textarea readonly class="rspJson">' + mock.responseJson + '</textarea></p></div></div>';
+						htmlStr += '<div class="am-u-sm-6"><p><span >描述用例本身的生成规则:</span><textarea readonly class="checkJson">' + mock.checkJson + '</textarea></p></div>';
+						htmlStr += '<div class="am-u-sm-6"><p><span >描述其他用例需要依赖的字段:</span><textarea readonly class="rspRefJson">' + mock.rspRefJson + '</textarea></p></div></div>';
 						htmlStr += '<div class="bianjiBtn">';
 						htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
 						htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn am-disabled">保存</button>';
@@ -651,6 +656,9 @@ function addCodMod(data) {
 	htmlStr += '<div class="am-g">';
 	htmlStr += '<div class="am-u-sm-6"><p><span >入参:</span><textarea class="reqJson" contenteditable="true"></textarea></p></div>';
 	htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><textarea class="rspJson" contenteditable="true"></textarea></p></div></div>';
+	htmlStr += '<div class="am-u-sm-6"><p><span >描述用例本身的生成规则:</span><textarea readonly class="checkJson"></textarea></p></div>';
+	htmlStr += '<div class="am-u-sm-6"><p><span >描述其他用例需要依赖的字段:</span><textarea readonly class="rspRefJson"></textarea></p></div></div>';
+	
 	htmlStr += '<div class="bianjiBtn">';
 	htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
 	htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn">保存</button>';
