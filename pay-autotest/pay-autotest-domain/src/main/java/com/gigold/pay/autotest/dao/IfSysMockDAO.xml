@@ -347,57 +347,84 @@
 	<select id="filterMocksByFailed" resultMap="ifSysMockResultMap">
 		<![CDATA[
 		select
-	e.ID,
-	(select f.IF_NAME from T_IF_INTERFACE f where f.id=e.if_id) IF_NAME,
-	(select f.IF_DESC from T_IF_INTERFACE f where f.id=e.if_id) IF_DESC,
-	(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.IF_ID=e.IF_ID and g.STATUS="Y") PRE_CODE_DESC,
-	(select f.IF_URL from T_IF_INTERFACE f where f.id=e.if_id) IF_URL,
-	(select f.IF_PROTOCOL from T_IF_INTERFACE f where f.id=e.if_id) IF_PROTOCOL,
-	e.CASE_NAME,
-	e.IF_ID,
-	(select g.RSP_CODE from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.STATUS="Y") RSP_CODE,
-	(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.RSP_CODE=e.REAL_RSP_CODE and g.IF_ID=e.IF_ID and g.STATUS="Y") RSP_CODE_DESC,
-	e.REQUEST_JSON,
-	e.RESPONSE_JSON,
-	e.REAL_RSP_CODE,
-	e.REAL_RESPONSE_JSON,
-	e.TEST_RESULT,
-	e.TM_SMP
-	from
-		(select b.MOCK_ID mockid from T_IF_MOCK_HISTORY b where b.JRN in (select c.JRN from (select distinct a.JRN from T_IF_MOCK_HISTORY a order by a.JRN desc limit 1) c )) d
-	left outer join
-		T_IF_AUTO_MOCK e
-	ON
-		d.mockid = e.id
-	WHERE
-		(ISNULL(e.TEST_RESULT) or e.TEST_RESULT!=1)
+			e.ID,
+			(select f.IF_NAME from T_IF_INTERFACE f where f.id=e.if_id) IF_NAME,
+			(select f.IF_DESC from T_IF_INTERFACE f where f.id=e.if_id) IF_DESC,
+			(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.IF_ID=e.IF_ID and g.STATUS="Y") PRE_CODE_DESC,
+			(select f.IF_URL from T_IF_INTERFACE f where f.id=e.if_id) IF_URL,
+			(select f.IF_PROTOCOL from T_IF_INTERFACE f where f.id=e.if_id) IF_PROTOCOL,
+			e.CASE_NAME,
+			e.IF_ID,
+			(select g.RSP_CODE from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.STATUS="Y") RSP_CODE,
+			(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.RSP_CODE=e.REAL_RSP_CODE and g.IF_ID=e.IF_ID and g.STATUS="Y") RSP_CODE_DESC,
+			e.REQUEST_JSON,
+			e.RESPONSE_JSON,
+			e.REAL_RSP_CODE,
+			e.REAL_RESPONSE_JSON,
+			e.TEST_RESULT,
+			e.TM_SMP
+		from
+			(select b.MOCK_ID mockid from T_IF_MOCK_HISTORY b where b.JRN in (select c.JRN from (select distinct a.JRN from T_IF_MOCK_HISTORY a order by a.JRN desc limit 1) c )) d
+		left outer join
+			T_IF_AUTO_MOCK e
+		ON
+			d.mockid = e.id
+		WHERE
+			(ISNULL(e.TEST_RESULT) or e.TEST_RESULT!=1)
       ]]>
 	</select>
 
 	<!-- 筛选所有测试过的数据 chenkuan @2015-12-08 -->
 	<select id="filterAllTestedMocks" resultMap="ifSysMockResultMap">
 		<![CDATA[
-		SELECT
-			a.ID,
-			b.IF_NAME,
-			b.IF_DESC,
-			(select e.RSP_CODE_DESC from T_IF_RETRUN_CODE e where e.ID=a.RSP_CODE_ID and e.IF_ID=a.IF_ID) PRE_CODE_DESC,
-			b.IF_URL,
-			b.IF_PROTOCOL,
-			a.CASE_NAME,
-			a.IF_ID,
-			(select c.RSP_CODE from T_IF_RETRUN_CODE c where c.ID=a.RSP_CODE_ID) RSP_CODE,
-			(select d.RSP_CODE_DESC from T_IF_RETRUN_CODE d where d.RSP_CODE=a.REAL_RSP_CODE and d.IF_ID=a.IF_ID and d.STATUS="Y") RSP_CODE_DESC,
-			a.REQUEST_JSON,
-			a.RESPONSE_JSON,
-			a.REAL_RSP_CODE,
-			a.REAL_RESPONSE_JSON,
-			a.TEST_RESULT,
-			a.TM_SMP
- 		FROM
- 			T_IF_AUTO_MOCK a left outer join T_IF_INTERFACE b ON a.IF_ID = b.ID
+		select
+			e.ID,
+			(select f.IF_NAME from T_IF_INTERFACE f where f.id=e.if_id) IF_NAME,
+			(select f.IF_DESC from T_IF_INTERFACE f where f.id=e.if_id) IF_DESC,
+			(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.IF_ID=e.IF_ID and g.STATUS="Y") PRE_CODE_DESC,
+			(select f.IF_URL from T_IF_INTERFACE f where f.id=e.if_id) IF_URL,
+			(select f.IF_PROTOCOL from T_IF_INTERFACE f where f.id=e.if_id) IF_PROTOCOL,
+			e.CASE_NAME,
+			e.IF_ID,
+			(select g.RSP_CODE from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.STATUS="Y") RSP_CODE,
+			(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.RSP_CODE=e.REAL_RSP_CODE and g.IF_ID=e.IF_ID and g.STATUS="Y") RSP_CODE_DESC,
+			e.REQUEST_JSON,
+			e.RESPONSE_JSON,
+			e.REAL_RSP_CODE,
+			e.REAL_RESPONSE_JSON,
+			e.TEST_RESULT,
+			e.TM_SMP
+		from
+			(select b.MOCK_ID mockid from T_IF_MOCK_HISTORY b where b.JRN in (select c.JRN from (select distinct a.JRN from T_IF_MOCK_HISTORY a order by a.JRN desc limit 1) c )) d
+		left outer join
+			T_IF_AUTO_MOCK e
+		ON
+			d.mockid = e.id
  		WHERE
- 			not ISNULL(a.TEST_RESULT) and STATUS='Y' and not ISNULL(TEST_RESULT)  and b.ISVALID='Y'
+ 			not ISNULL(e.TEST_RESULT) and STATUS='Y' and not ISNULL(e.TEST_RESULT)
+      ]]>
+	</select>
+
+	<!-- 返回测试过的用例数据 chenkuan @2015-12-08 -->
+	<select id="getCasesMarks" resultMap="ifSysMockResultMap">
+		<![CDATA[
+		select
+			(select h.IF_SYS_ID from T_IF_INTERFACE h where h.ID=e.IF_ID) IF_SYS_ID,
+			e.IF_ID,
+			e.ID,
+			(select f.IF_NAME from T_IF_INTERFACE f where f.id=e.if_id) IF_NAME,
+			e.CASE_NAME,
+			(select g.RSP_CODE from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.STATUS="Y") RSP_CODE,
+			(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.IF_ID=e.IF_ID and g.STATUS="Y") PRE_CODE_DESC,
+			(select f.IF_DESC from T_IF_INTERFACE f where f.id=e.if_id) IF_DESC
+		from
+			(select b.MOCK_ID mockid from T_IF_MOCK_HISTORY b where b.JRN in (select c.JRN from (select distinct a.JRN from T_IF_MOCK_HISTORY a order by a.JRN desc limit 1) c )) d
+		left outer join
+			T_IF_AUTO_MOCK e
+		ON
+			d.mockid = e.id
+ 		WHERE
+ 			not ISNULL(e.TEST_RESULT) and e.STATUS='Y' and not ISNULL(e.TEST_RESULT)
       ]]>
 	</select>
 

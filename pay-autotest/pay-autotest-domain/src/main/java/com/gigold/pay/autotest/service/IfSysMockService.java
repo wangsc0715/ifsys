@@ -370,7 +370,25 @@ public class IfSysMockService extends Domain {
 		}
 		return list;
 	}
-
+	/**
+	 *
+	 * Title: filterMocksByStatus<br/>
+	 * Description: 获取所有用例数据<br/>
+	 *
+	 * @author chenkuan
+	 * @date 2015年12月8日上午11:56:31
+	 *
+	 * @return
+	 */
+	public List<IfSysMock> getCasesMarks(){
+		List<IfSysMock> list = null;
+		try {
+			list = ifSysMockDao.getCasesMarks();
+		} catch (Exception e) {
+			list = null;
+		}
+		return list;
+	}
 	/**
 	 *
 	 * Title: filterMocksByStatus<br/>
