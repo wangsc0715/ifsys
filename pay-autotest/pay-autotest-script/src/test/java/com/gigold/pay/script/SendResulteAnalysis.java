@@ -246,7 +246,7 @@ public class SendResulteAnalysis {
                     sheet.setColumnView(4,20);
                     sheet.setColumnView(5,20);
                     // 设置行高
-                    sheet.setRowView(0,10,false);
+                    sheet.setRowView(0,1600,false);
                     // 合并页标题
                     sheet.mergeCells(0,0,5,0);
                     // 添加标题
@@ -270,9 +270,9 @@ public class SendResulteAnalysis {
                 for(IfSysMock stepObj :Steps){
                     stepsStr+=String.valueOf(inx_stp++)+". "+stepObj.getCaseName()+"\n";
                 }
-                stepsStr+=ifSysMock.getCaseName();
+                stepsStr+=(String.valueOf(inx_stp)+". "+ifSysMock.getCaseName());
                 //步骤
-                Label steps = new Label(3,inx,String.valueOf(inx_stp)+". "+stepsStr,wcf_left);
+                Label steps = new Label(3,inx,stepsStr,wcf_left);
                 //预期输出
                 Label preOut = new Label(4,inx,ifSysMock.getRspCode()+ifSysMock.getPreCodeDesc(),wcf_left);
                 //备注
