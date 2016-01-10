@@ -14,10 +14,7 @@ import com.gigold.pay.autotest.bo.IfSysRefer;
 import com.gigold.pay.autotest.bo.InterFaceInfo;
 import com.gigold.pay.autotest.dao.InterFaceDao;
 import com.gigold.pay.autotest.email.MailSenderService;
-import com.gigold.pay.autotest.service.IfSysMockHistoryService;
-import com.gigold.pay.autotest.service.IfSysMockService;
-import com.gigold.pay.autotest.service.IfSysStuffService;
-import com.gigold.pay.autotest.service.InterFaceService;
+import com.gigold.pay.autotest.service.*;
 import com.gigold.pay.autotest.threadpool.IfsysCheckThreadPool;
 import com.gigold.pay.framework.base.SpringContextHolder;
 import com.gigold.pay.framework.bootstrap.SystemPropertyConfigure;
@@ -44,7 +41,7 @@ public class IfSysAutoTest extends Domain {
 	private IfSysMockHistoryService ifSysMockHistoryService;
 	private InterFaceService interFaceService;
 	private InterFaceDao interFaceDao;
-
+	private IfSysAutoTestService ifSysAutoTestService;
 
 
 	public IfSysAutoTest(){
@@ -55,6 +52,8 @@ public class IfSysAutoTest extends Domain {
 		ifSysMockHistoryService = (IfSysMockHistoryService) SpringContextHolder.getBean(IfSysMockHistoryService.class);
 		interFaceService = (InterFaceService) SpringContextHolder.getBean(InterFaceService.class);
 		interFaceDao = (InterFaceDao) SpringContextHolder.getBean(InterFaceDao.class);
+		ifSysAutoTestService = (IfSysAutoTestService) SpringContextHolder.getBean(IfSysAutoTestService.class);
+
 
 	}
 	public void work() {
@@ -73,18 +72,26 @@ public class IfSysAutoTest extends Domain {
 
 		// 返回所有测试过的结果
 		List<IfSysMock> resulteMocks = ifSysMockService.filterMocksByFailed();
+		// 根据用例 - 步骤对应表
 		if(resulteMocks.isEmpty()){
 			System.out.print("没有查询到错误的结果集");
 		}else {
 			// 1.测试结果按接口分类
+			Map<String,Object> StepsMap = new HashMap<>();// 每个用例的步骤表
 			Map<String,List<IfSysMock>> rstItfces = new TreeMap<>();
 			for(IfSysMock ifSysMock:resulteMocks){
-				// 判断结果分类中是否已经初始化过了,若没有则初始化
+				// 首先,判断结果分类中是否已经初始化过了,若没有则初始化
 				String key  = String.valueOf(ifSysMock.getIfId());
+				String mockId  = String.valueOf(ifSysMock.getId());
 				if(!rstItfces.containsKey(key)){
 					rstItfces.put(key,new ArrayList<IfSysMock>()); // 键值格式为{"12":[1,2,3,4]}
 				}
-				// 增加mock
+				// 然后,初始化每个用例的步骤表 键值格式为 {"186":[1,2,3,4]}
+				List<IfSysMock> Steps = new ArrayList<>();
+				ifSysAutoTestService.invokerOrder(Steps,Integer.parseInt(mockId));
+				Collections.reverse(Steps);//步骤反序
+				StepsMap.put(mockId,Steps);
+				// 最后,增加mock
 				rstItfces.get(key).add(ifSysMock);
 			}
 
@@ -112,12 +119,13 @@ public class IfSysAutoTest extends Domain {
 						Collections.sort(observers.get(key), new Comparator<List<IfSysMock>>() {
 							@Override
 							public int compare(List<IfSysMock> o1, List<IfSysMock> o2) {
-								return o1.get(0).getIfId() -o2.get(0).getIfId();
+								return o1.get(0).getIfId() - o2.get(0).getIfId();
 							}
 						});
 					}
 				}
 			}
+
 
 			// 3.发件
 			for(String emailNuname:observers.keySet()){
@@ -136,6 +144,7 @@ public class IfSysAutoTest extends Domain {
 				Map<String,Object> model = new HashMap<>();
 				model.put("ifOfmockSetList", ifOfmockSetList);
 				model.put("userName", userName);
+				model.put("StepsMap", StepsMap);//每个用例的步骤表  {332=[], 159=[1,2], 330=[1,2]}
 
 				//if(email.equals("chenkuan@gigold.com")||email.equals("chenhl@gigold.com")||email.equals("liuzg@gigold.com")||email.equals("xiebin@gigold.com"))
 				mailSenderService.sendWithTemplateForHTML(model);

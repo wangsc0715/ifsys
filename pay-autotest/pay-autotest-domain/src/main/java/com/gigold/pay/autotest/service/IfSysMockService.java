@@ -7,6 +7,7 @@
  */
 package com.gigold.pay.autotest.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -256,7 +257,6 @@ public class IfSysMockService extends Domain {
 	 * @author xiebin
 	 * @date 2015年12月10日上午10:26:03
 	 *
-	 * @param ifId
 	 * @return
 	 */
 	public IfSysMock getReferByIfId(int mockId){
@@ -268,7 +268,43 @@ public class IfSysMockService extends Domain {
 		}
 		return ifmock;
 	}
-	
+
+	/**
+	 *
+	 * Title: getAllReferByMockId<br/>
+	 * Description: 根据用例id获取所有依赖的用例<br/>
+	 * @author chenkuan
+	 * @date 2015年1月8日上午10:26:03
+	 *
+	 * @return
+	 */
+	public ArrayList getAllReferByMockId(int mockId){
+		ArrayList<IfSysMock> steps = new ArrayList<>();
+		try {
+			IfSysMock referMock = ifSysMockDao.getReferByIfId(mockId);
+			getChildRefer(referMock,mockId,steps);
+
+		} catch (Exception e) {
+			steps = null;
+		}
+		return steps;
+	}
+
+	public void getChildRefer (IfSysMock firstMock ,int mockId,ArrayList<IfSysMock> steps){
+		IfSysMock ifmock = ifSysMockDao.getReferByIfId(mockId);
+
+		// 循环依赖判定
+		if(ifmock.getId() == firstMock.getId()){
+			String msg = "循环依赖,用例 "+String.valueOf(ifmock.getId())+" 依赖了自己";
+			System.out.printf(msg);
+			return;
+		}
+
+		if(ifmock!=null){
+			steps.add(ifmock);
+			getChildRefer(firstMock,ifmock.getId(),steps);
+		}
+	}
 	/**
 	 * 
 	 * Title: getMockInfoById<br/>
@@ -334,7 +370,25 @@ public class IfSysMockService extends Domain {
 		}
 		return list;
 	}
-
+	/**
+	 *
+	 * Title: filterMocksByStatus<br/>
+	 * Description: 获取所有用例数据<br/>
+	 *
+	 * @author chenkuan
+	 * @date 2015年12月8日上午11:56:31
+	 *
+	 * @return
+	 */
+	public List<IfSysMock> getCasesMarks(){
+		List<IfSysMock> list = null;
+		try {
+			list = ifSysMockDao.getCasesMarks();
+		} catch (Exception e) {
+			list = null;
+		}
+		return list;
+	}
 	/**
 	 *
 	 * Title: filterMocksByStatus<br/>
@@ -432,9 +486,6 @@ public class IfSysMockService extends Domain {
 	 * @date 2016年1月7日下午5:59:36
 	 *
 	 * @param ifSysMock
-	 * @param testResulte
-	 * @param realRspJson
-	 * @param realRspCode
 	 * @return
 	 */
 	public boolean writeBackRefCase(IfSysMock ifSysMock) {

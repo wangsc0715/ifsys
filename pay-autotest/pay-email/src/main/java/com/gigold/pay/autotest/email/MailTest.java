@@ -43,7 +43,7 @@ public class MailTest {
         addressTo.add("xiebin@gigold.com");
 		mailSender.setTo(addressTo);
 		mailSender.setSubject("来自独孤九剑接口自动化测试的邮件");  
-		mailSender.setTemplateName("mail.vm");//设置的邮件模板  
+		mailSender.setTemplateName("mail.vm");//设置的邮件模板
 		Map model=new HashMap();  
 		model.put("username", "zhansan");  
 		model.put("sys", "独孤九剑");  
