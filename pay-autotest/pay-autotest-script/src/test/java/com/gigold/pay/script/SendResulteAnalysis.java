@@ -15,7 +15,13 @@ import com.gigold.pay.autotest.dao.InterFaceDao;
 import com.gigold.pay.autotest.dao.InterFaceSystemDao;
 import com.gigold.pay.autotest.service.*;
 import jxl.Workbook;
+import jxl.format.*;
+import jxl.format.Colour;
 import jxl.write.*;
+import jxl.write.Alignment;
+import jxl.write.Border;
+import jxl.write.BorderLineStyle;
+import jxl.write.VerticalAlignment;
 import org.apache.commons.collections.list.TreeList;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -74,11 +80,11 @@ public class SendResulteAnalysis {
 	@Test
 	public void work() {
 		System.out.println("开始调用接口");
-		//autoTest();
+		autoTest();
 		System.out.println("调用接口结束");
-        //sendMail();
-        //testAutoTest();
-        sendCases();
+        sendMail();
+        testAutoTest();
+        //sendCases();
         System.out.println("work");
 	}
 
@@ -181,8 +187,8 @@ public class SendResulteAnalysis {
         try{
             WritableWorkbook book = Workbook.createWorkbook(new File("casesModel.xls"));//工作簿对象
             /** ************设置单元格字体************** */
-            WritableFont NormalFont = new WritableFont(WritableFont.ARIAL, 10);
-            WritableFont BoldFont = new WritableFont(WritableFont.ARIAL, 10,WritableFont.BOLD);
+            WritableFont NormalFont = new WritableFont(WritableFont.ARIAL, 12);
+            WritableFont BoldFont = new WritableFont(WritableFont.ARIAL, 14,WritableFont.BOLD);
 
             /** ************以下设置三种单元格样式，灵活备用************ */
             // 用于标题居中
@@ -191,6 +197,14 @@ public class SendResulteAnalysis {
             wcf_center.setVerticalAlignment(VerticalAlignment.CENTRE); // 文字垂直对齐
             wcf_center.setAlignment(Alignment.CENTRE); // 文字水平对齐
             wcf_center.setWrap(true); // 文字是否换行
+
+            // 用于表头
+            WritableCellFormat wcf_head = new WritableCellFormat(BoldFont);
+            wcf_head.setBorder(Border.ALL, BorderLineStyle.THIN); // 线条
+            wcf_head.setVerticalAlignment(VerticalAlignment.CENTRE); // 文字垂直对齐
+            wcf_head.setAlignment(Alignment.CENTRE); // 文字水平对齐
+            wcf_head.setWrap(true); // 文字是否换行
+            wcf_head.setBackground(Colour.LIGHT_BLUE);
 
             // 用于正文居左
             WritableCellFormat wcf_left = new WritableCellFormat(NormalFont);
@@ -232,12 +246,12 @@ public class SendResulteAnalysis {
                     sheet = book.createSheet(ifSysName , pageID++);
                     // 设置表头
                     Label title = new Label(0,0,ifSysName+" - 测试用例",wcf_center);
-                    Label head1 = new Label(0,1,"序号",wcf_center);
-                    Label head2 = new Label(1,1,"接口名",wcf_center);
-                    Label head3 = new Label(2,1,"用例名",wcf_center);
-                    Label head4 = new Label(3,1,"步骤",wcf_center);
-                    Label head5 = new Label(4,1,"预期输出",wcf_center);
-                    Label head6 = new Label(5,1,"备注",wcf_center);
+                    Label head1 = new Label(0,1,"序号",wcf_head);
+                    Label head2 = new Label(1,1,"接口名",wcf_head);
+                    Label head3 = new Label(2,1,"用例名",wcf_head);
+                    Label head4 = new Label(3,1,"步骤",wcf_head);
+                    Label head5 = new Label(4,1,"预期输出",wcf_head);
+                    Label head6 = new Label(5,1,"备注",wcf_head);
                     // 设置列宽
                     sheet.setColumnView(0,5);
                     sheet.setColumnView(1,30);
