@@ -44,7 +44,33 @@ public class IfSysMockAddReqDto extends RequestDto {
 	
 	private String caseName;
 	
+	private String checkJson; //用例数据自动生成规则描述 json格式 有格式要求
+	private String rspRefJson;//描述依赖其他用例的字段取值情况，多个字段之间用英文逗号隔开
 	
+	/**
+	 * @return the checkJson
+	 */
+	public String getCheckJson() {
+		return checkJson;
+	}
+	/**
+	 * @param checkJson the checkJson to set
+	 */
+	public void setCheckJson(String checkJson) {
+		this.checkJson = checkJson;
+	}
+	/**
+	 * @return the rspRefJson
+	 */
+	public String getRspRefJson() {
+		return rspRefJson;
+	}
+	/**
+	 * @param rspRefJson the rspRefJson to set
+	 */
+	public void setRspRefJson(String rspRefJson) {
+		this.rspRefJson = rspRefJson;
+	}
 	/**
 	 * @return the caseName
 	 */

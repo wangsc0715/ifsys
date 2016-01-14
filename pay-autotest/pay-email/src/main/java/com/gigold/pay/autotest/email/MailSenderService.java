@@ -224,6 +224,30 @@ public class MailSenderService extends Domain{
 	}
 
 	/**
+	 * 发送普通带附件的Html邮件-参数格式为file类
+	 *
+	 */
+	public void sendHtmlWithAttachment(File file) {
+		mailSender = this.getMailSender();
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
+		try {
+			MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+			messageHelper.setTo(getAddressTo());
+			//messageHelper.setCc(getCc());
+			messageHelper.setFrom(simpleMailMessage.getFrom());
+			messageHelper.setSubject(this.getSubject());
+			messageHelper.setText(this.getContent(), true);
+			FileSystemResource fs = new FileSystemResource(file);
+			// System.out.println("file.getFilename==="+file.getFilename());
+			messageHelper.addAttachment(fs.getFilename(), fs);
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		mailSender.send(mimeMessage);
+	}
+
+	/**
 	 * @return the mailSender
 	 */
 	public JavaMailSender getMailSender() {

@@ -92,7 +92,18 @@ public interface IfSysMockDAO {
 	 * @param ifId
 	 * @return
 	 */
-	public IfSysMock getReferByIfId(int ifId);  
+	public IfSysMock getReferByIfId(int ifId);
+
+	/**
+	 *
+	 * Title: getReferByIfId<br/>
+	 * Description: 获取所有用例数据<br/>
+	 * @author chenkuan
+	 * @date 2015年12月10日上午10:25:22
+	 *
+	 * @return
+	 */
+	public List<IfSysMock> getCasesMarks();
 
 	/**
 	 *
