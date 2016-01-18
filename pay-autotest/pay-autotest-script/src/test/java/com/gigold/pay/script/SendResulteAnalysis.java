@@ -39,6 +39,9 @@ import com.gigold.pay.autotest.threadpool.IfsysCheckThreadPool;
 import com.gigold.pay.framework.base.SpringContextHolder;
 import com.gigold.pay.framework.bootstrap.SystemPropertyConfigure;
 import org.springframework.core.task.SyncTaskExecutor;
+
+import static jxl.write.Alignment.*;
+
 /**
  * Title: Test<br/>
  * Description: <br/>
@@ -84,7 +87,7 @@ public class SendResulteAnalysis {
 		System.out.println("调用接口结束");
         sendMail();
         testAutoTest();
-        //sendCases();
+        sendCases();
         System.out.println("work");
 	}
 
@@ -172,7 +175,7 @@ public class SendResulteAnalysis {
                 Map<String,Object> model = new HashMap<>();
                 model.put("ifOfmockSetList", ifOfmockSetList);
                 model.put("userName", userName);
-                model.put("StepsMap", StepsMap);//每个用例的步骤表  {332=[], 159=[1,2], 330=[1,2]}
+                model.put("StepsMap", StepsMap); //每个用例的步骤表  {332=[], 159=[1,2], 330=[1,2]}
 
                 if(email.equals("chenkuan@gigold.com")||email.equals("chenhl@gigold.com")||email.equals("liuzg@gigold.com")||email.equals("xiebin@gigold.com"))
                 mailSenderService.sendWithTemplateForHTML(model);
@@ -195,22 +198,22 @@ public class SendResulteAnalysis {
             WritableCellFormat wcf_center = new WritableCellFormat(BoldFont);
             wcf_center.setBorder(Border.ALL, BorderLineStyle.THIN); // 线条
             wcf_center.setVerticalAlignment(VerticalAlignment.CENTRE); // 文字垂直对齐
-            wcf_center.setAlignment(Alignment.CENTRE); // 文字水平对齐
+            wcf_center.setAlignment(CENTRE); // 文字水平对齐
             wcf_center.setWrap(true); // 文字是否换行
 
             // 用于表头
             WritableCellFormat wcf_head = new WritableCellFormat(BoldFont);
             wcf_head.setBorder(Border.ALL, BorderLineStyle.THIN); // 线条
             wcf_head.setVerticalAlignment(VerticalAlignment.CENTRE); // 文字垂直对齐
-            wcf_head.setAlignment(Alignment.CENTRE); // 文字水平对齐
+            wcf_head.setAlignment(CENTRE); // 文字水平对齐
             wcf_head.setWrap(true); // 文字是否换行
-            wcf_head.setBackground(Colour.LIGHT_BLUE);
+            wcf_head.setBackground(Colour.OCEAN_BLUE);
 
             // 用于正文居左
             WritableCellFormat wcf_left = new WritableCellFormat(NormalFont);
             wcf_left.setBorder(Border.NONE, BorderLineStyle.THIN); // 线条
             wcf_left.setVerticalAlignment(VerticalAlignment.CENTRE); // 文字垂直对齐
-            wcf_left.setAlignment(Alignment.LEFT); // 文字水平对齐
+            wcf_left.setAlignment(LEFT); // 文字水平对齐
             wcf_left.setWrap(true); // 文字是否换行
 
 

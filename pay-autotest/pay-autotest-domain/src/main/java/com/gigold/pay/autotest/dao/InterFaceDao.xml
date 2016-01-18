@@ -96,7 +96,7 @@
 	</select>
 
 
-	<!-- 分页获取接口基本信息 测试脚本 -->
+	<!-- 获取接口总数 -->
 	<select id="getAllIfSysCount" resultType="int" parameterType="com.gigold.pay.autotest.bo.InterFaceInfo">
 		select count(*) from T_IF_INTERFACE a where a.IF_PROTOCOL ="HTTP" AND a.ISVALID="Y" and not isNull(a.IF_URL) AND a.`IF_URL`!="test.do" and a.IF_PRO_ID!=2
 	</select>
