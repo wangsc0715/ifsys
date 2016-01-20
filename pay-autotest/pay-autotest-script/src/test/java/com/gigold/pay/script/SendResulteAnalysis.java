@@ -207,7 +207,7 @@ public class SendResulteAnalysis {
             wcf_head.setVerticalAlignment(VerticalAlignment.CENTRE); // 文字垂直对齐
             wcf_head.setAlignment(CENTRE); // 文字水平对齐
             wcf_head.setWrap(true); // 文字是否换行
-            wcf_head.setBackground(Colour.OCEAN_BLUE);
+            wcf_head.setBackground(Colour.LIGHT_BLUE);
 
             // 用于正文居左
             WritableCellFormat wcf_left = new WritableCellFormat(NormalFont);
@@ -222,6 +222,13 @@ public class SendResulteAnalysis {
 
             // 添加附件 - 用例
             List<IfSysMock> resulteCases = ifSysMockService.getCasesMarks();
+            // 排序用例
+            Collections.sort(resulteCases, new Comparator<IfSysMock>() {
+                @Override
+                public int compare(IfSysMock o1, IfSysMock o2) {
+                    return o1.getIfId() - o2.getIfId();
+                }
+            });
             List<InterFaceSysTem> ifsysInfos = interFaceSysService.getAllSysInfo();
             Map<String,String> infos = new HashMap<>();
             // 查出系统信息
@@ -233,7 +240,21 @@ public class SendResulteAnalysis {
             // 遍历每一条步骤
             int pageID=0;// 页号
             Map<String,Integer> index = new HashMap<>();//所有页的行号
+            Map<Integer,Integer> ifidCntMap = new HashMap<>(); // 接口 - 用例数 映射
+//            // 初始化 接口 - 用例数 映射表
+//            for(IfSysMock ifSysMock:resulteCases){
+//                int ifid = ifSysMock.getIfId();
+//                if(!ifidCntMap.containsKey(ifid)){
+//                    ifidCntMap.put(ifid,0);
+//                }
+//                ifidCntMap.put(ifid,(ifidCntMap.get(ifid))+1);// 自增1
+//                // 接口用例数xxxxxxxxxx
+//            }
+
+
             for(IfSysMock ifSysMock:resulteCases) {
+
+                //初始化步骤
                 List<IfSysMock> Steps = new ArrayList<>();
                 String ifSysId = String.valueOf(ifSysMock.getIfSysId());
                 String ifSysName = infos.get(ifSysId);
@@ -281,14 +302,14 @@ public class SendResulteAnalysis {
                 //接口名
                 Label ifName = new Label(1,inx,"("+String.valueOf(ifSysMock.getIfId())+")"+ifSysMock.getIfName(),wcf_left);
                 //用例名
-                Label caseName = new Label(2,inx,"在"+ifSysMock.getCaseName()+"的情况下,测试"+ifSysMock.getIfName(),wcf_left);
+                Label caseName = new Label(2,inx,ifSysMock.getCaseName(),wcf_left);
+                //步骤
                 String stepsStr = "";
                 int inx_stp=1;
                 for(IfSysMock stepObj :Steps){
                     stepsStr+=String.valueOf(inx_stp++)+". "+stepObj.getCaseName()+"\n";
                 }
                 stepsStr+=(String.valueOf(inx_stp)+". "+ifSysMock.getCaseName());
-                //步骤
                 Label steps = new Label(3,inx,stepsStr,wcf_left);
                 //预期输出
                 Label preOut = new Label(4,inx,ifSysMock.getRspCode()+ifSysMock.getPreCodeDesc(),wcf_left);
