@@ -113,7 +113,7 @@ $(function() {
 		$("#doc-modal").css({
 			"height": bHeight,
 			"width": bWidth
-		});doc-modal
+		});
 		$("#doc-modal .am-modal-dialog").css({
 			"height": bHeight,
 			"width": bWidth
@@ -376,18 +376,18 @@ $(function() {
 						htmlStr += '<input type="hidden" class="hideInp" data-id="' + mock.id + '" data-ifId="' + mock.ifId + '" data-operName="' + data.interFaceInfo.ifName + '" data-rspCd="' + mock.rspCode + '" />';
 						htmlStr += '<p><span class="rspCd">' + mock.rspCode + ':</span>';
 						htmlStr += '<code class="rspCdDesc">' + mock.rspCodeDesc + '</code>';
-						htmlStr +='<button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary">依赖</button></p><hr />';
+						htmlStr +='<button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary">依赖</button>';
+						htmlStr += '<span class="bianjiBtn">';
+						htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
+						htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn am-disabled">保存</button>';
+						htmlStr += '<button type="button" class="am-btn am-btn-danger delBtn">删除</button></span></p><hr />';
 						htmlStr += '<p><span >('+mock.id+')用例名称:<input name="caseName" value="'+mock.caseName+'"</span></p>';
 						htmlStr += '<div class="am-g">';
 						htmlStr += '<div class="am-u-sm-6"><p><span >入参:</span><textarea readonly class="reqJson">' + mock.requestJson + '</textarea></p></div>';
-						htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><textarea readonly class="rspJson">' + mock.responseJson + '</textarea></p></div></div>';
+						htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><textarea readonly class="rspJson">' + mock.responseJson + '</textarea></p></div>';
 						htmlStr += '<div class="am-u-sm-6"><p><span >描述用例本身的生成规则:</span><textarea readonly class="checkJson">' + mock.checkJson + '</textarea></p></div>';
 						htmlStr += '<div class="am-u-sm-6"><p><span >描述其他用例需要依赖的字段:</span><textarea readonly class="rspRefJson">' + mock.rspRefJson + '</textarea></p></div></div>';
-						htmlStr += '<div class="bianjiBtn">';
-						htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
-						htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn am-disabled">保存</button>';
-						htmlStr += '<button type="button" class="am-btn am-btn-danger delBtn">删除</button>';
-						htmlStr += '</div></div></div>';
+						htmlStr += '</div></div>';
 					});
 					$(".modalCd").html(htmlStr);
 				}
@@ -677,19 +677,18 @@ function addCodMod(data) {
 	}
 	htmlStr += '</select>';
 	htmlStr += '<span class="rspCd"></span>';
-	htmlStr += '<code class="rspCdDesc"></code><button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary" disabled>依赖</button></p><hr />';
+	htmlStr += '<code class="rspCdDesc"></code><button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary" disabled>依赖</button>';
+	htmlStr += '<span class="bianjiBtn">';
+	htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
+	htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn">保存</button>';
+	htmlStr += '<button type="button" class="am-btn am-btn-danger delBtn">删除</button></span></p><hr />';
 	htmlStr += '<p><span >用例名称:<input name="caseName" value=""</span></p>';
 	htmlStr += '<div class="am-g">';
 	htmlStr += '<div class="am-u-sm-6"><p><span >入参:</span><textarea class="reqJson" contenteditable="true"></textarea></p></div>';
 	htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><textarea class="rspJson" contenteditable="true"></textarea></p></div></div>';
 	htmlStr += '<div class="am-u-sm-6"><p><span >描述用例本身的生成规则:</span><textarea readonly class="checkJson"></textarea></p></div>';
 	htmlStr += '<div class="am-u-sm-6"><p><span >描述其他用例需要依赖的字段:</span><textarea readonly class="rspRefJson"></textarea></p></div></div>';
-	
-	htmlStr += '<div class="bianjiBtn">';
-	htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
-	htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn">保存</button>';
-	htmlStr += '<button type="button" class="am-btn am-btn-danger delBtn">删除</button>';
-	htmlStr += '</div></div></div>';
+	htmlStr += '</div></div>';
 	var rspBoxs = $(document).find(".rspBox").prev();
 	if(rspBoxs.length==0){
 		$(".modalCd").html(htmlStr);
