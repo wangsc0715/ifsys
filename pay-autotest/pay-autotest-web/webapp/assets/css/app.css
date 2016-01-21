@@ -134,6 +134,7 @@ pre{
 }
 .bianjiBtn{
 	text-align: right;
+	float: right;
 }
 .bianjiBtn button{
 	margin:1px;
