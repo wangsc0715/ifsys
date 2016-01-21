@@ -255,7 +255,7 @@ $(function() {
 
 	//点击修改按钮进入可编辑状态
 	$(document).on("click", ".upDaBtn", function() {
-		var $ele = $(this).parent().parent();
+		var $ele = $(this).parent().parent().parent();
 		$ele.find("textarea").removeAttr("readonly");
 		$ele.find("textarea")[0].focus();
 		$ele.find(".addRspBtn").removeClass("am-disabled");
@@ -264,7 +264,7 @@ $(function() {
 	//保存修改的测试用例数据
 	$(document).on("click", ".addRspBtn", function() {
 
-		var $ele = $(this).parent().parent();
+		var $ele = $(this).parent().parent().parent();
 		var sendData = {};
 		sendData.id = $ele.find(".hideInp").attr("data-id");
 		sendData.ifId = $(".addBtn").attr("data-ifId");
@@ -281,7 +281,6 @@ $(function() {
 			"url": "autotest/updateifsysmock.do",
 			"data": JSON.stringify(sendData),
 			"onSuccess": function(data) {
-				console.log(data);
 				if (data.rspCd == "00000") {
 					alert("保存成功");
 					$ele.find(".hideInp").attr("data-id", data.ifSysMock.id);
@@ -300,7 +299,7 @@ $(function() {
 
 	//删除返回码模块
 	$(document).on("click", ".delBtn", function() {
-		var $ele = $(this).parent().parent();
+		var $ele = $(this).parent().parent().parent();
 		var sendData = {};
 		sendData.id = $ele.find(".hideInp").attr("data-id");
 		if(sendData.id){
