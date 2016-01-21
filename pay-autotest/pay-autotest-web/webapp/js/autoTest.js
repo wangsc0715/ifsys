@@ -93,6 +93,32 @@ $(function() {
 			"width": bWidth
 		});
 	}
+	
+	
+	window.onload = function() {
+		var bHeight = $(document).height();
+		var bWidth = $(document).width();
+		$("#doc-modal").css({
+			"height": bHeight,
+			"width": bWidth
+		});
+		$("#doc-modal .am-modal-dialog").css({
+			"height": bHeight,
+			"width": bWidth
+		});
+	}
+	window.onresize = function() {
+		var bHeight = $(document).height();
+		var bWidth = $(document).width();
+		$("#doc-modal").css({
+			"height": bHeight,
+			"width": bWidth
+		});doc-modal
+		$("#doc-modal .am-modal-dialog").css({
+			"height": bHeight,
+			"width": bWidth
+		});
+	}
 
 
 	//点击添加数据依赖关系

@@ -115,10 +115,7 @@ pre{
 	color:#0b76ac ;
 	text-align: left;
 }
-#doc-modal{
-	width:80%;
-	left:33%;
-}
+
 .rspBox{
 	border:1px solid #ddd;
 }
@@ -159,7 +156,8 @@ pre{
 #propDateShowBody tr td:nth-child(4){
 	text-align: left;
 }
-#doc-modal-rely{
+#doc-modal-rely,#doc-modal{
+	width:100%;
 	left:0 !important;
 	top:0 !important;
 	margin:0 !important;
