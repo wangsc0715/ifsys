@@ -463,6 +463,13 @@ public class SendResulteAnalysis {
 
             ArrayList<String> sys_iflist = (ArrayList<String>) (IfIDmodlMap.get(ifSysidKey).get("sys_iflist"));//接口数组自增
             if(!sys_iflist.contains(key))sys_iflist.add(key);
+            Collections.sort(sys_iflist, new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    return Integer.parseInt(o1) - Integer.parseInt(o2);
+                }
+            });
+
             // ==================收集结束
         }
 
