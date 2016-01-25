@@ -113,7 +113,7 @@ $(function() {
 		$("#doc-modal").css({
 			"height": bHeight,
 			"width": bWidth
-		});doc-modal
+		});
 		$("#doc-modal .am-modal-dialog").css({
 			"height": bHeight,
 			"width": bWidth

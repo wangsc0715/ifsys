@@ -12,6 +12,7 @@
 		<result property="status" column="STATUS" />
 		<result property="testResult" column="TEST_RESULT" />
 		<result property="ifName" column="IF_NAME" />
+		<result property="ifSysId" column="IF_SYS_ID" />
 	</resultMap>
 
 	
@@ -62,6 +63,7 @@
 			select b.ID,
 		b.MOCK_ID,
 		b.IF_ID,
+		(select d.IF_SYS_ID from T_IF_INTERFACE d where d.ID=b.IF_ID) IF_SYS_ID,
 		(select d.IF_NAME from T_IF_INTERFACE d where d.ID=b.IF_ID) IF_NAME,
 		b.TEST_RESULT,
 		b.JRN,
@@ -69,14 +71,12 @@
 		b.TEST_TIME,
 		b.STATUS,
 		b.TM_SMP
- from T_IF_MOCK_HISTORY b where b.JRN in
+ 		from T_IF_MOCK_HISTORY b where b.JRN in
 				(select c.JRN from (select distinct a.JRN from T_IF_MOCK_HISTORY a
 						order by a.JRN desc
 						limit #{limit}) c);
     	]]>
 	</select>
-	 
-
 </mapper>
  
  

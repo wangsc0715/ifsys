@@ -6,12 +6,20 @@ import com.gigold.pay.autotest.bo.InterFaceInfo;
 
 public interface InterFaceDao {
 	/**
-	 * 根据Id获得接口信息
+	 * 获得所有接口数
 	 * 
 	 * @param
 	 * @return
 	 */
 	public int getAllIfSysCount();
+
+	/**
+	 * 根据Id获得模块的接口数
+	 *
+	 * @param
+	 * @return
+	 */
+	public int getAllIfSysCountByMod(int modId);
 
 	/**
 	 * 根据Id获得接口信息

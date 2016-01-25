@@ -23,6 +23,10 @@
     .head{background:grey;color:#eee;font-size:.5rem}
     .progress{width: 200px;display: block;height: 20px;border: 1px solid grey;}
     .progress span{display: block;height: 20px;background: #585eaa;}
+
+    .progress-pice{width: 200px;display: block;height: 10px;border: 1px solid grey;}
+    .progress-pice span{display: block;height: 10px;background: #585eaa;}
+
     .rate span{float:left}
     small{font-size:0.75em;color:grey}
 </style>
@@ -31,20 +35,34 @@
 
 你好:<br>
 
-<p>1.最近 ${jnrCount} 批测试结果总览:</p>
+<p style="font-size:24px">1.最近 ${jnrCount} 批测试结果总览:</p>
 <p>纵坐标:接口id,横坐标:批次(从左到右为最新)</p>
 <br>
+#foreach($ifmod in $IfIDmodlMap)
+<p>
+    <p style="font-size:16px">$ifmod.get("sys_name")</p>
+    <p>测试接口数:$ifmod.get("sys_ifCount")</p>
+    <p>测试用例数:$ifmod.get("sys_caseCount")</p>
+    <p class="rate"><span>测试通过率(最新): </span><span class="progress-pice"><span style="width:$ifmod.get("sys_mockPassRate")%"></span></span> $ifmod.get("sys_mockPassRate") %</p>
+    <p class="rate"><span>用例覆盖率(最新): </span><span class="progress-pice"><span style="width:$ifmod.get("sys_CCcoverage")%"></span></span> $ifmod.get("sys_CCcoverage") %</p>
+    <p class="rate"><span>接口覆盖率(最新): </span><span class="progress-pice"><span style="width:$ifmod.get("sys_IFcoverage")%"></span></span> $ifmod.get("sys_IFcoverage") %</p>
+</p>
 <table class='his'>
-    #foreach( $ifId in $IfIDNameMap.keySet())
+    <tr><td class="head" colspan="17" style="background:#585eaa;font-size:.75em;">$ifmod.get("sys_name")</td></tr>
+    ## 根据id- 接口名映射表遍历接口id,以避免重复
+    #foreach( $ifId in $ifmod.get("sys_iflist"))
     <tr>
+        ## 限制最大名字长度为 9
         #if($IfIDNameMap[$ifId].length()>=9)
             #set($ifnamelength = 9)
         #else
             #set($ifnamelength = $IfIDNameMap[$ifId].length())
         #end
+        ## 接口名
         <td class="head" style="white-space: nowrap;text-overflow: ellipsis;text-align:left;font-size:.75em;" title="$IfIDNameMap[$ifId]">$ifId - $IfIDNameMap[$ifId].substring(0,$ifnamelength)</td>
+        ## 遍历当前接口的每一批数据
         #foreach( $JNR in $OrderedHeadJNRSet)
-
+            ## 取当前批次/当前接口/的ifPassRate 来判断样式
             #set( $passRate = $initedDataSet[$JNR].get($ifId).get("ifPassRate") )
             #set($passStyle = 'normal')
 
@@ -77,7 +95,7 @@
                 #set($passStyle = 'normal')
             #end
 
-
+            ## 没一个方格 - 每一个接口当前批次的测试用例群
             <td class="$passStyle" title="$ifId&#10;$IfIDNameMap[$ifId]&#10;总共 $!initedDataSet[$JNR].get($ifId).get("ifTestData").size() 条测试数据&#10;单接口通过率:$!initedDataSet[$JNR].get($ifId).get("ifPassRate")">$!initedDataSet[$JNR].get($ifId).get("ifTestData").size()</td>
         #end
        <td class="head" style="width:40px;text-align:right;font-size:.75em;"> $!IfIDDsnrMap[$ifId] </td>
@@ -91,8 +109,11 @@
         <td class="head" style="background:#585eaa;"></td>
     </tr>
 </table>
+<br>
+<hr>
+#end
 
-<p>2.其他指标</p>
+<p style="font-size:24px">2.总体指标</p>
 <p>测试接口数:${ifCount}</p>
 <p>测试用例数:${caseCount}</p>
 <p class="rate"><span>测试通过率(最新): </span><span class="progress"><span style="width:${mockPassRate}%"></span></span> ${mockPassRate} %</p>

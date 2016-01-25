@@ -35,6 +35,7 @@
 		ii.IF_URL,
 		(select sys.IF_SYS_NAME from T_IF_SYSTEM sys where sys.id=ii.IF_SYS_ID)
 		SYS_NAME,
+		ii.IF_SYS_ID,
 		(select pro.IF_PRO_NAME from T_IF_PRO pro where pro.id=ii.IF_PRO_ID and
 		pro.IF_SYS_ID=ii.IF_SYS_ID) PRO_NAME,
 		(select sys.ADDRESS_URL from T_IF_SYSTEM sys where sys.id=ii.IF_SYS_ID)
@@ -99,6 +100,21 @@
 	<!-- 获取接口总数 -->
 	<select id="getAllIfSysCount" resultType="int" parameterType="com.gigold.pay.autotest.bo.InterFaceInfo">
 		select count(*) from T_IF_INTERFACE a where a.IF_PROTOCOL ="HTTP" AND a.ISVALID="Y" and not isNull(a.IF_URL) AND a.`IF_URL`!="test.do" and a.IF_PRO_ID!=2
+	</select>
+
+	<!-- 获取接口总数 -->
+	<select id="getAllIfSysCountByMod" resultType="int" parameterType="com.gigold.pay.autotest.bo.InterFaceInfo">
+		select
+			count(*)
+		from
+			T_IF_INTERFACE a
+		where
+			a.IF_PROTOCOL ="HTTP"
+			AND a.ISVALID="Y"
+			and not isNull(a.IF_URL)
+			AND a.`IF_URL`!="test.do"
+			and a.IF_PRO_ID!=2
+			and a.IF_SYS_ID=#{modId}
 	</select>
 	
 	
