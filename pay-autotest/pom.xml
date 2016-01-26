@@ -148,4 +148,22 @@
     <module>pay-autotest-threadpool</module>
     <module>pay-autotest-script</module>
   </modules>
+
+  <profiles>
+  <profile>
+    <id>sonar</id>
+    <activation>
+      <activeByDefault>true</activeByDefault>
+    </activation>
+    <properties>
+      <sonar.jdbc.url>
+        jdbc:mysql://rds80ubr9x806azaml24.mysql.rds.aliyuncs.com:3306/motion2?useUnicode=true&amp;characterEncoding=utf8
+      </sonar.jdbc.url>
+      <sonar.jdbc.username>motion2</sonar.jdbc.username>
+      <sonar.jdbc.password>motion2cs</sonar.jdbc.password>
+      <sonar.host.url>http://123.57.152.75:9800/sonarqube</sonar.host.url>
+    </properties>
+  </profile>
+  </profiles>
 </project>
+

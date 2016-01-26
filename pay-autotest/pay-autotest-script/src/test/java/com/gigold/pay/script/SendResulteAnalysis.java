@@ -12,13 +12,13 @@ import java.util.*;
 
 import com.gigold.pay.autotest.bo.InterFaceSysTem;
 import com.gigold.pay.autotest.dao.InterFaceDao;
-import com.gigold.pay.autotest.dao.InterFaceSystemDao;
 import com.gigold.pay.autotest.service.*;
 import jxl.Workbook;
+import jxl.format.Colour;
 import jxl.write.*;
-import org.apache.commons.collections.list.TreeList;
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.io.input.ReaderInputStream;
+import jxl.write.Border;
+import jxl.write.BorderLineStyle;
+import jxl.write.VerticalAlignment;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,9 @@ import com.gigold.pay.autotest.email.MailSenderService;
 import com.gigold.pay.autotest.threadpool.IfsysCheckThreadPool;
 import com.gigold.pay.framework.base.SpringContextHolder;
 import com.gigold.pay.framework.bootstrap.SystemPropertyConfigure;
-import org.springframework.core.task.SyncTaskExecutor;
+
+import static jxl.write.Alignment.*;
+
 /**
  * Title: Test<br/>
  * Description: <br/>
@@ -77,8 +79,8 @@ public class SendResulteAnalysis {
 		//autoTest();
 		System.out.println("调用接口结束");
         //sendMail();
-        //testAutoTest();
-        sendCases();
+        testAutoTest();
+        //sendCases();
         System.out.println("work");
 	}
 
@@ -166,7 +168,7 @@ public class SendResulteAnalysis {
                 Map<String,Object> model = new HashMap<>();
                 model.put("ifOfmockSetList", ifOfmockSetList);
                 model.put("userName", userName);
-                model.put("StepsMap", StepsMap);//每个用例的步骤表  {332=[], 159=[1,2], 330=[1,2]}
+                model.put("StepsMap", StepsMap); //每个用例的步骤表  {332=[], 159=[1,2], 330=[1,2]}
 
                 if(email.equals("chenkuan@gigold.com")||email.equals("chenhl@gigold.com")||email.equals("liuzg@gigold.com")||email.equals("xiebin@gigold.com"))
                 mailSenderService.sendWithTemplateForHTML(model);
@@ -181,22 +183,30 @@ public class SendResulteAnalysis {
         try{
             WritableWorkbook book = Workbook.createWorkbook(new File("casesModel.xls"));//工作簿对象
             /** ************设置单元格字体************** */
-            WritableFont NormalFont = new WritableFont(WritableFont.ARIAL, 10);
-            WritableFont BoldFont = new WritableFont(WritableFont.ARIAL, 10,WritableFont.BOLD);
+            WritableFont NormalFont = new WritableFont(WritableFont.ARIAL, 12);
+            WritableFont BoldFont = new WritableFont(WritableFont.ARIAL, 14,WritableFont.BOLD);
 
             /** ************以下设置三种单元格样式，灵活备用************ */
             // 用于标题居中
             WritableCellFormat wcf_center = new WritableCellFormat(BoldFont);
             wcf_center.setBorder(Border.ALL, BorderLineStyle.THIN); // 线条
             wcf_center.setVerticalAlignment(VerticalAlignment.CENTRE); // 文字垂直对齐
-            wcf_center.setAlignment(Alignment.CENTRE); // 文字水平对齐
+            wcf_center.setAlignment(CENTRE); // 文字水平对齐
             wcf_center.setWrap(true); // 文字是否换行
+
+            // 用于表头
+            WritableCellFormat wcf_head = new WritableCellFormat(BoldFont);
+            wcf_head.setBorder(Border.ALL, BorderLineStyle.THIN); // 线条
+            wcf_head.setVerticalAlignment(VerticalAlignment.CENTRE); // 文字垂直对齐
+            wcf_head.setAlignment(CENTRE); // 文字水平对齐
+            wcf_head.setWrap(true); // 文字是否换行
+            wcf_head.setBackground(Colour.LIGHT_BLUE);
 
             // 用于正文居左
             WritableCellFormat wcf_left = new WritableCellFormat(NormalFont);
             wcf_left.setBorder(Border.NONE, BorderLineStyle.THIN); // 线条
             wcf_left.setVerticalAlignment(VerticalAlignment.CENTRE); // 文字垂直对齐
-            wcf_left.setAlignment(Alignment.LEFT); // 文字水平对齐
+            wcf_left.setAlignment(LEFT); // 文字水平对齐
             wcf_left.setWrap(true); // 文字是否换行
 
 
@@ -205,6 +215,13 @@ public class SendResulteAnalysis {
 
             // 添加附件 - 用例
             List<IfSysMock> resulteCases = ifSysMockService.getCasesMarks();
+            // 排序用例
+            Collections.sort(resulteCases, new Comparator<IfSysMock>() {
+                @Override
+                public int compare(IfSysMock o1, IfSysMock o2) {
+                    return o1.getIfId() - o2.getIfId();
+                }
+            });
             List<InterFaceSysTem> ifsysInfos = interFaceSysService.getAllSysInfo();
             Map<String,String> infos = new HashMap<>();
             // 查出系统信息
@@ -216,7 +233,10 @@ public class SendResulteAnalysis {
             // 遍历每一条步骤
             int pageID=0;// 页号
             Map<String,Integer> index = new HashMap<>();//所有页的行号
+            Map<Integer,Integer> ifidCntMap = new HashMap<>(); // 接口 - 用例数 映射
+
             for(IfSysMock ifSysMock:resulteCases) {
+                //初始化"步骤"
                 List<IfSysMock> Steps = new ArrayList<>();
                 String ifSysId = String.valueOf(ifSysMock.getIfSysId());
                 String ifSysName = infos.get(ifSysId);
@@ -232,12 +252,12 @@ public class SendResulteAnalysis {
                     sheet = book.createSheet(ifSysName , pageID++);
                     // 设置表头
                     Label title = new Label(0,0,ifSysName+" - 测试用例",wcf_center);
-                    Label head1 = new Label(0,1,"序号",wcf_center);
-                    Label head2 = new Label(1,1,"接口名",wcf_center);
-                    Label head3 = new Label(2,1,"用例名",wcf_center);
-                    Label head4 = new Label(3,1,"步骤",wcf_center);
-                    Label head5 = new Label(4,1,"预期输出",wcf_center);
-                    Label head6 = new Label(5,1,"备注",wcf_center);
+                    Label head1 = new Label(0,1,"序号",wcf_head);
+                    Label head2 = new Label(1,1,"接口名",wcf_head);
+                    Label head3 = new Label(2,1,"用例名",wcf_head);
+                    Label head4 = new Label(3,1,"步骤",wcf_head);
+                    Label head5 = new Label(4,1,"预期输出",wcf_head);
+                    Label head6 = new Label(5,1,"备注",wcf_head);
                     // 设置列宽
                     sheet.setColumnView(0,5);
                     sheet.setColumnView(1,30);
@@ -264,14 +284,14 @@ public class SendResulteAnalysis {
                 //接口名
                 Label ifName = new Label(1,inx,"("+String.valueOf(ifSysMock.getIfId())+")"+ifSysMock.getIfName(),wcf_left);
                 //用例名
-                Label caseName = new Label(2,inx,"在"+ifSysMock.getCaseName()+"的情况下,测试"+ifSysMock.getIfName(),wcf_left);
+                Label caseName = new Label(2,inx,ifSysMock.getCaseName(),wcf_left);
+                //步骤
                 String stepsStr = "";
                 int inx_stp=1;
                 for(IfSysMock stepObj :Steps){
                     stepsStr+=String.valueOf(inx_stp++)+". "+stepObj.getCaseName()+"\n";
                 }
                 stepsStr+=(String.valueOf(inx_stp)+". "+ifSysMock.getCaseName());
-                //步骤
                 Label steps = new Label(3,inx,stepsStr,wcf_left);
                 //预期输出
                 Label preOut = new Label(4,inx,ifSysMock.getRspCode()+ifSysMock.getPreCodeDesc(),wcf_left);
@@ -331,8 +351,8 @@ public class SendResulteAnalysis {
         }
 
         // 重新格式化结果数据
-        Iterator entries = mailBuffers.entrySet().iterator();
-        Comparator comparator = new Comparator<String>(){
+        Iterator<Map.Entry<String, List<IfSysMockHistory>>> entries = mailBuffers.entrySet().iterator();
+        Comparator<String> comparator = new Comparator<String>(){
 
             public int compare(String o1, String o2)
             {
@@ -343,15 +363,15 @@ public class SendResulteAnalysis {
                 else
                     return n1-n2;
             }};
-        Map<String,Map> initedDataSet = new TreeMap<>();
+        Map<String, Map<String, Map<String, Object>>> initedDataSet = new TreeMap<String, Map<String, Map<String, Object>>>();
         ArrayList<String> HeadIFID = new ArrayList<>();
 
         while (entries.hasNext()) {
-            Map.Entry entry = (Map.Entry) entries.next();
+            Map.Entry<String, List<IfSysMockHistory>> entry = entries.next();
             // 每一批的批号
-            String JNR = (String)entry.getKey();
+            String JNR = entry.getKey();
             // 每一批的所有数据
-            List<IfSysMockHistory> histMocks = (List<IfSysMockHistory>)entry.getValue();//[{if1,test1,info1},{if1,test2,info2}]
+            List<IfSysMockHistory> histMocks = entry.getValue();//[{if1,test1,info1},{if1,test2,info2}]
 
             // 遍历所有数据,并分装到eachIfset
             Map<String,Map<String,Object>> eachIfSet = new HashMap<>();// {if1 : {null,null,[] },if2 : { }}
@@ -396,31 +416,67 @@ public class SendResulteAnalysis {
         // 格式化结束
 
 
+        Map<String,String> IfIDNameMap = new TreeMap<String,String>(comparator);// id-名字映射
+        Map<String,String> IfIDDsnrMap = new TreeMap<String,String>(comparator); // id-设计者映射
+        Map<String,HashMap<String,Object>> IfIDmodlMap = new TreeMap<String,HashMap<String,Object>>(comparator); // id-系统模块映射
         // 去重 - HeadIFID 去重/排序
-        Map<String,String> IfIDNameMap = new TreeMap<>(comparator);// id-名字映射
-        Map<String,String> IfIDDsnrMap = new TreeMap<>(comparator); // id-设计者映射
-        for (Iterator iter = HeadIFID.iterator(); iter.hasNext();) {
-            String _ifId = String.valueOf(iter.next());
-            IfIDNameMap.put(_ifId,_ifId);
+        for (String aHeadIFID : HeadIFID) {
+            String _ifId = String.valueOf(aHeadIFID);
+            IfIDNameMap.put(_ifId, _ifId);
         }
-        // 去重 - 替换接口名
-        Iterator<String> iter = IfIDNameMap.keySet().iterator();
-        while (iter.hasNext()) {
-            String key = iter.next();
-            InterFaceInfo ifinfo=interFaceService.getInterFaceById(Integer.parseInt(key));
-            if(ifinfo!=null){
-                IfIDNameMap.put(key,ifinfo.getIfName());
-                IfIDDsnrMap.put(key,ifinfo.getDsname());
-            }
-        }
-        // 去重 - 结束
-
-        // JNR集合
-        Set<String> OrderedHeadJNRSet = initedDataSet.keySet();
 
         // 计算通过率 - 格式化数据
         List<IfSysMockHistory> lastRst = ifSysMockHistoryService.getNewestReslutOf(1);//最近一批数据
         float _passRate = 0;
+
+        // 去重 - 替换接口名
+        for (String key : IfIDNameMap.keySet()) {
+            InterFaceInfo ifinfo = interFaceService.getInterFaceById(Integer.parseInt(key));
+            if (ifinfo != null) {
+                IfIDNameMap.put(key, ifinfo.getIfName());
+                IfIDDsnrMap.put(key, ifinfo.getDsname());
+            }
+        }
+
+        // 所属模块结果数据映射
+        List<InterFaceSysTem> sysInfos = interFaceSysService.getAllSysInfo();
+        HashMap sysIdNameMap = new HashMap();
+        for(InterFaceSysTem sysInfo : sysInfos){
+            sysIdNameMap.put(sysInfo.getId(),sysInfo.getSysName());
+        }
+
+        // 遍历近期数据
+        for(IfSysMockHistory alastRst:lastRst){
+            // 收集接口与所属模块的对应关系
+            String ifSysidKey = String.valueOf(alastRst.getIfSysId());
+            String key = String.valueOf(alastRst.getIfId());
+            if (!IfIDmodlMap.containsKey(ifSysidKey)) {
+                IfIDmodlMap.put(ifSysidKey, new HashMap<String, Object>());
+                IfIDmodlMap.get(ifSysidKey).put("sys_iflist", new ArrayList<String>());
+                IfIDmodlMap.get(ifSysidKey).put("sys_name", sysIdNameMap.get(alastRst.getIfSysId()));
+                IfIDmodlMap.get(ifSysidKey).put("sys_ifCount", 0);
+                IfIDmodlMap.get(ifSysidKey).put("sys_caseCount", 0);
+                IfIDmodlMap.get(ifSysidKey).put("sys_mockPassRate", 0);
+                IfIDmodlMap.get(ifSysidKey).put("sys_CCcoverage", 0);
+                IfIDmodlMap.get(ifSysidKey).put("sys_IFcoverage", 0);
+            }
+
+            ArrayList<String> sys_iflist = (ArrayList<String>) (IfIDmodlMap.get(ifSysidKey).get("sys_iflist"));//接口数组自增
+            if(!sys_iflist.contains(key))sys_iflist.add(key);
+            Collections.sort(sys_iflist, new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    return Integer.parseInt(o1) - Integer.parseInt(o2);
+                }
+            });
+
+            // ==================收集结束
+        }
+
+        // 去重 - 结束
+
+        // JNR集合
+        Set<String> OrderedHeadJNRSet = initedDataSet.keySet();
 
         // 用例总数
         float mockCount = lastRst.size();
@@ -451,6 +507,48 @@ public class SendResulteAnalysis {
         float CCcoverage = ( 1 - CCprob/CCtot );
         float IFcoverage = ( IFtst/IFtot );
 
+
+
+
+
+        // 计算各模测试指标
+        for(String modID: IfIDmodlMap.keySet()){
+            HashMap modeDetail = IfIDmodlMap.get(modID);
+            List modeIflist = (ArrayList)modeDetail.get("sys_iflist");
+            modeDetail.put("sys_ifCount",modeIflist.size());// 接口数计算
+
+            // 用例数计算
+            int _mockCt = 0;
+            float mod_CCprob=0;//
+            float mod__passRate = 0;
+            for(IfSysMockHistory alastRst:lastRst){
+                if(alastRst.getIfSysId()==Integer.parseInt(modID)){
+                    if(!(alastRst.getTestResult()==null||alastRst.getTestResult().equals("1")||alastRst.getTestResult().equals("0")))
+                        mod_CCprob++;// 问题记录自增
+                    // 通过率累计
+                    mod__passRate += ((alastRst.getTestResult()!=null)&&alastRst.getTestResult().equals("1")?1:0);
+                    // 用例数自增
+                    _mockCt++;
+                    // 接口数自增
+                }
+            }
+
+            float mod_mockPassRate = 100*mod__passRate/_mockCt;
+            modeDetail.put("sys_caseCount",_mockCt);
+
+            // 接口覆盖率计算
+            int mod_IFtst= (int) IfIDmodlMap.get(modID).get("sys_ifCount");
+            float mod_IFtot= interFaceDao.getAllIfSysCountByMod(Integer.parseInt(modID));
+            float mod_IFcoverage = ( mod_IFtst/mod_IFtot );
+            modeDetail.put("sys_IFcoverage",(float)(Math.round(mod_IFcoverage*10000))/100);
+
+            // 计算用例覆盖率
+            float mod_CCtot=_mockCt;
+            float mod_CCcoverage = ( 1 - mod_CCprob/mod_CCtot );
+            modeDetail.put("sys_CCcoverage",(float)(Math.round(mod_CCcoverage*10000))/100);
+            modeDetail.put("sys_mockPassRate",(float)(Math.round(mod_mockPassRate*100))/100);
+        }
+
         // 发送邮件
         String[] copyList = SystemPropertyConfigure.getProperty("mail.default.observer").split(",");
         List<String> copyTo = new ArrayList<String>();
@@ -467,6 +565,7 @@ public class SendResulteAnalysis {
         model.put("initedDataSet", initedDataSet);// 所有数据
         model.put("IfIDNameMap", IfIDNameMap);// 表列头
         model.put("IfIDDsnrMap", IfIDDsnrMap);// 设计者映射
+        model.put("IfIDmodlMap", IfIDmodlMap);// 模块接口映射
         model.put("OrderedHeadJNRSet", OrderedHeadJNRSet);//表行头
      //   model.put("userName", userName);
         // 最近一条JNR
@@ -480,7 +579,7 @@ public class SendResulteAnalysis {
         model.put("CCcoverage", (float)(Math.round(CCcoverage*10000))/100);//保留两位
         model.put("IFcoverage", (float)(Math.round(IFcoverage*10000))/100);//保留两位
         mailSenderService.sendWithTemplateForHTML(model);
-
+        System.out.print(IfIDmodlMap);
         System.out.println("邮件发送成功！");
     }
 

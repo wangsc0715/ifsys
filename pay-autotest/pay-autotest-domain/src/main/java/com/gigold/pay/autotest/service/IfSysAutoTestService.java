@@ -102,7 +102,7 @@ public class IfSysAutoTestService extends Domain {
 		mock.setIsCase("N");
 		return mock;
 	}
-	
+
 	/**
 	 * 
 	 * Title: writeBackRefCaseContent<br/>
@@ -184,16 +184,16 @@ public class IfSysAutoTestService extends Domain {
 			}
 			
 			//先处理请求报文
-			postData=preHanlderReuestBody(postData,refmock);
+			//postData=preHanlderRexuestBody(postData,refmock);
 			// 实际请求后，返回的报文（返回码和返回实体）
 			String responseJson = "";
 			try {
 				responseJson=httpClientService.httpPost(refmock.getAddressUrl(), postData,cookieStore);
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
+			}finally {
+				writeBackRefCaseContent(refmock,responseJson);
 			}
-			
-			writeBackRefCaseContent(refmock,responseJson);
 
 		}
 	}
@@ -216,7 +216,7 @@ public class IfSysAutoTestService extends Domain {
 			return;
 		}
 		//先处理请求报文
-		postData=preHanlderReuestBody(postData,mock);
+		//postData=preHanlderReuestBody(postData,mock);
 		// 实际请求后，返回的报文（返回码和返回实体）
 		String responseJson = "";
 		try {
@@ -224,9 +224,11 @@ public class IfSysAutoTestService extends Domain {
 		} catch (Exception e) {
 			responseJson = "";
 			debug("调用失败 调用目标测试用例过程中出现异常:"+e.getMessage());
+		}finally {
+			// 实际结果回写
+			writeBackContent(mock, responseJson);
 		}
-		// 实际结果回写
-		writeBackContent(mock, responseJson);
+
 	}
 
 	/**
