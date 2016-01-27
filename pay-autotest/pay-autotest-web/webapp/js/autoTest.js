@@ -367,7 +367,7 @@ $(function() {
 				if (data.rspCd == "00000") {
 					var htmlStr = "";
 					var size = data.interFaceInfo.mockList.length;
-					$(".operName").html(data.interFaceInfo.ifName);
+					$(".operName").html("<a href='/ifsys/interFaceDetail.html?id="+data.interFaceInfo.id+"'>("+data.interFaceInfo.id+")"+data.interFaceInfo.ifName+"</a>");
 					$.each(data.interFaceInfo.mockList, function(index, mock) {
 						htmlStr += '<h4 class="am-panel-title" data-am-collapse="{target:\'#id'+index+'\'}">('+mock.id+')'+mock.caseName;
 						htmlStr += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;('+mock.rspCodeDesc+')'+mock.rspCode+'</h4>';
@@ -376,6 +376,7 @@ $(function() {
 						htmlStr += '<p><span class="rspCd">' + mock.rspCode + ':</span>';
 						htmlStr += '<code class="rspCdDesc">' + mock.rspCodeDesc + '</code>';
 						htmlStr +='<button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary">依赖</button>';
+						htmlStr +='<a href="/ifsys/interFaceUpdate.html?id='+data.interFaceInfo.id+'#markThead">添加返回码</a>';
 						htmlStr += '<span class="bianjiBtn">';
 						htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
 						htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn am-disabled">保存</button>';
