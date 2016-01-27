@@ -5,7 +5,7 @@ function handlerData(data) {
 	var listStr = "";
 	$.each(data.pageInfo.list,
 		function(index, rowData) {
-			listStr += '<tr data-id=' + rowData.id + '>' + '<td  width=60 class="am-primary">' + (index + 1) + '</td>' + '<td class="textLeft">' + rowData.ifName + '</td>' + '<td class="textLeft">' + rowData.sysName + '</td>' + '<td class="textLeft">' + rowData.proName + '</td>' + '<td class="textLeft">' + rowData.designName + '</td>' + '<td class="textLeft">' + rowData.ifDesc + '</td>' + '<td width=200>' + '<a target="_blank" href="interFaceDetail.html?id=' + rowData.id + "&userName=" + $.getUrlParam("userName") + '" class="">查看详情</a>&nbsp;&nbsp;' + '<a target="_blank" href="interFaceUpdate.html?id=' + rowData.id + "&userName=" + $.getUrlParam("userName") + '" class="">修改</a>&nbsp;&nbsp;' + '<a href="#" id="' + rowData.id + '" class="deleteBtn">删除</a>' + '</td>' + '</tr>';
+			listStr += '<tr data-id=' + rowData.id + '>' + '<td  width=60 class="am-primary">' + rowData.id + '</td>' + '<td class="textLeft">' + rowData.ifName + '</td>' + '<td class="textLeft">' + rowData.sysName + '</td>' + '<td class="textLeft">' + rowData.proName + '</td>' + '<td class="textLeft">' + rowData.designName + '</td>' + '<td class="textLeft">' + rowData.ifDesc + '</td>' + '<td width=200>' + '<a target="_blank" href="interFaceDetail.html?id=' + rowData.id + "&userName=" + $.getUrlParam("userName") + '" class="">查看详情</a>&nbsp;&nbsp;' + '<a target="_blank" href="interFaceUpdate.html?id=' + rowData.id + "&userName=" + $.getUrlParam("userName") + '" class="">修改</a>&nbsp;&nbsp;' + '<a href="#" id="' + rowData.id + '" class="deleteBtn">删除</a>' + '</td>' + '</tr>';
 		});
 	$("#propDateShowBody").html(listStr);
 	//添加页码
