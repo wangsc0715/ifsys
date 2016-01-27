@@ -121,17 +121,12 @@ public class HttpClientService extends Domain{
 			} else {
 				debug("服务器响应失败 : 返回状态" + statusCode);
 			}
-		} catch (ClientProtocolException e) {
-			debug("服务器响应失败");
 		} catch (IOException e) {
 			debug("服务器响应失败");
 		}
 
 		return responseData;
 	}
-
-
-	
 
 
 	public HttpPost createPostMethed(String url) {

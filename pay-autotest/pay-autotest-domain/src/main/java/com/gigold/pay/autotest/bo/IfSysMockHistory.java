@@ -44,6 +44,17 @@ public class IfSysMockHistory extends Domain {
 	private String status;
 	// 接口名
 	private String ifName;
+	private int ifSysId;
+
+	public int getIfSysId() {
+		return ifSysId;
+	}
+
+	public void setIfSysId(int ifSysId) {
+		this.ifSysId = ifSysId;
+	}
+
+	// 所属模块
 
 	public String getIfName() {
 		return ifName;
