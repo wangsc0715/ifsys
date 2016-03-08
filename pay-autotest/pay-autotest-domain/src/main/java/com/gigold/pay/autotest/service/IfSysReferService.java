@@ -176,4 +176,17 @@ public class IfSysReferService extends Domain {
 		}
 		return list;
 	}
+
+	public boolean updataReferFields(List<IfSysFeildRefer> ifSysFeildRefers){
+		boolean flag = false;
+		try{
+			for (IfSysFeildRefer ifSysFeildRefer :ifSysFeildRefers){
+				ifSysReferDAO.updataReferFields(ifSysFeildRefer);
+			}
+			flag = true;
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return flag;
+	}
 }

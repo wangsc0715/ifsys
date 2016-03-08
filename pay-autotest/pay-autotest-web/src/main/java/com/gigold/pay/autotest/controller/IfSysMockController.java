@@ -10,16 +10,13 @@ package com.gigold.pay.autotest.controller;
 import java.util.List;
 
 import com.gigold.pay.autotest.bo.*;
+import com.gigold.pay.autotest.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.gigold.pay.autotest.service.IfSysMockService;
-import com.gigold.pay.autotest.service.InterFaceFieldService;
-import com.gigold.pay.autotest.service.InterFaceService;
-import com.gigold.pay.autotest.service.RetrunCodeService;
 import com.gigold.pay.framework.base.SpringContextHolder;
 import com.gigold.pay.framework.bootstrap.SystemPropertyConfigure;
 import com.gigold.pay.framework.core.SysCode;
@@ -50,6 +47,8 @@ public class IfSysMockController extends BaseController {
 	InterFaceService interFaceService;
 	@Autowired
 	private RetrunCodeService retrunCodeService;
+	@Autowired
+	IfSysReferService ifSysReferService;
 
 	/**
 	 * @return the retrunCodeService
@@ -411,18 +410,11 @@ public class IfSysMockController extends BaseController {
 			return reDto;
 		}
 
-
-
 		List<IfSysFeildRefer> ifSysFeildReferList = dto.getReferList();
-		for(IfSysFeildRefer ifSysFeildRefer :ifSysFeildReferList){
+		boolean flag = ifSysReferService.updataReferFields(ifSysFeildReferList);
 
-		}
-
-		// 遍历增加数据
-		boolean flag = ifSysMockService.addIfSysMock(ifSysMock);
 		if (flag) {
 			reDto.setRspCd(SysCode.SUCCESS);
-			reDto.setIfSysMock(ifSysMock);
 		} else {
 			reDto.setRspCd(CodeItem.FAILURE);
 		}

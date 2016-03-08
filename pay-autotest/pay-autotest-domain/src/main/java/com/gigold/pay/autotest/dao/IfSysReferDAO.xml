@@ -38,6 +38,14 @@
 		where a.mockid = #{mockid}
 	</select>
 
+	<!-- 查询用例字段依赖列表 - 插入方法 -->
+	<update id="updataReferFields" parameterType="com.gigold.pay.autotest.bo.IfSysFeildRefer">
+		REPLACE INTO T_IF_REFER_MOCK_FEILD
+			(mockid,ref_mock_id,ref_feild,alias,status)
+		value
+			(#{ifSysFeildRefer.mockid},#{ref_mock_id},#{ref_feild},#{alias},#{status})
+	</update>
+
 	<insert id="addMockRefer" parameterType="com.gigold.pay.autotest.bo.IfSysRefer"
 		useGeneratedKeys="true" keyProperty="id">
         <![CDATA[  
