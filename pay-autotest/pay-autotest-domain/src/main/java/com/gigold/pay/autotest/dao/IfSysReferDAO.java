@@ -98,4 +98,10 @@ public interface IfSysReferDAO {
 	 * @return 所依赖的所有字段
 	 */
 	public List<IfSysFeildRefer> queryReferFields(int mockid);
+
+	/**
+	 * 更新 插入一条依赖
+	 * @param ifSysFeildRefer
+     */
+	public void updataReferFields(IfSysFeildRefer ifSysFeildRefer);
 }

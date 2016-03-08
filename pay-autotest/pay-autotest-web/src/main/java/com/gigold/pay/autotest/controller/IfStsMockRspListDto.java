@@ -36,6 +36,6 @@ public class IfStsMockRspListDto extends ResponseDto {
 		this.interFaceInfo = interFaceInfo;
 	}
 
-	
+
 
 }

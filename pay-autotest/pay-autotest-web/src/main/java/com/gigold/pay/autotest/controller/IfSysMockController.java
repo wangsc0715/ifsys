@@ -9,20 +9,14 @@ package com.gigold.pay.autotest.controller;
 
 import java.util.List;
 
+import com.gigold.pay.autotest.bo.*;
+import com.gigold.pay.autotest.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.gigold.pay.autotest.bo.IfSysMock;
-import com.gigold.pay.autotest.bo.InterFaceField;
-import com.gigold.pay.autotest.bo.InterFaceInfo;
-import com.gigold.pay.autotest.bo.ReturnCode;
-import com.gigold.pay.autotest.service.IfSysMockService;
-import com.gigold.pay.autotest.service.InterFaceFieldService;
-import com.gigold.pay.autotest.service.InterFaceService;
-import com.gigold.pay.autotest.service.RetrunCodeService;
 import com.gigold.pay.framework.base.SpringContextHolder;
 import com.gigold.pay.framework.bootstrap.SystemPropertyConfigure;
 import com.gigold.pay.framework.core.SysCode;
@@ -53,6 +47,8 @@ public class IfSysMockController extends BaseController {
 	InterFaceService interFaceService;
 	@Autowired
 	private RetrunCodeService retrunCodeService;
+	@Autowired
+	IfSysReferService ifSysReferService;
 
 	/**
 	 * @return the retrunCodeService
@@ -400,9 +396,42 @@ public class IfSysMockController extends BaseController {
 		}
 		return rdto;
 	}
-	
-	
-	
+
+
+	/**
+	 * 增加字段依赖数据
+	 * {
+	 * 	referList:[
+	 * 		{mockid:xxx,ref_mock_id:xxx,ref_feild:xxx,alias:xxx,status:xxx},
+	 * 		{mockid:xxx,ref_mock_id:xxx,ref_feild:xxx,alias:xxx,status:xxx}
+	 * 	]
+	 * }
+	 *
+	 * @param dto
+	 * @return
+     */
+	@RequestMapping("/addFieldRefer.do")
+	public @ResponseBody
+	IfSysFieldReferListRspDto addFieldRefer(@RequestBody IfSysFieldReferListReqDto dto) {
+		IfSysFieldReferListRspDto reDto = new IfSysFieldReferListRspDto();
+		// 验证请求参数合法性
+		String code = dto.validation();
+		// 没有通过则返回对应的返回码
+		if (!"00000".equals(code)) {
+			reDto.setRspCd(code);
+			return reDto;
+		}
+
+		List<IfSysFeildRefer> ifSysFeildReferList = dto.getReferList();
+		boolean flag = ifSysReferService.updataReferFields(ifSysFeildReferList);
+
+		if (flag) {
+			reDto.setRspCd(SysCode.SUCCESS);
+		} else {
+			reDto.setRspCd(CodeItem.FAILURE);
+		}
+		return reDto;
+	}
 	
 
 }
