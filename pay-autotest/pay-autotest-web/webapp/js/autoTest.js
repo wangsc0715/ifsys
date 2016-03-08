@@ -255,7 +255,7 @@ $(function() {
 
 	//点击修改按钮进入可编辑状态
 	$(document).on("click", ".upDaBtn", function() {
-		var $ele = $(this).parent().parent();
+		var $ele = $(this).parent().parent().parent();
 		$ele.find("textarea").removeAttr("readonly");
 		$ele.find("textarea")[0].focus();
 		$ele.find(".addRspBtn").removeClass("am-disabled");
@@ -264,7 +264,7 @@ $(function() {
 	//保存修改的测试用例数据
 	$(document).on("click", ".addRspBtn", function() {
 
-		var $ele = $(this).parent().parent();
+		var $ele = $(this).parent().parent().parent();
 		var sendData = {};
 		sendData.id = $ele.find(".hideInp").attr("data-id");
 		sendData.ifId = $(".addBtn").attr("data-ifId");
@@ -281,7 +281,6 @@ $(function() {
 			"url": "autotest/updateifsysmock.do",
 			"data": JSON.stringify(sendData),
 			"onSuccess": function(data) {
-				console.log(data);
 				if (data.rspCd == "00000") {
 					alert("保存成功");
 					$ele.find(".hideInp").attr("data-id", data.ifSysMock.id);
@@ -300,7 +299,7 @@ $(function() {
 
 	//删除返回码模块
 	$(document).on("click", ".delBtn", function() {
-		var $ele = $(this).parent().parent();
+		var $ele = $(this).parent().parent().parent();
 		var sendData = {};
 		sendData.id = $ele.find(".hideInp").attr("data-id");
 		if(sendData.id){
@@ -368,7 +367,7 @@ $(function() {
 				if (data.rspCd == "00000") {
 					var htmlStr = "";
 					var size = data.interFaceInfo.mockList.length;
-					$(".operName").html(data.interFaceInfo.ifName);
+					$(".operName").html("<a href='/ifsys/interFaceDetail.html?id="+data.interFaceInfo.id+"'>("+data.interFaceInfo.id+")"+data.interFaceInfo.ifName+"</a>");
 					$.each(data.interFaceInfo.mockList, function(index, mock) {
 						htmlStr += '<h4 class="am-panel-title" data-am-collapse="{target:\'#id'+index+'\'}">('+mock.id+')'+mock.caseName;
 						htmlStr += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;('+mock.rspCodeDesc+')'+mock.rspCode+'</h4>';
@@ -376,18 +375,19 @@ $(function() {
 						htmlStr += '<input type="hidden" class="hideInp" data-id="' + mock.id + '" data-ifId="' + mock.ifId + '" data-operName="' + data.interFaceInfo.ifName + '" data-rspCd="' + mock.rspCode + '" />';
 						htmlStr += '<p><span class="rspCd">' + mock.rspCode + ':</span>';
 						htmlStr += '<code class="rspCdDesc">' + mock.rspCodeDesc + '</code>';
-						htmlStr +='<button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary">依赖</button></p><hr />';
+						htmlStr +='<button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary">依赖</button>';
+						htmlStr +='<a href="/ifsys/interFaceUpdate.html?id='+data.interFaceInfo.id+'#markThead">添加返回码</a>';
+						htmlStr += '<span class="bianjiBtn">';
+						htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
+						htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn am-disabled">保存</button>';
+						htmlStr += '<button type="button" class="am-btn am-btn-danger delBtn">删除</button></span></p><hr />';
 						htmlStr += '<p><span >('+mock.id+')用例名称:<input name="caseName" value="'+mock.caseName+'"</span></p>';
 						htmlStr += '<div class="am-g">';
 						htmlStr += '<div class="am-u-sm-6"><p><span >入参:</span><textarea readonly class="reqJson">' + mock.requestJson + '</textarea></p></div>';
-						htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><textarea readonly class="rspJson">' + mock.responseJson + '</textarea></p></div></div>';
+						htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><textarea readonly class="rspJson">' + mock.responseJson + '</textarea></p></div>';
 						htmlStr += '<div class="am-u-sm-6"><p><span >描述用例本身的生成规则:</span><textarea readonly class="checkJson">' + mock.checkJson + '</textarea></p></div>';
 						htmlStr += '<div class="am-u-sm-6"><p><span >描述其他用例需要依赖的字段:</span><textarea readonly class="rspRefJson">' + mock.rspRefJson + '</textarea></p></div></div>';
-						htmlStr += '<div class="bianjiBtn">';
-						htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
-						htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn am-disabled">保存</button>';
-						htmlStr += '<button type="button" class="am-btn am-btn-danger delBtn">删除</button>';
-						htmlStr += '</div></div></div>';
+						htmlStr += '</div></div>';
 					});
 					$(".modalCd").html(htmlStr);
 				}
@@ -677,19 +677,18 @@ function addCodMod(data) {
 	}
 	htmlStr += '</select>';
 	htmlStr += '<span class="rspCd"></span>';
-	htmlStr += '<code class="rspCdDesc"></code><button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary" disabled>依赖</button></p><hr />';
+	htmlStr += '<code class="rspCdDesc"></code><button class="am-btn am-radius relyBtn am-btn-xs am-btn-secondary" disabled>依赖</button>';
+	htmlStr += '<span class="bianjiBtn">';
+	htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
+	htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn">保存</button>';
+	htmlStr += '<button type="button" class="am-btn am-btn-danger delBtn">删除</button></span></p><hr />';
 	htmlStr += '<p><span >用例名称:<input name="caseName" value=""</span></p>';
 	htmlStr += '<div class="am-g">';
 	htmlStr += '<div class="am-u-sm-6"><p><span >入参:</span><textarea class="reqJson" contenteditable="true"></textarea></p></div>';
 	htmlStr += '<div class="am-u-sm-6"><p><span >出参:</span><textarea class="rspJson" contenteditable="true"></textarea></p></div></div>';
 	htmlStr += '<div class="am-u-sm-6"><p><span >描述用例本身的生成规则:</span><textarea readonly class="checkJson"></textarea></p></div>';
 	htmlStr += '<div class="am-u-sm-6"><p><span >描述其他用例需要依赖的字段:</span><textarea readonly class="rspRefJson"></textarea></p></div></div>';
-	
-	htmlStr += '<div class="bianjiBtn">';
-	htmlStr += '<button type="button" class="am-btn am-btn-default upDaBtn">修改</button>';
-	htmlStr += '<button type="button" class="am-btn am-btn-default addRspBtn">保存</button>';
-	htmlStr += '<button type="button" class="am-btn am-btn-danger delBtn">删除</button>';
-	htmlStr += '</div></div></div>';
+	htmlStr += '</div></div>';
 	var rspBoxs = $(document).find(".rspBox").prev();
 	if(rspBoxs.length==0){
 		$(".modalCd").html(htmlStr);
