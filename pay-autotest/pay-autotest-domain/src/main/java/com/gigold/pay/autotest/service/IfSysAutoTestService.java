@@ -8,8 +8,12 @@
 package com.gigold.pay.autotest.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.gigold.pay.autotest.bo.IfSysFeildRefer;
+import com.gigold.pay.autotest.dao.IfSysReferDAO;
 import org.apache.http.client.CookieStore;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +29,6 @@ import com.gigold.pay.framework.util.common.StringUtil;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 /**
  * Title: IfSysAutoTestService<br/>
  * Description: <br/>
@@ -45,6 +48,7 @@ public class IfSysAutoTestService extends Domain {
 	IfSysMockService ifSysMockService;
 	@Autowired
 	IfSysReferService ifSysReferService;
+
 
 	public void writeBackContent(IfSysMock mock, String responseJson) {
 
@@ -147,13 +151,15 @@ public class IfSysAutoTestService extends Domain {
 			mock.setAddressUrl(url);
 			// 1、获取该测试用例调用时依赖的其他用例的调用列表
 			List<IfSysMock> invokerOrderList = new ArrayList<IfSysMock>();
+			// 放到第一位
+			invokerOrderList.add(mock);
 			invokerOrder(invokerOrderList, mock.getId());
-			//存放依赖的cookies
+			// 存放依赖的cookies
 			CookieStore cookieStore=new BasicCookieStore();
 			// 2、 按照调用序号依次调用被依赖测试用例
 			invokRefCase(invokerOrderList,cookieStore);
 			// 3、最后调用目标接口
-			invokCase(mock,cookieStore);
+			//invokCase(mock,cookieStore);
 
 		}
 
@@ -170,25 +176,51 @@ public class IfSysAutoTestService extends Domain {
 	 * @param invokerOrderList
 	 */
 	public void invokRefCase(List<IfSysMock> invokerOrderList,CookieStore cookieStore) {
+		/**
+		 * 1.定义调用列表中所有mock返回的结果
+		 */
+		Map<Integer,String> allRespMap = new HashMap<>();// 临时变量
+
 		for (int i = invokerOrderList.size() - 1; i >= 0; i--) {
 			IfSysMock refmock = invokerOrderList.get(i);
+
+
 			/**
-			 * 调用HTTP请求
+			 * 2.根据1中返回的结果,以及当前接口所依赖的返回,替换请求报文
 			 */
-			// 期望请求报文
 			String postData = refmock.getRequestJson();
-			
 			if(StringUtil.isBlank(postData)){
 				debug("用例请求报文为空----"+refmock.getCaseName());
 				return;
 			}
-			
-			//先处理请求报文
-			//postData=preHanlderRexuestBody(postData,refmock);
-			// 实际请求后，返回的报文（返回码和返回实体）
+			// 1.获取当前接口所依赖的所有字段,
+			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(refmock.getFollowId());
+			for(IfSysFeildRefer referField :referFields){
+				//2.根据返回字段,替换当前报文; 别名 => mockid => feild 依次遍历 _AllTheMocksResult
+				int nowMockId = referField.getRef_mock_id(); // 当前用例数据的id
+				String path = referField.getRef_feild();//当前用例数据所依赖的域
+				int refMockId = referField.getRef_mock_id();//当前用例数据所依赖的用例id
+
+				// 根据每一个依赖的用例在临时变量中查询出记录的返回的json
+				String backJson = allRespMap.get(nowMockId);
+				// 根据每个依赖的域,在返回的json中查询出值
+				String backField = gatJsonValByPath(backJson,path);
+				postData.replace(referField.getAlias() ,backField);// 替换别名代表的值
+			}
+
+
+			// 定义返回
 			String responseJson = "";
 			try {
+				/**
+				 * 3.发送http请求
+				 */
 				responseJson=httpClientService.httpPost(refmock.getAddressUrl(), postData,cookieStore);
+				/**
+				 * 4 在次把本次结果存在返回结果内返回存在结果里
+				 */
+				allRespMap.put(refmock.getId(),responseJson);
+
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
 			}finally {
@@ -421,4 +453,53 @@ public class IfSysAutoTestService extends Domain {
 		return addressUrl;
 	}
 
+	/**
+	 * 根据表达式 从json字符串中取值
+	 * @param jsonString json字符串
+	 * @param field 查找表达式
+     * @return 返回字符串
+     */
+	public static String gatJsonValByPath(String jsonString,String field){
+		JSONObject json;
+		try {
+			json = JSONObject.fromObject(jsonString);
+		} catch (Exception e) {
+			json = new JSONObject();
+		}
+
+		// 替换数组[]为.
+		field = field.replaceAll("\\[",".");
+		field = field.replaceAll("]\\.",".");
+		field = field.replaceAll("]",".");
+		field = field.replaceAll("\\.$","");
+		System.out.println(field);
+		// 逐级查找path对应的值
+		String[] path = field.split("\\.");
+		for(int i = 0; i<path.length;i++){
+			if(json.get(path[i]) instanceof JSONArray){
+				JSONArray jsonArr = JSONArray.fromObject(json.get(path[i]));
+				if(i>=path.length-1){
+					// 若下一个位置在path[]中已经超标,
+					// 则当前jsonArray对象已经是最后的位置,
+					// 直接返回即可
+					System.out.println("out");
+					return jsonArr.toString();
+				}else{
+					int idxOfJsonArr = Integer.parseInt(path[i+i]); //path的下一个位置转为整型就是所需值的下标
+					json=jsonArr.getJSONObject(idxOfJsonArr);
+					i++;
+				}
+			}else{
+				if(i>=path.length-1){
+					return json.get(path[i]).toString();
+				}
+				json = JSONObject.fromObject(json.get(path[i]));
+			}
+		}
+		return json.toString();
+	}
+
+	public static void main(String[] args){
+
+	}
 }

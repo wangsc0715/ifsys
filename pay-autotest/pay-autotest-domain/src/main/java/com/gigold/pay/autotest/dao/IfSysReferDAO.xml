@@ -11,9 +11,32 @@
 		<result property="rspCodeDesc" column="RSP_CODE_DESC" />
 		<result property="caseName" column="CASE_NAME" />
 		<result property="ifName" column="IF_NAME" />
-
-
 	</resultMap>
+
+	<!-- 查询用例字段依赖列表 - 域定义 -->
+	<resultMap type="com.gigold.pay.autotest.bo.IfSysFeildRefer" id="ifSysFieldMap">
+		<id property="id" column="id" />
+		<result property="mockid" column="mockid" />
+		<result property="ref_mock_id" column="ref_mock_id" />
+		<result property="ref_feild" column="ref_feild" />
+		<result property="alias" column="alias" />
+		<result property="status" column="status" />
+	</resultMap>
+
+
+	<!-- 查询用例字段依赖列表 - 查询方法 -->
+	<select id="queryReferFields" parameterType="com.gigold.pay.autotest.bo.IfSysFeildRefer"
+			resultMap="ifSysFieldMap">
+		select a.id,
+		a.mockid,
+		a.ref_mock_id,
+		a.ref_feild,
+		a.alias,
+		a.status
+		from
+		T_IF_REFER_MOCK_FEILD a
+		where a.mockid = #{mockid}
+	</select>
 
 	<insert id="addMockRefer" parameterType="com.gigold.pay.autotest.bo.IfSysRefer"
 		useGeneratedKeys="true" keyProperty="id">
@@ -115,9 +138,7 @@
         and REFER_MOCK_ID=#{refMockId}
       ]]>
 	</select>
-
 </mapper>
- 
  
  
  

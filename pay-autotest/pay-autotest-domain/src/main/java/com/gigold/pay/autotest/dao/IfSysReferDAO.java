@@ -9,6 +9,7 @@ package com.gigold.pay.autotest.dao;
 
 import java.util.List;
 
+import com.gigold.pay.autotest.bo.IfSysFeildRefer;
 import com.gigold.pay.autotest.bo.IfSysRefer;
 
 /**
@@ -90,6 +91,11 @@ public interface IfSysReferDAO {
 	 * @return
 	 */
 	public int updateMockRefer(IfSysRefer ifSysRefer);
-	
 
+	/**
+	 * 查询所有依赖的字段
+	 * @param mockid 主mock
+	 * @return 所依赖的所有字段
+	 */
+	public List<IfSysFeildRefer> queryReferFields(int mockid);
 }

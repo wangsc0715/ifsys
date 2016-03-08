@@ -9,6 +9,7 @@ package com.gigold.pay.autotest.service;
 
 import java.util.List;
 
+import com.gigold.pay.autotest.bo.IfSysFeildRefer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,6 @@ public class IfSysReferService extends Domain {
      * @author xiebin
      * @date 2015年12月10日上午10:15:30
      *
-     * @param ifId
      * @return
      */
 	public List<IfSysRefer> getReferList(int mockId) {
@@ -124,7 +124,6 @@ public class IfSysReferService extends Domain {
 	 * @author xiebin
 	 * @date 2015年12月22日下午6:25:43
 	 *
-	 * @param id
 	 * @return
 	 */
 	public boolean  updateMockRefer(IfSysRefer ifSysRefer) {
@@ -158,6 +157,22 @@ public class IfSysReferService extends Domain {
 		} catch (Exception e) {
 			e.printStackTrace();
             debug("调用 getReferByrefMockId 数据库发送异常");
+		}
+		return list;
+	}
+
+	/**
+	 * 获取mock的字段依赖
+	 * @param mockid 当前数据的mockid
+	 * @return 返回依赖的数据结果
+     */
+	public List<IfSysFeildRefer> queryReferFields(int mockid){
+		List<IfSysFeildRefer> list = null;
+		try {
+			list =ifSysReferDAO.queryReferFields(mockid);
+		} catch (Exception e) {
+			e.printStackTrace();
+            debug("获取不到当前接口"+String.valueOf(mockid)+" 的依赖");
 		}
 		return list;
 	}

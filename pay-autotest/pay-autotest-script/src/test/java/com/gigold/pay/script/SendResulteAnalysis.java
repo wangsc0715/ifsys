@@ -78,7 +78,7 @@ public class SendResulteAnalysis {
 		System.out.println("开始调用接口");
 		//autoTest();
 		System.out.println("调用接口结束");
-        //sendMail();
+        sendMail();
         testAutoTest();
         //sendCases();
         System.out.println("work");
@@ -91,7 +91,10 @@ public class SendResulteAnalysis {
 		
 	}
 
-   // @Test
+    /**
+     * 发送详情邮件
+     */
+//    @Test
 	public void sendMail() {
 
         // 返回所有测试过的结果
@@ -170,7 +173,7 @@ public class SendResulteAnalysis {
                 model.put("userName", userName);
                 model.put("StepsMap", StepsMap); //每个用例的步骤表  {332=[], 159=[1,2], 330=[1,2]}
 
-                if(email.equals("chenkuan@gigold.com")||email.equals("chenhl@gigold.com")||email.equals("liuzg@gigold.com")||email.equals("xiebin@gigold.com"))
+                //if(email.equals("chenkuan@gigold.com")||email.equals("chenhl@gigold.com")||email.equals("liuzg@gigold.com")||email.equals("xiebin@gigold.com"))
                 mailSenderService.sendWithTemplateForHTML(model);
             }
             System.out.println("邮件发送成功！");
@@ -178,8 +181,11 @@ public class SendResulteAnalysis {
 	}
 
 
+    /**
+     * 发送接口测试用例
+     */
     //@Test
-    public  void sendCases() {
+    public void sendCases() {
         try{
             WritableWorkbook book = Workbook.createWorkbook(new File("casesModel.xls"));//工作簿对象
             /** ************设置单元格字体************** */
@@ -329,6 +335,9 @@ public class SendResulteAnalysis {
         //mailSenderService.sendHtmlWithAttachment(new File("casesModel.xls"));
     }
 
+    /**
+     * 发送总体邮件
+     */
 	//@Test
 	public void testAutoTest() {
         int jnrCount = 15;
