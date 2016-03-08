@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gigold.pay.autotest.dao.IfSysFeildReferDao">
+
+	<resultMap type="com.gigold.pay.autotest.bo.IfSysFeildRefer" id="ifSysFieldMap">
+		<id property="id" column="id" />
+		<result property="mockid" column="mockid" />
+		<result property="ref_mock_id" column="ref_mock_id" />
+		<result property="ref_feild" column="ref_feild" />
+		<result property="alias" column="alias" />
+		<result property="status" column="status" />
+	</resultMap>
+
+
+	<!-- 查询用例字段依赖列表 -->
+	<select id="queryReferFields" parameterType="com.gigold.pay.autotest.bo.IfSysFeildRefer"
+		resultMap="ifSysFieldMap">
+		select a.id,
+			a.mockid,
+			a.ref_mock_id,
+			a.ref_feild,
+			a.alias,
+			a.status
+		from
+			T_IF_REFER_MOCK_FEILD a
+		where a.mockid = #{mockid}
+	</select>
+
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 
