@@ -398,6 +398,18 @@ public class IfSysMockController extends BaseController {
 	}
 
 
+	/**
+	 * 增加字段依赖数据
+	 * {
+	 * 	referList:[
+	 * 		{mockid:xxx,ref_mock_id:xxx,ref_feild:xxx,alias:xxx,status:xxx},
+	 * 		{mockid:xxx,ref_mock_id:xxx,ref_feild:xxx,alias:xxx,status:xxx}
+	 * 	]
+	 * }
+	 *
+	 * @param dto
+	 * @return
+     */
 	@RequestMapping("/addFieldRefer.do")
 	public @ResponseBody
 	IfSysFieldReferListRspDto addFieldRefer(@RequestBody IfSysFieldReferListReqDto dto) {
