@@ -423,6 +423,7 @@ public class IfSysMockController extends BaseController {
 		}
 
 		List<IfSysFeildRefer> ifSysFeildReferList = dto.getReferList();
+		reDto.setList(ifSysFeildReferList);
 		boolean flag = ifSysReferService.updataReferFields(ifSysFeildReferList);
 
 		if (flag) {
@@ -432,6 +433,61 @@ public class IfSysMockController extends BaseController {
 		}
 		return reDto;
 	}
-	
+
+	/**
+	 * 查询字段依赖关系
+	 * @param dto
+	 * @return
+     */
+	@RequestMapping("/queryFieldRefer.do")
+	public @ResponseBody
+	IfSysFieldReferListRspDto queryFieldRefer(@RequestBody IfSysFieldReferReqDto dto) {
+		IfSysFieldReferListRspDto reDto = new IfSysFieldReferListRspDto();
+		// 验证请求参数合法性
+		String code = dto.validation();
+		// 没有通过则返回对应的返回码
+		if (!"00000".equals(code)) {
+			reDto.setRspCd(code);
+			return reDto;
+		}
+
+		try {
+			List<IfSysFeildRefer> ifSysFeildReferList = ifSysReferService.queryReferFields(Integer.parseInt(dto.getMockid()));
+			reDto.setList(ifSysFeildReferList);
+			reDto.setRspCd(SysCode.SUCCESS);
+		}catch (Exception e){
+			reDto.setRspCd(SysCode.SYS_FAIL);
+		}
+		return reDto;
+	}
+
+	/**
+	 * 删除字段依赖关系
+	 * @param dto
+	 * @return
+     */
+	@RequestMapping("/deleteFieldRefer.do")
+	public @ResponseBody
+	IfSysFieldReferListRspDto deleteReferField(@RequestBody IfSysFieldReferReqDto dto) {
+		IfSysFieldReferListRspDto reDto = new IfSysFieldReferListRspDto();
+		// 验证请求参数合法性
+		String code = dto.validation();
+		// 没有通过则返回对应的返回码
+		if (!"00000".equals(code)) {
+			reDto.setRspCd(code);
+			return reDto;
+		}
+
+		boolean flag = false;
+		try {
+			flag = ifSysReferService.deleteReferField(Integer.parseInt(dto.getMockid()));
+			reDto.setRspCd(SysCode.SUCCESS);
+		}catch (Exception e){
+			reDto.setRspCd(SysCode.SYS_FAIL);
+		}
+
+		return reDto;
+	}
+
 
 }

@@ -177,6 +177,12 @@ public class IfSysReferService extends Domain {
 		return list;
 	}
 
+
+	/**
+	 * 更新mock关系
+	 * @param ifSysFeildRefers
+	 * @return
+     */
 	public boolean updataReferFields(List<IfSysFeildRefer> ifSysFeildRefers){
 		boolean flag = false;
 		try{
@@ -189,4 +195,22 @@ public class IfSysReferService extends Domain {
 		}
 		return flag;
 	}
+
+	/**
+	 * 删除mock字段依赖关系
+	 * @param id 关系id
+	 * @return
+     */
+	public boolean deleteReferField(int id){
+		boolean flag = false;
+		try {
+			ifSysReferDAO.deleteReferField(id);
+			flag = true;
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return flag;
+	};
+
+
 }
