@@ -100,6 +100,20 @@ public interface IfSysReferDAO {
 	public List<IfSysFeildRefer> queryReferFields(int mockid);
 
 	/**
+	 * 根据关系id查询字段依赖关系
+	 * @param id 主mock
+	 * @return 所依赖的所有字段
+	 */
+	public IfSysFeildRefer queryReferFieldById(int id);
+
+	/**
+	 * 根据mockid删除关联数据
+	 * @param id
+	 * @return
+     */
+	public boolean deleteReferField(int id);
+
+	/**
 	 * 更新 插入一条依赖
 	 * @param ifSysFeildRefer
      */
