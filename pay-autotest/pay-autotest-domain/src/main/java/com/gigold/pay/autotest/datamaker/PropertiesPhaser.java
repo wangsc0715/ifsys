@@ -13,7 +13,7 @@ public class PropertiesPhaser {
 
     public PropertiesPhaser(String dir){
         // 生成文件对象
-        File pf = new File(System.getProperty("user.dir")
+        File pf = new File(getClass().getResource("/").getFile()
                 + "/"+dir);
 
         // 生成文件输入流

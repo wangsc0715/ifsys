@@ -6,7 +6,7 @@ package com.gigold.pay.autotest.datamaker;
  * 全局变量
  */
 public class GlobalVal {
-    public static PropertiesPhaser globalVal = new PropertiesPhaser("/pay-autotest-script/src/main/resources/server.properties");
+    public static PropertiesPhaser globalVal = new PropertiesPhaser("pay-autotest-script/src/main/resources/server.properties");
     public static String get(String key){
         return globalVal.get(key);
     }

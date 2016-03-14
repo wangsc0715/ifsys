@@ -84,12 +84,12 @@ public class DBconnector {
         }
     }
 
-    public static void main(String[] args){
-        try {
-            DBconnector dBconnector = new DBconnector();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    public static void main(String[] args){
+//        try {
+//            DBconnector dBconnector = new DBconnector();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 }

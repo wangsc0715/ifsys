@@ -15,7 +15,7 @@ public class IdCardNo {
 ////        System.out.println(getUnusedPhoneNo());
 ////        System.out.println(getAvalidPhoneNo());
 //        System.out.println(getUnusedNo());
-//        disableNo("530500198304214639");
+////        disableNo("530500198304214639");
 //    }
 
     public static String getUnusedNo() throws Exception {

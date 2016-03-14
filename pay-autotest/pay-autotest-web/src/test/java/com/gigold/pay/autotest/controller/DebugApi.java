@@ -2,6 +2,7 @@ package com.gigold.pay.autotest.controller;
 
 
 import com.gigold.pay.autotest.bo.IfSysFeildRefer;
+import com.gigold.pay.autotest.datamaker.ConstField;
 import com.gigold.pay.autotest.service.IfSysReferService;
 import java.util.List;
 import org.junit.Test;
@@ -15,14 +16,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class DebugApi  {
     @Autowired
     private IfSysReferService ifSysReferService;
+    @Test
+    public void updataReferFields(){
+        try {
+            System.out.println(ConstField.getAllConstFields());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 //    @Test
-//    public void updataReferFields(){
-////        List<IfSysFeildRefer> a = ifSysReferService.queryReferFields(1);
-////        ifSysReferService.updataReferFields(a);
+//    public void queryReferFields(){
+//        List<IfSysFeildRefer> a = ifSysReferService.queryReferFields(1);
+//        System.out.println(a);
 //    }
-////    @Test
-////    public void queryReferFields(){
-////        List<IfSysFeildRefer> a = ifSysReferService.queryReferFields(1);
-////        System.out.println(a);
-////    }
 }
