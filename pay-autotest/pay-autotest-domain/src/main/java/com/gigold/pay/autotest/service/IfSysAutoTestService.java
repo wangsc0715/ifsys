@@ -197,19 +197,24 @@ public class IfSysAutoTestService extends Domain {
 				debug("用例请求报文为空----"+refmock.getCaseName());
 				return;
 			}
-			// 1.获取当前接口所依赖的所有字段,
-			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(refmock.getFollowId());
-			for(IfSysFeildRefer referField :referFields){
-				//2.根据返回字段,替换当前报文; 别名 => mockid => feild 依次遍历 allRespMap
-				int nowMockId = referField.getRef_mock_id(); // 当前用例数据的id
-				String path = referField.getRef_feild(); // 当前用例数据所依赖的域
 
-				// 根据每一个依赖的用例,在临时变量中查询出记录的返回的json
-				String backJson = allRespMap.get(nowMockId);
-				// 根据每个依赖的域,在返回的json中查询出值
-				String backField = gatJsonValByPath(backJson,path);
-				postData.replace(referField.getAlias() ,backField);// 替换别名代表的值
+			try {
+				// 1.获取当前接口所依赖的所有字段,
+				List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(refmock.getFollowId());
+				for(IfSysFeildRefer referField :referFields){
+					//2.根据返回字段,替换当前报文; 别名 => mockid => feild 依次遍历 allRespMap
+					int nowMockId = referField.getRef_mock_id(); // 当前用例数据的id
+					String path = referField.getRef_feild(); // 当前用例数据所依赖的域
+					// 根据每一个依赖的用例,在临时变量中查询出记录的返回的json
+					String backJson = allRespMap.get(nowMockId);
+					// 根据每个依赖的域,在返回的json中查询出值
+					String backField = gatJsonValByPath(backJson,path);
+					postData.replace(referField.getAlias() ,backField);// 替换别名代表的值
+				}
+			}catch (Exception e){
+				e.printStackTrace();
 			}
+
 
 			/**
 			 * 额外:替换常量如:唯一手机号, 唯一邮箱号, 唯一身份证号, 当前日期 等
