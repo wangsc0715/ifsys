@@ -264,7 +264,11 @@ public class IfSysAutoTestService extends Domain {
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
 			}finally {
-				writeBackRefCaseContent(refmock,responseJson);
+				if(i<=0){ //如果当前用例是依赖列表中最后的用例,则写道数据库中
+					writeBackContent(refmock, responseJson);
+				}else{
+					writeBackRefCaseContent(refmock,responseJson);
+				}
 			}
 
 		}
