@@ -18,13 +18,13 @@ public class ConstField {
 //        addToAvalidList(renewPhone());
 //    }
 
-    public static List getAllConstFields() throws Exception{
+    public static List<Map> getAllConstFields() throws Exception{
         List<Map> list = new ArrayList<>();
         DBconnector dBconnector = new DBconnector();
         try {
             ResultSet rs = dBconnector.query("select * FROM T_IF_REFER_CONST_FEILD a where a.status = 'Y' limit 10;");
             while (rs.next()) {
-                Map obj = new HashMap();
+                Map<String,String> obj = new HashMap<>();
                 obj.put("id",rs.getString("id"));
                 obj.put("holder",rs.getString("holder"));
                 obj.put("desc",rs.getString("desc"));

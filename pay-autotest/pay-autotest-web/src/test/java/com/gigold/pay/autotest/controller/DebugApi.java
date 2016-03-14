@@ -16,14 +16,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class DebugApi  {
     @Autowired
     private IfSysReferService ifSysReferService;
-    @Test
-    public void updataReferFields(){
-        try {
-            System.out.println(ConstField.getAllConstFields());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    @Test
+//    public void updataReferFields(){
+//        try {
+//            System.out.println(ConstField.getAllConstFields());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 //    @Test
 //    public void queryReferFields(){
 //        List<IfSysFeildRefer> a = ifSysReferService.queryReferFields(1);

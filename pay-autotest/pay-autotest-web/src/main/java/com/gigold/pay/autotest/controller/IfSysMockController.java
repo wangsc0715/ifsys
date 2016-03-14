@@ -491,9 +491,12 @@ public class IfSysMockController extends BaseController {
 		return reDto;
 	}
 
+	/**
+	 * 获取用例常量域
+     */
 	@RequestMapping("/getConstFields.do")
 	public @ResponseBody
-	ResponseDto getConstFields(@RequestBody RequestDto dto){
+	ResponseDto getConstFields(){
 		ResponseDto reDto = new ResponseDto();
 		try {
 			reDto.setDataes(ConstField.getAllConstFields());
