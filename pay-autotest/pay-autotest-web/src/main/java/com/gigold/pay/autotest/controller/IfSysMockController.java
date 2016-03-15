@@ -10,7 +10,9 @@ package com.gigold.pay.autotest.controller;
 import java.util.List;
 
 import com.gigold.pay.autotest.bo.*;
+import com.gigold.pay.autotest.datamaker.ConstField;
 import com.gigold.pay.autotest.service.*;
+import com.gigold.pay.framework.web.RequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -489,5 +491,19 @@ public class IfSysMockController extends BaseController {
 		return reDto;
 	}
 
-
+	/**
+	 * 获取用例常量域
+     */
+	@RequestMapping("/getConstFields.do")
+	public @ResponseBody
+	ResponseDto getConstFields(){
+		ResponseDto reDto = new ResponseDto();
+		try {
+			reDto.setDataes(ConstField.getAllConstFields());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		reDto.setRspCd(SysCode.SUCCESS);
+		return reDto;
+	}
 }

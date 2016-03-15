@@ -14,6 +14,8 @@ import java.util.Map;
 
 import com.gigold.pay.autotest.bo.IfSysFeildRefer;
 import com.gigold.pay.autotest.dao.IfSysReferDAO;
+import com.gigold.pay.autotest.datamaker.IdCardNo;
+import com.gigold.pay.autotest.datamaker.PhoneNo;
 import org.apache.http.client.CookieStore;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,6 +179,8 @@ public class IfSysAutoTestService extends Domain {
 	 */
 	public void invokRefCase(List<IfSysMock> invokerOrderList,CookieStore cookieStore) {
 		/**
+		 * *** 替换接口前后依赖的字段
+		 *
 		 * 1.定义调用列表中所有mock返回的结果
 		 */
 		Map<Integer,String> allRespMap = new HashMap<>();// 临时变量
@@ -193,20 +197,56 @@ public class IfSysAutoTestService extends Domain {
 				debug("用例请求报文为空----"+refmock.getCaseName());
 				return;
 			}
-			// 1.获取当前接口所依赖的所有字段,
-			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(refmock.getFollowId());
-			for(IfSysFeildRefer referField :referFields){
-				//2.根据返回字段,替换当前报文; 别名 => mockid => feild 依次遍历 _AllTheMocksResult
-				int nowMockId = referField.getRef_mock_id(); // 当前用例数据的id
-				String path = referField.getRef_feild();//当前用例数据所依赖的域
-				int refMockId = referField.getRef_mock_id();//当前用例数据所依赖的用例id
 
-				// 根据每一个依赖的用例在临时变量中查询出记录的返回的json
-				String backJson = allRespMap.get(nowMockId);
-				// 根据每个依赖的域,在返回的json中查询出值
-				String backField = gatJsonValByPath(backJson,path);
-				postData.replace(referField.getAlias() ,backField);// 替换别名代表的值
+			try {
+				// 1.获取当前接口所依赖的所有字段,
+				List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(refmock.getFollowId());
+				for(IfSysFeildRefer referField :referFields){
+					//2.根据返回字段,替换当前报文; 别名 => mockid => feild 依次遍历 allRespMap
+					int nowMockId = referField.getRef_mock_id(); // 当前用例数据的id
+					String path = referField.getRef_feild(); // 当前用例数据所依赖的域
+					// 根据每一个依赖的用例,在临时变量中查询出记录的返回的json
+					String backJson = allRespMap.get(nowMockId);
+					// 根据每个依赖的域,在返回的json中查询出值
+					String backField = gatJsonValByPath(backJson,path);
+					postData.replace(referField.getAlias() ,backField);// 替换别名代表的值
+				}
+			}catch (Exception e){
+				e.printStackTrace();
 			}
+
+
+			/**
+			 * 额外:替换常量如:唯一手机号, 唯一邮箱号, 唯一身份证号, 当前日期 等
+			 */
+			try {
+
+				String str_phone = "#{CONST-FRESH-PHONE-NO}";
+				String str_idcard = "#{CONST-FRESH-IDCARD-NO}";
+				String str_nowdata = "#{CONST-NOW-DATA}";
+				// 替换手机号
+				if(postData.indexOf(str_phone)>=0){ // 存在则替换
+					postData = postData.replace(str_phone, PhoneNo.getUnusedPhoneNo());
+					PhoneNo.renewPhone();
+				}
+
+				// 替换身份证号
+				if(postData.indexOf(str_idcard)>=0){ // 不存在则不替换
+					String idcardNo = IdCardNo.getUnusedNo();
+					postData.replace(str_idcard, idcardNo);
+					IdCardNo.disableNo(idcardNo);
+				}
+
+				// 替换当前日期
+				if(postData.indexOf(str_nowdata)>=0){
+					// do something
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			System.out.println("替换后的最终postData=>>"+postData);
+
 
 
 			// 定义返回
@@ -224,7 +264,11 @@ public class IfSysAutoTestService extends Domain {
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
 			}finally {
-				writeBackRefCaseContent(refmock,responseJson);
+				if(i<=0){ //如果当前用例是依赖列表中最后的用例,则写道数据库中
+					writeBackContent(refmock, responseJson);
+				}else{
+					writeBackRefCaseContent(refmock,responseJson);
+				}
 			}
 
 		}

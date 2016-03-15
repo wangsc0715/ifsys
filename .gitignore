@@ -8,3 +8,7 @@ ifsys/src/main/webapp/webapp.iml
 
 .idea/*.xml
 *.iml
+
+*.properties
+
+*.properties
