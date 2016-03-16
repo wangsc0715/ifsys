@@ -33,10 +33,10 @@ public class IfSysFieldReferReqDto extends RequestDto {
     }
 
     public String validation(){
-        if(this.mockid.isEmpty() && this.id.isEmpty()){
-            return CodeItem.REQ_JSON_IS_NULL;
-        }else{
+//        if(this.mockid.isEmpty() && this.id.isEmpty()){
+//            return CodeItem.REQ_JSON_IS_NULL;
+//        }else{
             return SysCode.SUCCESS;
-        }
+//        }
     }
 }

@@ -48,7 +48,7 @@
 
 	<!-- 用例字段依赖列表 删除方法 -->
 	<delete id="deleteReferField" parameterType="com.gigold.pay.autotest.bo.IfSysFeildRefer">
-		DELETE from T_IF_REFER_MOCK_FEILD  where id = #{mockid}
+		DELETE from T_IF_REFER_MOCK_FEILD  where id = #{id}
 	</delete>
 
 	<!-- 用例字段依赖列表 根据id查询 -->
