@@ -490,7 +490,7 @@ public class IfSysMockController extends BaseController {
 
 		boolean flag = false;
 		try {
-			flag = ifSysReferService.deleteReferField(Integer.parseInt(dto.getMockid()));
+			flag = ifSysReferService.deleteReferField(Integer.parseInt(dto.getId()));
 			reDto.setRspCd(SysCode.SUCCESS);
 		}catch (Exception e){
 			reDto.setRspCd(SysCode.SYS_FAIL);
