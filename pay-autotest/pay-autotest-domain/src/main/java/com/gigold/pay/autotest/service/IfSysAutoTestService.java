@@ -176,18 +176,16 @@ public class IfSysAutoTestService extends Domain {
 	 *
 	 * @param invokerOrderList
 	 */
+	Map<Integer,String> allRespMap = new HashMap<>();// 临时变量
 	public void invokRefCase(List<IfSysMock> invokerOrderList,CookieStore cookieStore) {
 		/**
 		 * *** 替换接口前后依赖的字段
 		 *
 		 * 1.定义调用列表中所有mock返回的结果
 		 */
-		Map<Integer,String> allRespMap = new HashMap<>();// 临时变量
 
 		for (int i = invokerOrderList.size() - 1; i >= 0; i--) {
 			IfSysMock refmock = invokerOrderList.get(i);
-
-
 			/**
 			 * 2.根据1中返回的结果,以及当前接口所依赖的返回,替换请求报文
 			 */
@@ -236,6 +234,7 @@ public class IfSysAutoTestService extends Domain {
      * @return
      */
 	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap){
+		if(!(mockid==727))return "";
 		try {
 			// 1.获取当前接口所依赖的所有字段,
 			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(mockid);
@@ -248,6 +247,8 @@ public class IfSysAutoTestService extends Domain {
 				// 根据每个依赖的域,在返回的json中查询出值
 				String backField = gatJsonValByPath(backJson,path);
 				requestStr = requestStr.replace(referField.getAlias() ,backField);// 替换别名代表的值
+				System.out.println(requestStr);
+
 			}
 
 
@@ -274,6 +275,7 @@ public class IfSysAutoTestService extends Domain {
 			if(requestStr.indexOf(str_nowdata)>=0){
 				Format format = new SimpleDateFormat("yyyy-MM-dd");
 				requestStr = requestStr.replace(str_nowdata,format.format(new Date()));
+				System.out.println(requestStr);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -511,6 +513,8 @@ public class IfSysAutoTestService extends Domain {
      */
 	public static String gatJsonValByPath(String jsonString,String field){
 		JSONObject json;
+		// 判断传入字符串是否为空
+		if(jsonString.isEmpty()||field.isEmpty())return "";
 		try {
 			json = JSONObject.fromObject(jsonString);
 		} catch (Exception e) {

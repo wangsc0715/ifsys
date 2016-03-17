@@ -219,6 +219,7 @@
 	<select id="getMockInfoById" parameterType="int" resultMap="ifSysMockResultMap">
      <![CDATA[ 
 		select ID,
+		CASE_NAME,
 		IF_ID,
 		RSP_CODE_ID,
 		(select RSP_CODE_DESC from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE_DESC,
