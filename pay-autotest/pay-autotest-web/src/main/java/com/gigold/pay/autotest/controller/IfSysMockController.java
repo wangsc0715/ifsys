@@ -48,6 +48,10 @@ public class IfSysMockController extends BaseController {
 	@Autowired
 	InterFaceService interFaceService;
 	@Autowired
+	InterFaceSysService interFaceSysService;
+	@Autowired
+	InterFaceProService interFaceProService;
+	@Autowired
 	private RetrunCodeService retrunCodeService;
 	@Autowired
 	IfSysReferService ifSysReferService;
@@ -260,6 +264,10 @@ public class IfSysMockController extends BaseController {
 			e.printStackTrace();
 		}
 		List<InterFaceInfo> list = interFaceService.getAllIfSys(interFaceInfo);
+		for(InterFaceInfo interFaceInfo1 : list){
+			List<IfSysMock> mocklist = ifSysMockService.getMockInfoByIfId(interFaceInfo1.getId());
+			interFaceInfo1.setMockList(mocklist);
+		}
 		if (list != null) {
 			pageInfo = new PageInfo<InterFaceInfo>(list);
 			reDto.setPageInfo(pageInfo);
@@ -482,7 +490,7 @@ public class IfSysMockController extends BaseController {
 
 		boolean flag = false;
 		try {
-			flag = ifSysReferService.deleteReferField(Integer.parseInt(dto.getMockid()));
+			flag = ifSysReferService.deleteReferField(Integer.parseInt(dto.getId()));
 			reDto.setRspCd(SysCode.SUCCESS);
 		}catch (Exception e){
 			reDto.setRspCd(SysCode.SYS_FAIL);
@@ -506,4 +514,73 @@ public class IfSysMockController extends BaseController {
 		reDto.setRspCd(SysCode.SUCCESS);
 		return reDto;
 	}
+
+	/**
+	 * 获取接口信息
+	 */
+	@RequestMapping("/queryInterFaceById.do")
+	public @ResponseBody
+	IfSysInterFaceInfoRspDto getInterFaceInfo(@RequestBody IfSysInterFaceReqDto dto){
+
+		IfSysInterFaceInfoRspDto reDto = new IfSysInterFaceInfoRspDto();
+
+
+		// 获取接口信息
+		InterFaceInfo interFaceInfo = interFaceService.getInterFaceById(dto.getIfId());
+		if (interFaceInfo == null || interFaceInfo.getId() == 0) {
+			reDto.setRspCd(CodeItem.FAILURE);
+			return reDto;
+		}
+
+
+		// 获取所属系统信息
+		InterFaceSysTem interFaceSysTem = (InterFaceSysTem) SpringContextHolder.getBean(InterFaceSysTem.class);
+		interFaceSysTem.setId(interFaceInfo.getIfSysId());
+		interFaceSysTem = interFaceSysService.getSysInfoById(interFaceSysTem);
+		if (interFaceSysTem == null) {
+			reDto.setRspCd(CodeItem.FAILURE);
+			return reDto;
+		}
+
+		// 获取返回码列表
+		List<ReturnCode> returnCodes = retrunCodeService.getReturnCodeByIfId(dto.getIfId());
+
+		// 设置接口信息
+		reDto.setInterFaceInfo(interFaceInfo);
+		// 设置接口所属系统信息
+		reDto.setSystem(interFaceSysTem);
+		// 设置接口所属产品信息
+		reDto.setReturnCodeList(returnCodes);
+
+		reDto.setRspCd(SysCode.SUCCESS);
+		return reDto;
+	}
+
+//	/**
+//	 * 获取接口信息
+//	 */
+//	@RequestMapping("/getIndexTree.do")
+//	public @ResponseBody IfSysMockRspDto getIndexTree(@RequestBody IfSysMockPageDto dto) {
+//		debug("getAllIfSys方法");
+//		IfSysMockRspDto reDto = new IfSysMockRspDto();
+//		int curPageNum = dto.getPageNum();
+//		PageInfo<InterFaceInfo> pageInfo = null;
+//		PageHelper.startPage(curPageNum, Integer.parseInt(SystemPropertyConfigure.getProperty("sys.pageSize")));
+//		InterFaceInfo interFaceInfo = null;
+//		try {
+//			interFaceInfo = createBO(dto, InterFaceInfo.class);
+//		} catch (PendingException e) {
+//			debug("转换bo异常");
+//			e.printStackTrace();
+//		}
+//		List<InterFaceInfo> list = interFaceService.getAllIfSys(interFaceInfo);
+//		if (list != null) {
+//			pageInfo = new PageInfo<InterFaceInfo>(list);
+//			reDto.setPageInfo(pageInfo);
+//			reDto.setRspCd(SysCode.SUCCESS);
+//		} else {
+//			reDto.setRspCd(CodeItem.FAILURE);
+//		}
+//		return reDto;
+//	}
 }

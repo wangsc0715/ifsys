@@ -14,6 +14,15 @@ public class IfSysFieldReferReqDto extends RequestDto {
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
     private String mockid;
+    private String id;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getMockid() {
         return mockid;
@@ -24,10 +33,10 @@ public class IfSysFieldReferReqDto extends RequestDto {
     }
 
     public String validation(){
-        if(this.mockid.isEmpty()){
-            return CodeItem.REQ_JSON_IS_NULL;
-        }else{
+//        if(this.mockid.isEmpty() && this.id.isEmpty()){
+//            return CodeItem.REQ_JSON_IS_NULL;
+//        }else{
             return SysCode.SUCCESS;
-        }
+//        }
     }
 }
