@@ -366,7 +366,10 @@ public class IfSysMockController extends BaseController {
 	@RequestMapping("/getmockbypage.do")
 	public @ResponseBody IfSysMockPageRspDto getmockbypage(@RequestBody IfSysMockPageReqDto dto) {
 		IfSysMockPageRspDto reDto = new IfSysMockPageRspDto();
-		PageHelper.startPage(dto.getPageNum(),5);
+
+		int pageSize = dto.getPageSize();
+		PageHelper.startPage(dto.getPageNum(),pageSize>0?pageSize:5);
+
 		IfSysMock ifSysMock=null;
 		try {
 			ifSysMock=createBO(dto, IfSysMock.class);

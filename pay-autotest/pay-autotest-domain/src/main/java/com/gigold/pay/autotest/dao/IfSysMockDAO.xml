@@ -74,7 +74,10 @@
 		where
 		STATUS='Y'
 		) tt
-		where tt.IF_NAME like '%${ifName}%'
+		where
+		tt.IF_NAME like '%${ifName}%'
+		or tt.id like '%${ifName}%'
+		or tt.CASE_NAME like '%${ifName}%'
 		<if test="ifSysId != null and ifSysId!=0">
 			and tt.IF_SYS_ID = #{ifSysId}
 		</if>

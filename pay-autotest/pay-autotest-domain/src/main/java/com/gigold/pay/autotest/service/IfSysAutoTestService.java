@@ -543,19 +543,4 @@ public class IfSysAutoTestService extends Domain {
 		return json.toString();
 	}
 
-	public static void main(String[] args){
-		String json = "{\n" +
-				"    \"key1\": \"val1\",\n" +
-				"    \"key2\": [\n" +
-				"        {\n" +
-				"            \"key21\": \"val21\"\n" +
-				"        },\n" +
-				"        {\n" +
-				"            \"key22\": \"val22\"\n" +
-				"        }\n" +
-				"    ]\n" +
-				"}";
-		String key  = "key2[0].key21";
-		System.out.println(gatJsonValByPath(json,key));
-	}
 }
