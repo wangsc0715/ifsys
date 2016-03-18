@@ -61,6 +61,7 @@ public class IfSysAutoTestService extends Domain {
 		}
 		String relRspCode = String.valueOf(jsonObject.get("rspCd"));
 		String testResulte;
+		String realRequestJson = mock.getRequestJson();
 		// 1-正常 0-失败 -1-请求或响应存在其他异常
 		if (relRspCode.equals(mock.getRspCode())) {// 返回码与预期一致
 			testResulte ="1";
@@ -176,14 +177,13 @@ public class IfSysAutoTestService extends Domain {
 	 *
 	 * @param invokerOrderList
 	 */
-	Map<Integer,String> allRespMap = new HashMap<>();// 临时变量
 	public void invokRefCase(List<IfSysMock> invokerOrderList,CookieStore cookieStore) {
 		/**
 		 * *** 替换接口前后依赖的字段
 		 *
 		 * 1.定义调用列表中所有mock返回的结果
 		 */
-
+		Map<Integer,String> allRespMap = new HashMap<>();// 临时变量
 		for (int i = invokerOrderList.size() - 1; i >= 0; i--) {
 			IfSysMock refmock = invokerOrderList.get(i);
 			/**
@@ -199,6 +199,7 @@ public class IfSysAutoTestService extends Domain {
 			 * 替换前序接口的占位符
 			 */
 			postData = replaceHolder(postData,refmock.getId(),allRespMap);
+			refmock.setRealRequestJson(postData);// 写入真实的请求参数
 			System.out.println("替换后的最终postData=>>"+postData);
 
 			// 定义返回
