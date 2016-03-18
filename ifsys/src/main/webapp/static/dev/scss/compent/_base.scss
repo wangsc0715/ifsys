@@ -1,0 +1,147 @@
+@charset "utf-8";
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-weight: normal;
+  line-height: 1.1;
+}
+
+ol, ul, menu {
+  list-style: none outside none;
+}
+
+body, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, button, select, textarea, p, blockquote, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+}
+
+header,footer{
+  margin: 0 auto;
+}
+
+address, caption, cite, code, dfn, em, i, th, var, optgroup {
+  font-style: normal;
+  font-weight: normal;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+fieldset {
+  border: none;
+}
+
+input, button {
+  border: none;
+}
+
+input[type="submit"], input[type="reset"], input[type="button"], button {
+  -webkit-appearance: none;
+}
+.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+  cursor: not-allowed;
+  background-color: #eeeeee;
+}
+input[type="file"]:focus, input[type="radio"]:focus, input[type="checkbox"]:focus {
+  outline: none;
+  outline-offset: inherit;
+}
+
+input, button, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+img {
+  border: 0;
+  vertical-align: middle;
+  -ms-interpolation-mode: bicubic;
+}
+
+a {
+  color: #279bec;
+  text-decoration: none;
+  cursor: pointer;
+}
+a:hover, a:focus {
+  color: #1b609b;
+  outline: none;
+  text-decoration: underline;
+}
+
+a:active{
+  color: #279bec;
+}
+
+::-ms-clear {
+  display: none;
+}
+
+::-ms-reveal {
+  display: none;
+}
+
+.ml10{
+  margin-left: 10px;
+}
+
+.mr10{
+  margin-right: 10px;
+}
+
+.pt10{
+  padding-top: 10px;
+}
+
+.pt20{
+  padding-top: 20px;
+}
+
+.cl {
+  *zoom: 1;
+
+  &:after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    font-size: 0;
+    visibility: hidden;
+    overflow: hidden;
+  }
+}
+
+.hide{
+  display: none;
+}
+
+.hidden{
+  visibility: hidden;
+}
+
+.wp{
+    width: 1000px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.table-middle {
+  height: 100%;
+  width: 100%;
+  display: table;
+  position: relative;
+  text-align: center;
+}
+.table-cell {
+  display: table-cell;
+  vertical-align: middle;
+  width: 100%;
+}
+
+.text-overflow{
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
