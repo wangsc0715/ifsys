@@ -23,11 +23,19 @@ public class IfSysMockPageReqDto extends RequestDto {
 	/** serialVersionUID */
 	private static final long serialVersionUID = 1L;
 	private int pageNum;
+	private int pageSize;
 	private int ifSysId;
 	private int ifProId;
 	private String  ifName;
-	
-	
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
 	/**
 	 * @return the pageNum
 	 */

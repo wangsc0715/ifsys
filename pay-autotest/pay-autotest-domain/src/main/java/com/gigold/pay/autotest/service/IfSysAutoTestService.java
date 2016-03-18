@@ -7,10 +7,9 @@
  */
 package com.gigold.pay.autotest.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import com.gigold.pay.autotest.bo.IfSysFeildRefer;
 import com.gigold.pay.autotest.dao.IfSysReferDAO;
@@ -62,6 +61,7 @@ public class IfSysAutoTestService extends Domain {
 		}
 		String relRspCode = String.valueOf(jsonObject.get("rspCd"));
 		String testResulte;
+		String realRequestJson = mock.getRequestJson();
 		// 1-正常 0-失败 -1-请求或响应存在其他异常
 		if (relRspCode.equals(mock.getRspCode())) {// 返回码与预期一致
 			testResulte ="1";
@@ -184,11 +184,8 @@ public class IfSysAutoTestService extends Domain {
 		 * 1.定义调用列表中所有mock返回的结果
 		 */
 		Map<Integer,String> allRespMap = new HashMap<>();// 临时变量
-
 		for (int i = invokerOrderList.size() - 1; i >= 0; i--) {
 			IfSysMock refmock = invokerOrderList.get(i);
-
-
 			/**
 			 * 2.根据1中返回的结果,以及当前接口所依赖的返回,替换请求报文
 			 */
@@ -198,56 +195,12 @@ public class IfSysAutoTestService extends Domain {
 				return;
 			}
 
-			try {
-				// 1.获取当前接口所依赖的所有字段,
-				List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(refmock.getFollowId());
-				for(IfSysFeildRefer referField :referFields){
-					//2.根据返回字段,替换当前报文; 别名 => mockid => feild 依次遍历 allRespMap
-					int nowMockId = referField.getRef_mock_id(); // 当前用例数据的id
-					String path = referField.getRef_feild(); // 当前用例数据所依赖的域
-					// 根据每一个依赖的用例,在临时变量中查询出记录的返回的json
-					String backJson = allRespMap.get(nowMockId);
-					// 根据每个依赖的域,在返回的json中查询出值
-					String backField = gatJsonValByPath(backJson,path);
-					postData.replace(referField.getAlias() ,backField);// 替换别名代表的值
-				}
-			}catch (Exception e){
-				e.printStackTrace();
-			}
-
-
 			/**
-			 * 额外:替换常量如:唯一手机号, 唯一邮箱号, 唯一身份证号, 当前日期 等
+			 * 替换前序接口的占位符
 			 */
-			try {
-
-				String str_phone = "#{CONST-FRESH-PHONE-NO}";
-				String str_idcard = "#{CONST-FRESH-IDCARD-NO}";
-				String str_nowdata = "#{CONST-NOW-DATA}";
-				// 替换手机号
-				if(postData.indexOf(str_phone)>=0){ // 存在则替换
-					postData = postData.replace(str_phone, PhoneNo.getUnusedPhoneNo());
-					PhoneNo.renewPhone();
-				}
-
-				// 替换身份证号
-				if(postData.indexOf(str_idcard)>=0){ // 不存在则不替换
-					String idcardNo = IdCardNo.getUnusedNo();
-					postData.replace(str_idcard, idcardNo);
-					IdCardNo.disableNo(idcardNo);
-				}
-
-				// 替换当前日期
-				if(postData.indexOf(str_nowdata)>=0){
-					// do something
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
+			postData = replaceHolder(postData,refmock.getId(),allRespMap);
+			refmock.setRealRequestJson(postData);// 写入真实的请求参数
 			System.out.println("替换后的最终postData=>>"+postData);
-
-
 
 			// 定义返回
 			String responseJson = "";
@@ -274,6 +227,62 @@ public class IfSysAutoTestService extends Domain {
 		}
 	}
 
+	/**
+	 * 替换接口占位符依赖
+	 * @param requestStr 原始请求参数
+	 * @param mockid 目标用例
+	 * @param allRespMap 依赖用例的所有返回<用例id,用例返回字符串>
+     * @return
+     */
+	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap){
+		if(!(mockid==727))return "";
+		try {
+			// 1.获取当前接口所依赖的所有字段,
+			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(mockid);
+			for(IfSysFeildRefer referField :referFields){
+				//2.根据返回字段,替换当前报文; 别名 => mockid => feild 依次遍历 allRespMap
+				int nowMockId = referField.getRef_mock_id(); // 当前用例数据的id
+				String path = referField.getRef_feild(); // 当前用例数据所依赖的域
+				// 根据每一个依赖的用例,在临时变量中查询出记录的返回的json
+				String backJson = allRespMap.get(nowMockId);
+				// 根据每个依赖的域,在返回的json中查询出值
+				String backField = gatJsonValByPath(backJson,path);
+				requestStr = requestStr.replace(referField.getAlias() ,backField);// 替换别名代表的值
+				System.out.println(requestStr);
+
+			}
+
+
+		/**
+		 * 额外:替换常量如:唯一手机号, 唯一邮箱号, 唯一身份证号, 当前日期 等
+		 */
+			String str_phone = "#{CONST-FRESH-PHONE-NO}";
+			String str_idcard = "#{CONST-FRESH-IDCARD-NO}";
+			String str_nowdata = "#{CONST-NOW-DATA}";
+			// 替换手机号
+			if(requestStr.indexOf(str_phone)>=0){ // 存在则替换
+				requestStr = requestStr.replace(str_phone, PhoneNo.getUnusedPhoneNo());
+				PhoneNo.renewPhone();
+			}
+
+			// 替换身份证号
+			if(requestStr.indexOf(str_idcard)>=0){ // 不存在则不替换
+				String idcardNo = IdCardNo.getUnusedNo();
+				requestStr = requestStr.replace(str_idcard, idcardNo);
+				IdCardNo.disableNo(idcardNo);
+			}
+
+			// 替换当前日期
+			if(requestStr.indexOf(str_nowdata)>=0){
+				Format format = new SimpleDateFormat("yyyy-MM-dd");
+				requestStr = requestStr.replace(str_nowdata,format.format(new Date()));
+				System.out.println(requestStr);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return requestStr;
+	}
 	/**
 	 * 
 	 * Title: invokCase<br/>
@@ -505,6 +514,8 @@ public class IfSysAutoTestService extends Domain {
      */
 	public static String gatJsonValByPath(String jsonString,String field){
 		JSONObject json;
+		// 判断传入字符串是否为空
+		if(jsonString.isEmpty()||field.isEmpty())return "";
 		try {
 			json = JSONObject.fromObject(jsonString);
 		} catch (Exception e) {
@@ -543,19 +554,4 @@ public class IfSysAutoTestService extends Domain {
 		return json.toString();
 	}
 
-	public static void main(String[] args){
-		String json = "{\n" +
-				"    \"key1\": \"val1\",\n" +
-				"    \"key2\": [\n" +
-				"        {\n" +
-				"            \"key21\": \"val21\"\n" +
-				"        },\n" +
-				"        {\n" +
-				"            \"key22\": \"val22\"\n" +
-				"        }\n" +
-				"    ]\n" +
-				"}";
-		String key  = "key2[0].key21";
-		System.out.println(gatJsonValByPath(json,key));
-	}
 }

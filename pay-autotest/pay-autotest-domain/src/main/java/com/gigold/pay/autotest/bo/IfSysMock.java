@@ -33,6 +33,7 @@ public class IfSysMock {
 	private String responseJson;
 	private String testResult;
 	private String realRspCode;
+	private String realRequestJson;// 真实请求
 	private String realResponseJson;
 	private String caseName;
 	private String checkJson; //用例数据自动生成规则描述 json格式 有格式要求
@@ -60,10 +61,15 @@ public class IfSysMock {
 	private int ifSysId;
 	private int ifProId;
 
-	
-	
-	
-	
+
+	public String getRealRequestJson() {
+		return realRequestJson;
+	}
+
+	public void setRealRequestJson(String realRequestJson) {
+		this.realRequestJson = realRequestJson;
+	}
+
 	/**
 	 * @return the isCase
 	 */

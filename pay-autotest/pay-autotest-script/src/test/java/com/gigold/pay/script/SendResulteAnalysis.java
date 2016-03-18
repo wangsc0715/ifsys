@@ -78,8 +78,8 @@ public class SendResulteAnalysis {
 		System.out.println("开始调用接口");
 		autoTest();
 		System.out.println("调用接口结束");
-        sendMail();
-        testAutoTest();
+        //sendMail();
+        //testAutoTest();
         //sendCases();
         System.out.println("work");
 	}
