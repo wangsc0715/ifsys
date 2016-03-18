@@ -9,6 +9,7 @@ package com.gigold.pay.autotest.bo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Title: InterFaceInfo<br/>
@@ -27,17 +28,35 @@ public class InterFaceInfo {
 	private String proName;
 	private String ifUrl;
 	private String ifDesc;
-	
 	private String addressUrl;
 	private String method;
 	private String methodVersion;
 	private String reqJsonStr;
 	private String rspJsonStr;
 	private String dsname;
+	private List<ReturnCode> returnCodeList;
+	private List<IfSysMock> mockList=new ArrayList<IfSysMock>();
+	private List<Map> mockidList=new ArrayList<>();
 
 	private int ifSysId;
 	private int ifProId;
 
+
+	public List<Map> getMockidList() {
+		return mockidList;
+	}
+
+	public void setMockidList(List<Map> mockidList) {
+		this.mockidList = mockidList;
+	}
+
+	public List<ReturnCode> getReturnCodeList() {
+		return returnCodeList;
+	}
+
+	public void setReturnCodeList(List<ReturnCode> returnCodeList) {
+		this.returnCodeList = returnCodeList;
+	}
 
 	public String getDsname() {
 		return dsname;
@@ -229,7 +248,6 @@ public class InterFaceInfo {
 		this.rspJsonStr = rspJsonStr;
 	}
 
-	private List<IfSysMock> mockList=new ArrayList<IfSysMock>();
 
 	/**
 	 * @return the mockList
