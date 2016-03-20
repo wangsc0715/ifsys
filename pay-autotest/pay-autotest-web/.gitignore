@@ -1,3 +1,4 @@
 /target/
+#/webapp/node_modules/
 system.properties
 server.properties
