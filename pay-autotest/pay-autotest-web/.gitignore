@@ -1,3 +1,4 @@
 /target/
+*/node-modules/*
 system.properties
 server.properties
