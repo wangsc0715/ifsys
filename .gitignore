@@ -1,6 +1,6 @@
 
 ifsys/src/main/webapp/webapp.iml
-ifsys/src/main/webapp/node_modules
+ifsys/src/main/webapp/node_modules/*
 *.ipr
 
 *.iws
