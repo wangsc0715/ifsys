@@ -15,12 +15,14 @@
 		<result property="ifStatus" column="IF_STATUS" />
 		<result property="ifUrl" column="IF_URL" />
 		<result property="addressUrl" column="ADDRESS_URL" />
-		<result property="ifType" column="IF_TYPE" />
+		<result property="method" column="IF_TYPE" />
+		<result property="ifUrl" column="IF_FULL_URL" />
 		<result property="ifProtocol" column="IF_PROTOCOL" />
 		<result property="isValid" column="ISVALID" />
 		<result property="method" column="IF_METHOD" />
 		<result property="methodVersion" column="IF_DUBBO_VERSION" />
 		<result property="dsname" column="DSNAME" />
+		<result property="dsname" column="USERNAME" />
 	</resultMap>
 
 	<!-- 根据ID查询接口信息 -->
@@ -47,6 +49,9 @@
 <!-- 分页获取接口基本信息 列表页 -->
 	<select id="getAllIfSys" resultMap="ifResultMap" parameterType="com.gigold.pay.autotest.bo.InterFaceInfo">
 		select
+		concat(address_url,if_url) IF_FULL_URL,
+		if_desc IF_DESC,
+		if_type IF_TYPE,
 		inteFace.ID,
 		IF_NAME,
 		IF_SYS_NAME SYS_NAME,

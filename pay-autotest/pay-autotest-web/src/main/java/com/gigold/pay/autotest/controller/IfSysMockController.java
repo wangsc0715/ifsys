@@ -7,7 +7,10 @@
  */
 package com.gigold.pay.autotest.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.gigold.pay.autotest.bo.*;
 import com.gigold.pay.autotest.datamaker.ConstField;
@@ -263,14 +266,22 @@ public class IfSysMockController extends BaseController {
 			debug("转换bo异常");
 			e.printStackTrace();
 		}
+
 		List<InterFaceInfo> list = interFaceService.getAllIfSys(interFaceInfo);
 		for(InterFaceInfo interFaceInfo1 : list){
-			List<IfSysMock> mocklist = ifSysMockService.getMockInfoByIfId(interFaceInfo1.getId());
-			interFaceInfo1.setMockList(mocklist);
+
+			// 加入重组的 mocklist,去掉一些无用信息
+			List<Map> mockidlist  = ifSysMockService.getInterfaceMocksById(interFaceInfo1.getId());
+
+			// 加入返回码
+			List<ReturnCode> returnCodeList = retrunCodeService.getReturnCodeByIfId(interFaceInfo1.getId());
+			interFaceInfo1.setMockidList(mockidlist);
+			interFaceInfo1.setReturnCodeList(returnCodeList);
 		}
 		if (list != null) {
 			pageInfo = new PageInfo<InterFaceInfo>(list);
 			reDto.setPageInfo(pageInfo);
+
 			reDto.setRspCd(SysCode.SUCCESS);
 		} else {
 			reDto.setRspCd(CodeItem.FAILURE);
@@ -408,6 +419,29 @@ public class IfSysMockController extends BaseController {
 			rdto.setRspCd(CodeItem.FAILURE);
 		}
 		return rdto;
+	}
+
+
+	@RequestMapping("/getMockById.do")
+	public @ResponseBody IfSysMockInfoRspDto getMockByMockId(@RequestBody IfSysMockAddReqDto dto) {
+
+		IfSysMockInfoRspDto reDto = new IfSysMockInfoRspDto();
+		int mockid = dto.getId();
+		if (mockid == 0) {
+			reDto.setRspCd(CodeItem.IF_ID_FAILURE);
+			return reDto;
+		}
+
+		IfSysMock ifSysMock = new IfSysMock();
+		ifSysMock.setId(mockid);
+		ifSysMock = ifSysMockService.getMockInfoById(ifSysMock);
+		if (ifSysMock != null) {
+			reDto.setMock(ifSysMock);
+			reDto.setRspCd(SysCode.SUCCESS);
+		} else {
+			reDto.setRspCd(CodeItem.FAILURE);
+		}
+		return reDto;
 	}
 
 

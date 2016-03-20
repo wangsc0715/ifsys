@@ -41,6 +41,11 @@
 
 	</resultMap>
 
+	<resultMap type="HashMap" id="HashMap">
+		<id property="id" column="ID" />
+		<result property="caseName" column="CASE_NAME" />
+	</resultMap>
+
 
 <!-- 查询测试用例列表 -->
 	<select id="queryMockByPage" parameterType="com.gigold.pay.autotest.bo.IfSysMock"
@@ -87,7 +92,13 @@
 		</if>
 	</select>
 
-
+	<select id="getInterfaceMocksById" parameterType="int" resultMap="HashMap">
+		select au.ID,
+		au.CASE_NAME
+		from T_IF_AUTO_MOCK au
+		where IF_ID=#{ifId}
+		and STATUS='Y'
+	</select>
 
 	<!-- 根据ID查询接口关注关系信息 -->
 	<select id="getInterfaceFollowShipById" parameterType="int"

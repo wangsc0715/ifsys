@@ -9,6 +9,7 @@ package com.gigold.pay.autotest.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -508,5 +509,20 @@ public class IfSysMockService extends Domain {
 				e.printStackTrace();
 			}
 			return list;
+	}
+
+	/**
+	 * 获取接口下的mockid
+	 * @param ifId
+	 * @return
+     */
+	public List<Map> getInterfaceMocksById(int ifId) {
+		List<Map> list = null;
+		try{
+			list = ifSysMockDao.getInterfaceMocksById(ifId);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return list;
 	}
 }

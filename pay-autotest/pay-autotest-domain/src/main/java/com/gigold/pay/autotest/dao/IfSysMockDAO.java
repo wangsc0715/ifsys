@@ -201,4 +201,12 @@ public interface IfSysMockDAO {
 	
 	
 	public List<IfSysMock> queryMockByPage(IfSysMock ifsysmock);
+
+	/**
+	 * 获取接口下的 mockid
+	 * @param ifId
+	 * @return
+	 */
+	public List<Map> getInterfaceMocksById(int ifId);
+
 }
