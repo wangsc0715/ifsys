@@ -365,7 +365,7 @@ define(function(require, exports, module){
 			ele.appendChild(styleition(json,null,true));
 		}catch (e){
 			ele.innerHTML = text;
-			alert("Json 格式不正确")
+			alert("Json 格式不正确");
 		}
 
 		function styleition(json,key,isLastEle){
