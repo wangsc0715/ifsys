@@ -2,3 +2,9 @@
 /webapp/node_modules/
 system.properties
 server.properties
+*.iml
+.settings
+.project
+.classpath
+*.ipr
+*.iws
