@@ -235,7 +235,6 @@ public class IfSysAutoTestService extends Domain {
      * @return
      */
 	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap){
-		if(!(mockid==727))return "";
 		try {
 			// 1.获取当前接口所依赖的所有字段,
 			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(mockid);
@@ -260,20 +259,20 @@ public class IfSysAutoTestService extends Domain {
 			String str_idcard = "#{CONST-FRESH-IDCARD-NO}";
 			String str_nowdata = "#{CONST-NOW-DATA}";
 			// 替换手机号
-			if(requestStr.indexOf(str_phone)>=0){ // 存在则替换
+			if(requestStr.contains(str_phone)){ // 存在则替换
 				requestStr = requestStr.replace(str_phone, PhoneNo.getUnusedPhoneNo());
 				PhoneNo.renewPhone();
 			}
 
 			// 替换身份证号
-			if(requestStr.indexOf(str_idcard)>=0){ // 不存在则不替换
+			if(requestStr.contains(str_idcard)){ // 不存在则不替换
 				String idcardNo = IdCardNo.getUnusedNo();
 				requestStr = requestStr.replace(str_idcard, idcardNo);
 				IdCardNo.disableNo(idcardNo);
 			}
 
 			// 替换当前日期
-			if(requestStr.indexOf(str_nowdata)>=0){
+			if(requestStr.contains(str_nowdata)){
 				Format format = new SimpleDateFormat("yyyy-MM-dd");
 				requestStr = requestStr.replace(str_nowdata,format.format(new Date()));
 				System.out.println(requestStr);
