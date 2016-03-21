@@ -200,7 +200,9 @@ public class IfSysAutoTestService extends Domain {
 			 */
 			postData = replaceHolder(postData,refmock.getId(),allRespMap);
 			refmock.setRealRequestJson(postData);// 写入真实的请求参数
-			System.out.println("替换后的最终postData=>>"+postData);
+			if(refmock.getId()==71){
+				System.out.println("替换后的最终postData=>>"+postData);
+			}
 
 			// 定义返回
 			String responseJson = "";
@@ -217,11 +219,7 @@ public class IfSysAutoTestService extends Domain {
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
 			}finally {
-				if(i<=0){ //如果当前用例是依赖列表中最后的用例,则写道数据库中
 					writeBackContent(refmock, responseJson);
-				}else{
-					writeBackRefCaseContent(refmock,responseJson);
-				}
 			}
 
 		}
@@ -235,6 +233,9 @@ public class IfSysAutoTestService extends Domain {
      * @return
      */
 	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap){
+		if(mockid==71){
+			System.out.println(requestStr);
+		}
 		try {
 			// 1.获取当前接口所依赖的所有字段,
 			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(mockid);
@@ -246,9 +247,10 @@ public class IfSysAutoTestService extends Domain {
 				String backJson = allRespMap.get(nowMockId);
 				// 根据每个依赖的域,在返回的json中查询出值
 				String backField = gatJsonValByPath(backJson,path);
-				requestStr = requestStr.replace(referField.getAlias() ,backField);// 替换别名代表的值
-				System.out.println(requestStr);
-
+				if(requestStr.contains(referField.getAlias())){
+					requestStr = requestStr.replace(referField.getAlias() ,backField);// 替换别名代表的值
+					System.out.println(requestStr);
+				}
 			}
 
 

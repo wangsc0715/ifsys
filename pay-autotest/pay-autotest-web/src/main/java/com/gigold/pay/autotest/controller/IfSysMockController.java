@@ -435,8 +435,14 @@ public class IfSysMockController extends BaseController {
 		IfSysMock ifSysMock = new IfSysMock();
 		ifSysMock.setId(mockid);
 		ifSysMock = ifSysMockService.getMockInfoById(ifSysMock);
+
+		List<IfSysRefer> refers= ifSysReferService.getReferList(mockid);
+		List<IfSysFeildRefer> fields = ifSysReferService.queryReferFields(mockid);
+
 		if (ifSysMock != null) {
 			reDto.setMock(ifSysMock);
+			reDto.setMockReferList(refers);
+			reDto.setMockFieldReferList(fields);
 			reDto.setRspCd(SysCode.SUCCESS);
 		} else {
 			reDto.setRspCd(CodeItem.FAILURE);
