@@ -78,8 +78,8 @@ public class SendResulteAnalysis {
 		System.out.println("开始调用接口");
 		autoTest();
 		System.out.println("调用接口结束");
-        //sendMail();
-        //testAutoTest();
+        sendMail();
+        testAutoTest();
         //sendCases();
         System.out.println("work");
 	}
@@ -173,7 +173,7 @@ public class SendResulteAnalysis {
                 model.put("userName", userName);
                 model.put("StepsMap", StepsMap); //每个用例的步骤表  {332=[], 159=[1,2], 330=[1,2]}
 
-                //if(email.equals("chenkuan@gigold.com")||email.equals("chenhl@gigold.com")||email.equals("liuzg@gigold.com")||email.equals("xiebin@gigold.com"))
+                if(email.equals("chenkuan@gigold.com")||email.equals("chenhl@gigold.com")||email.equals("liuzg@gigold.com")||email.equals("xiebin@gigold.com"))
                 mailSenderService.sendWithTemplateForHTML(model);
             }
             System.out.println("邮件发送成功！");

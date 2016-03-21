@@ -12,6 +12,8 @@ import com.gigold.pay.autotest.bo.InterFaceInfo;
 import com.gigold.pay.framework.web.ResponseDto;
 import com.github.pagehelper.PageInfo;
 
+import java.util.List;
+
 /**
  * Title: IfSysMockRspDto<br/>
  * Description: <br/>
@@ -25,6 +27,24 @@ public class IfSysMockInfoRspDto extends ResponseDto {
 	/** serialVersionUID */
 	private static final long serialVersionUID = 1L;
 	private IfSysMock mock;
+	private List mockFieldReferList;
+	private List mockReferList;
+
+	public List getMockFieldReferList() {
+		return mockFieldReferList;
+	}
+
+	public void setMockFieldReferList(List mockFieldReferList) {
+		this.mockFieldReferList = mockFieldReferList;
+	}
+
+	public List getMockReferList() {
+		return mockReferList;
+	}
+
+	public void setMockReferList(List mockReferList) {
+		this.mockReferList = mockReferList;
+	}
 
 	public IfSysMock getMock() {
 		return mock;
