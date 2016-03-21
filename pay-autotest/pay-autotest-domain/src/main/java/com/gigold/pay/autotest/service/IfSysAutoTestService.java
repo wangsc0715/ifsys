@@ -200,7 +200,9 @@ public class IfSysAutoTestService extends Domain {
 			 */
 			postData = replaceHolder(postData,refmock.getId(),allRespMap);
 			refmock.setRealRequestJson(postData);// 写入真实的请求参数
-			System.out.println("替换后的最终postData=>>"+postData);
+			if(refmock.getId()==71){
+				System.out.println("替换后的最终postData=>>"+postData);
+			}
 
 			// 定义返回
 			String responseJson = "";
@@ -217,11 +219,7 @@ public class IfSysAutoTestService extends Domain {
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
 			}finally {
-				if(i<=0){ //如果当前用例是依赖列表中最后的用例,则写道数据库中
 					writeBackContent(refmock, responseJson);
-				}else{
-					writeBackRefCaseContent(refmock,responseJson);
-				}
 			}
 
 		}
@@ -235,7 +233,9 @@ public class IfSysAutoTestService extends Domain {
      * @return
      */
 	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap){
-		if(!(mockid==727))return "";
+		if(mockid==71){
+			System.out.println(requestStr);
+		}
 		try {
 			// 1.获取当前接口所依赖的所有字段,
 			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(mockid);
@@ -247,9 +247,10 @@ public class IfSysAutoTestService extends Domain {
 				String backJson = allRespMap.get(nowMockId);
 				// 根据每个依赖的域,在返回的json中查询出值
 				String backField = gatJsonValByPath(backJson,path);
-				requestStr = requestStr.replace(referField.getAlias() ,backField);// 替换别名代表的值
-				System.out.println(requestStr);
-
+				if(requestStr.contains(referField.getAlias())){
+					requestStr = requestStr.replace(referField.getAlias() ,backField);// 替换别名代表的值
+					System.out.println(requestStr);
+				}
 			}
 
 
@@ -260,20 +261,20 @@ public class IfSysAutoTestService extends Domain {
 			String str_idcard = "#{CONST-FRESH-IDCARD-NO}";
 			String str_nowdata = "#{CONST-NOW-DATA}";
 			// 替换手机号
-			if(requestStr.indexOf(str_phone)>=0){ // 存在则替换
+			if(requestStr.contains(str_phone)){ // 存在则替换
 				requestStr = requestStr.replace(str_phone, PhoneNo.getUnusedPhoneNo());
 				PhoneNo.renewPhone();
 			}
 
 			// 替换身份证号
-			if(requestStr.indexOf(str_idcard)>=0){ // 不存在则不替换
+			if(requestStr.contains(str_idcard)){ // 不存在则不替换
 				String idcardNo = IdCardNo.getUnusedNo();
 				requestStr = requestStr.replace(str_idcard, idcardNo);
 				IdCardNo.disableNo(idcardNo);
 			}
 
 			// 替换当前日期
-			if(requestStr.indexOf(str_nowdata)>=0){
+			if(requestStr.contains(str_nowdata)){
 				Format format = new SimpleDateFormat("yyyy-MM-dd");
 				requestStr = requestStr.replace(str_nowdata,format.format(new Date()));
 				System.out.println(requestStr);
