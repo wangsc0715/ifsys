@@ -13,6 +13,7 @@ import java.util.*;
 
 import com.gigold.pay.autotest.bo.IfSysFeildRefer;
 import com.gigold.pay.autotest.dao.IfSysReferDAO;
+import com.gigold.pay.autotest.datamaker.BankCardNo;
 import com.gigold.pay.autotest.datamaker.HexNo;
 import com.gigold.pay.autotest.datamaker.IdCardNo;
 import com.gigold.pay.autotest.datamaker.PhoneNo;
@@ -263,6 +264,19 @@ public class IfSysAutoTestService extends Domain {
 			String str_idcard = "#{CONST-FRESH-IDCARD-NO}";
 			String str_nowdata = "#{CONST-NOW-DATA}";
 			String str_hex_6 = "#{CONST-HEX-6}";
+			String str_bankcard_no = "#{CONST-BANK-CARD-NO}";
+
+
+			// 替换有效银行卡
+			if(requestStr.contains(str_hex_6)){ // 存在则替换
+				String bankCardNo = BankCardNo.getUnusedNo();
+				requestStr = requestStr.replace(str_bankcard_no,bankCardNo );
+				if(isLastMock){
+					BankCardNo.renewNo();
+					BankCardNo.addToAvalidList(bankCardNo,"接口系统:mock-"+String.valueOf(mockid));
+				}
+			}
+
 
 			// 替换16进制数
 			if(requestStr.contains(str_hex_6)){ // 存在则替换
@@ -288,7 +302,9 @@ public class IfSysAutoTestService extends Domain {
 			if(requestStr.contains(str_idcard)){ // 不存在则不替换
 				String idcardNo = IdCardNo.getUnusedNo();
 				requestStr = requestStr.replace(str_idcard, idcardNo);
-				if(isLastMock)IdCardNo.disableNo(idcardNo,"接口系统:mock-"+String.valueOf(mockid));
+				if(isLastMock){
+					IdCardNo.disableNo(idcardNo,"接口系统:mock-"+String.valueOf(mockid));
+				};
 			}
 
 			// 替换当前日期
@@ -550,7 +566,7 @@ public class IfSysAutoTestService extends Domain {
 		// 逐级查找path对应的值
 		String[] path = field.split("\\.");
 		for(int i = 0; i<path.length;i++){
-			if(json.get(path[i]) instanceof JSONArray){
+			if(!json.isEmpty() && json.get(path[i]) instanceof JSONArray){
 				JSONArray jsonArr = JSONArray.fromObject(json.get(path[i]));
 				if(i>=path.length-1){
 					// 若下一个位置在path[]中已经超标,

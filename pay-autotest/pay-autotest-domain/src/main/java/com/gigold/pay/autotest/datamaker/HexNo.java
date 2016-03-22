@@ -83,7 +83,7 @@ public class HexNo {
     public static void disableNo(String no , String useage) throws Exception {
         DBconnector dBconnector = new DBconnector();
         try {
-            dBconnector.insert("UPDATE T_UI_AVL_OPER_ACCT SET stat='N',useage='"+useage+"' WHERE operacct='" + no + "'");
+            dBconnector.insert("UPDATE T_UI_AVL_OPER_ACCT SET,useage='"+useage+"' WHERE operacct='" + no + "'");
         } finally {
             dBconnector.close();
         }

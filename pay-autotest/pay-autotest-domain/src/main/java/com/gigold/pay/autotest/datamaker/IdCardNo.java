@@ -51,28 +51,28 @@ public class IdCardNo {
         return list;
     }
 
-//    public static void renewNo(String nub) throws Exception {
-//        String phonenum = "";
-//        DBconnector dBconnector = new DBconnector();
-//        try {
-//            ResultSet rs = dBconnector.query("select * from T_UI_AVL_IDCARD_NO a limit 1");
-//            while (rs.next()) {
-//                phonenum = rs.getString("NUMBER");
-//            }
-//            String phone_head = phonenum.substring(0, 3);
-//            String phone_nill = phonenum.substring(3, 11);
-//            long _phone_nill = Long.parseLong(phone_nill);
-//            _phone_nill++;
-//            // 向左补足
-//            String filledString = "00000000" + String.valueOf(_phone_nill);
-//            filledString = phone_head + filledString.substring(filledString.length() - 8);
-//            dBconnector.updata("update T_UI_LAST_PHONE_NO a set a.NUMBER='" + filledString + "' where a.id=1");
-//        } catch (Exception ignore) {
-//
-//        } finally {
-//            dBconnector.close();
-//        }
-//    }
+    public static void renewNo() throws Exception {
+        String phonenum = "";
+        DBconnector dBconnector = new DBconnector();
+        try {
+            ResultSet rs = dBconnector.query("select * from T_UI_AVL_IDCARD_NO a limit 1");
+            while (rs.next()) {
+                phonenum = rs.getString("NUMBER");
+            }
+            String phone_head = phonenum.substring(0, 3);
+            String phone_nill = phonenum.substring(3, 11);
+            long _phone_nill = Long.parseLong(phone_nill);
+            _phone_nill++;
+            // 向左补足
+            String filledString = "00000000" + String.valueOf(_phone_nill);
+            filledString = phone_head + filledString.substring(filledString.length() - 8);
+            dBconnector.updata("update T_UI_LAST_PHONE_NO a set a.NUMBER='" + filledString + "' where a.id=1");
+        } catch (Exception ignore) {
+
+        } finally {
+            dBconnector.close();
+        }
+    }
 
     public static void disableNo(String CardNo) throws Exception {
         DBconnector dBconnector = new DBconnector();

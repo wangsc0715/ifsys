@@ -87,7 +87,7 @@ public class PhoneNo {
     public static void addToAvalidList(String PhoneNo,String useage) throws Exception {
         DBconnector dBconnector = new DBconnector();
         try {
-            dBconnector.insert("insert into T_UI_AVL_PHONE_NO set NUMBER='" + PhoneNo + "' and useage='"+useage+"'");
+            dBconnector.insert("insert into T_UI_AVL_PHONE_NO set NUMBER='" + PhoneNo + "',useage='"+useage+"'");
         } finally {
             dBconnector.close();
         }
