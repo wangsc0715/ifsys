@@ -13,6 +13,7 @@ import java.util.*;
 
 import com.gigold.pay.autotest.bo.IfSysFeildRefer;
 import com.gigold.pay.autotest.dao.IfSysReferDAO;
+import com.gigold.pay.autotest.datamaker.HexNo;
 import com.gigold.pay.autotest.datamaker.IdCardNo;
 import com.gigold.pay.autotest.datamaker.PhoneNo;
 import org.apache.http.client.CookieStore;
@@ -198,7 +199,7 @@ public class IfSysAutoTestService extends Domain {
 			/**
 			 * 替换前序接口的占位符
 			 */
-			postData = replaceHolder(postData,refmock.getId(),allRespMap);
+			postData = replaceHolder(postData,refmock.getId(),allRespMap, i == 0);
 			refmock.setRealRequestJson(postData);// 写入真实的请求参数
 			if(refmock.getId()==71){
 				System.out.println("替换后的最终postData=>>"+postData);
@@ -219,7 +220,7 @@ public class IfSysAutoTestService extends Domain {
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
 			}finally {
-					writeBackContent(refmock, responseJson);
+				writeBackContent(refmock, responseJson);
 			}
 
 		}
@@ -232,8 +233,9 @@ public class IfSysAutoTestService extends Domain {
 	 * @param allRespMap 依赖用例的所有返回<用例id,用例返回字符串>
      * @return
      */
-	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap){
+	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap,boolean isLastMock){
 		if(mockid==71){
+			System.out.println(requestStr);
 			System.out.println(requestStr);
 		}
 		try {
@@ -260,17 +262,33 @@ public class IfSysAutoTestService extends Domain {
 			String str_phone = "#{CONST-FRESH-PHONE-NO}";
 			String str_idcard = "#{CONST-FRESH-IDCARD-NO}";
 			String str_nowdata = "#{CONST-NOW-DATA}";
+			String str_hex_6 = "#{CONST-HEX-6}";
+
+			// 替换16进制数
+			if(requestStr.contains(str_hex_6)){ // 存在则替换
+				String hex = HexNo.getLastHexNo();
+				requestStr = requestStr.replace(str_hex_6,hex );
+				if(isLastMock){
+					HexNo.renewNo();
+					HexNo.disableNo(hex,"接口系统:mock-"+String.valueOf(mockid));
+				}
+			}
+
 			// 替换手机号
 			if(requestStr.contains(str_phone)){ // 存在则替换
-				requestStr = requestStr.replace(str_phone, PhoneNo.getUnusedPhoneNo());
-				PhoneNo.renewPhone();
+				String unUsedNo = PhoneNo.getUnusedPhoneNo();
+				requestStr = requestStr.replace(str_phone,unUsedNo );
+				if(isLastMock){
+					PhoneNo.renewPhone();
+					PhoneNo.addToAvalidList(unUsedNo,"接口系统:mock-"+String.valueOf(mockid));
+				}
 			}
 
 			// 替换身份证号
 			if(requestStr.contains(str_idcard)){ // 不存在则不替换
 				String idcardNo = IdCardNo.getUnusedNo();
 				requestStr = requestStr.replace(str_idcard, idcardNo);
-				IdCardNo.disableNo(idcardNo);
+				if(isLastMock)IdCardNo.disableNo(idcardNo,"接口系统:mock-"+String.valueOf(mockid));
 			}
 
 			// 替换当前日期

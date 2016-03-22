@@ -12,10 +12,10 @@ import java.util.List;
  */
 public class PhoneNo {
 
-//    public static void main(String args[]) {
+//    public static void main(String args[]) throws Exception {
 ////        System.out.println(getUnusedPhoneNo());
 ////        System.out.println(getAvalidPhoneNo());
-//        addToAvalidList(renewPhone());
+//        addToAvalidList(getUnusedPhoneNo());
 //    }
 
     public static String getUnusedPhoneNo() throws Exception {
@@ -78,6 +78,16 @@ public class PhoneNo {
         DBconnector dBconnector = new DBconnector();
         try {
             dBconnector.insert("insert into T_UI_AVL_PHONE_NO set NUMBER='" + PhoneNo + "'");
+        } finally {
+            dBconnector.close();
+        }
+
+    }
+
+    public static void addToAvalidList(String PhoneNo,String useage) throws Exception {
+        DBconnector dBconnector = new DBconnector();
+        try {
+            dBconnector.insert("insert into T_UI_AVL_PHONE_NO set NUMBER='" + PhoneNo + "' and useage='"+useage+"'");
         } finally {
             dBconnector.close();
         }
