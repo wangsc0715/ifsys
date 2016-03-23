@@ -52,6 +52,35 @@ public class IfSysReferService extends Domain {
 		}
 		return list;
 	}
+
+	/**
+	 * 深度求解
+	 * @param mockId 用例ID
+	 * @return 返回用例依赖列表
+     */
+	public List<IfSysRefer> getDeeplyReferList(int mockId){
+		// 要做递归退出检测
+		List<IfSysRefer> refers = null;
+		try {
+			refers =ifSysReferDAO.getReferList(mockId);
+			for(IfSysRefer refer: refers){
+				// 查询下级依赖
+				List<IfSysRefer> __refers = getDeeplyReferList(refer.getRefMockId());
+				// 合并下级依赖
+				if(__refers.size()>0){
+					__refers.addAll(refers);
+					refers = __refers;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			debug("调用 getReferList 数据库发送异常");
+		}
+		return refers;
+	}
+
+
+
 	
 	public IfSysRefer getReferById(int mockId) {
 		IfSysRefer ifSysRefer = null;

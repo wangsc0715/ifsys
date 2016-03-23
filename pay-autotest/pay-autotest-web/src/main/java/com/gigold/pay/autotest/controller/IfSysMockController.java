@@ -436,7 +436,7 @@ public class IfSysMockController extends BaseController {
 		ifSysMock.setId(mockid);
 		ifSysMock = ifSysMockService.getMockInfoById(ifSysMock);
 
-		List<IfSysRefer> refers= ifSysReferService.getReferList(mockid);
+		List<IfSysRefer> refers= ifSysReferService.getDeeplyReferList(mockid);
 		List<IfSysFeildRefer> fields = ifSysReferService.queryReferFields(mockid);
 
 		if (ifSysMock != null) {
