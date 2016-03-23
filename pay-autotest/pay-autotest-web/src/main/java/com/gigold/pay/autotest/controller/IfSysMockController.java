@@ -226,6 +226,7 @@ public class IfSysMockController extends BaseController {
 		IfSysMock ifSysMock = null;
 		try {
 			ifSysMock = createBO(dto, IfSysMock.class);
+			ifSysMock.setRequestPath(dto.getRequestPath()); // 设置用例path
 		} catch (PendingException e) {
 			reDto.setRspCd(CodeItem.CREATE_BO_FAILURE);
 			return reDto;

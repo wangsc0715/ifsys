@@ -54,26 +54,38 @@ public class IfSysAutoTestService extends Domain {
 
 
 	public void writeBackContent(IfSysMock mock, String responseJson) {
+		if(mock.getRspCode()==null){
+			/**
+			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
+			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
+			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
+			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
+			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
+			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
+			 */
+			ifSysMockService.writeBackRealRsp(mock,"1",responseJson,"没有返回码");
+		}else{
+			// 否则使用返回码验证
+			JSONObject jsonObject;
+			try {
+				jsonObject = JSONObject.fromObject(responseJson);
+			} catch (Exception e) {
+				jsonObject = new JSONObject();
+			}
+			String relRspCode = String.valueOf(jsonObject.get("rspCd"));
+			String testResulte;
+			// 1-正常 0-失败 -1-请求或响应存在其他异常
+			if (relRspCode.equals(mock.getRspCode())) {// 返回码与预期一致
+				testResulte ="1";
+			} else if (StringUtil.isNotEmpty(relRspCode)&&(!relRspCode.equals("null"))) {// 返回码与预期不一致,但不为空
+				testResulte ="0";
+			} else { // 返回码与预期不一致,或为空,或为其他
+				testResulte="-1";
+			}
+			mock.setTestResult(testResulte);
+			ifSysMockService.writeBackRealRsp(mock,testResulte,responseJson,relRspCode);
+		}
 
-		JSONObject jsonObject;
-		try {
-			jsonObject = JSONObject.fromObject(responseJson);
-		} catch (Exception e) {
-			jsonObject = new JSONObject();
-		}
-		String relRspCode = String.valueOf(jsonObject.get("rspCd"));
-		String testResulte;
-		String realRequestJson = mock.getRequestJson();
-		// 1-正常 0-失败 -1-请求或响应存在其他异常
-		if (relRspCode.equals(mock.getRspCode())) {// 返回码与预期一致
-			testResulte ="1";
-		} else if (StringUtil.isNotEmpty(relRspCode)&&(!relRspCode.equals("null"))) {// 返回码与预期不一致,但不为空
-			testResulte ="0";
-		} else { // 返回码与预期不一致,或为空,或为其他
-			testResulte="-1";
-		}
-		mock.setTestResult(testResulte);
-		ifSysMockService.writeBackRealRsp(mock,testResulte,responseJson,relRspCode);
 	}
 	/**
 	 * 
@@ -181,41 +193,42 @@ public class IfSysAutoTestService extends Domain {
 	 */
 	public void invokRefCase(List<IfSysMock> invokerOrderList,CookieStore cookieStore) {
 		/**
-		 * *** 替换接口前后依赖的字段
-		 *
 		 * 1.定义调用列表中所有mock返回的结果
 		 */
 		Map<Integer,String> allRespMap = new HashMap<>();// 临时变量
+		Map<String,String> replacedStrs = new HashMap<>();// 已替换变量
+
 		for (int i = invokerOrderList.size() - 1; i >= 0; i--) {
 			IfSysMock refmock = invokerOrderList.get(i);
-			/**
-			 * 2.根据1中返回的结果,以及当前接口所依赖的返回,替换请求报文
-			 */
+			// 替换请求报文
 			String postData = refmock.getRequestJson();
 			if(StringUtil.isBlank(postData)){
 				debug("用例请求报文为空----"+refmock.getCaseName());
 				return;
 			}
 
-			/**
-			 * 替换前序接口的占位符
-			 */
-			postData = replaceHolder(postData,refmock.getId(),allRespMap, i == 0);
-			refmock.setRealRequestJson(postData);// 写入真实的请求参数
-			if(refmock.getId()==71){
-				System.out.println("替换后的最终postData=>>"+postData);
-			}
+			// 替换请求字符串中的占位符
+			postData = replaceHolder(postData,refmock.getId(),allRespMap, replacedStrs);
+			// 入库真实的请求参数
+			refmock.setRealRequestJson(postData);
 
+			// 替换请求地址中的占位符
+			String realddressUrl = refmock.getRequestPath();
+			if(realddressUrl.isEmpty()){
+				// 若真实地址不存在则用接口地址
+				realddressUrl = refmock.getAddressUrl();
+			}else{
+				// 若存在则直接使用,先要替换占位符
+				realddressUrl = replaceHolder(realddressUrl,refmock.getId(),allRespMap,replacedStrs);
+			}
+			// 入库真实的请求地址
+			refmock.setRealRequestPath(realddressUrl);
 			// 定义返回
 			String responseJson = "";
 			try {
-				/**
-				 * 3.发送http请求
-				 */
-				responseJson=httpClientService.httpPost(refmock.getAddressUrl(), postData,cookieStore);
-				/**
-				 * 4 在次把本次结果存在返回结果内返回存在结果里
-				 */
+				// 发送请求
+				responseJson=httpClientService.httpPost(realddressUrl, postData,cookieStore);
+				// 将请求结果记录到临时变量中
 				allRespMap.put(refmock.getId(),responseJson);
 
 			} catch (Exception e) {
@@ -232,13 +245,10 @@ public class IfSysAutoTestService extends Domain {
 	 * @param requestStr 原始请求参数
 	 * @param mockid 目标用例
 	 * @param allRespMap 依赖用例的所有返回<用例id,用例返回字符串>
-     * @return
+	 * @param replacedStrs 依赖用例的所有返回<占位符,占位符取值>
+     * @return 替换后的字符串
      */
-	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap,boolean isLastMock){
-		if(mockid==71){
-			System.out.println(requestStr);
-			System.out.println(requestStr);
-		}
+	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap,Map<String,String> replacedStrs){
 		try {
 			// 1.获取当前接口所依赖的所有字段,
 			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(mockid);
@@ -268,51 +278,72 @@ public class IfSysAutoTestService extends Domain {
 
 
 			// 替换有效银行卡
-			if(requestStr.contains(str_hex_6)){ // 存在则替换
-				String bankCardNo = BankCardNo.getUnusedNo();
-				requestStr = requestStr.replace(str_bankcard_no,bankCardNo );
-				if(isLastMock){
+			if(requestStr.contains(str_bankcard_no)){ // 存在则替换
+				if(replacedStrs.containsKey(str_bankcard_no)){// 若整个会话中已经存过当前值则直接用
+					requestStr = requestStr.replace(str_bankcard_no,replacedStrs.get(str_bankcard_no) );
+				}else{// 否则新取一个,然后刷新列表
+					// 取值
+					String bankCardNo = BankCardNo.getUnusedNo();
+					// 替换
+					requestStr = requestStr.replace(str_bankcard_no,replacedStrs.get(str_bankcard_no) );
+					// 刷新值
 					BankCardNo.renewNo();
+					// 入库值
 					BankCardNo.addToAvalidList(bankCardNo,"接口系统:mock-"+String.valueOf(mockid));
+					// 记录值
+					replacedStrs.put(str_bankcard_no,bankCardNo);
 				}
 			}
 
 
 			// 替换16进制数
 			if(requestStr.contains(str_hex_6)){ // 存在则替换
-				String hex = HexNo.getLastHexNo();
-				requestStr = requestStr.replace(str_hex_6,hex );
-				if(isLastMock){
+				// 先看会话中是否已经存过了
+				if(replacedStrs.containsKey(str_bankcard_no)){
+					requestStr = requestStr.replace(str_hex_6,replacedStrs.get(str_hex_6) );
+				}else{
+					String hex = HexNo.getLastHexNo();
+					requestStr = requestStr.replace(str_hex_6,hex );
 					HexNo.renewNo();
 					HexNo.disableNo(hex,"接口系统:mock-"+String.valueOf(mockid));
+					replacedStrs.put(str_hex_6,hex);
 				}
 			}
 
 			// 替换手机号
 			if(requestStr.contains(str_phone)){ // 存在则替换
-				String unUsedNo = PhoneNo.getUnusedPhoneNo();
-				requestStr = requestStr.replace(str_phone,unUsedNo );
-				if(isLastMock){
+				if(replacedStrs.containsKey(str_phone)){
+					requestStr = requestStr.replace(str_phone,replacedStrs.get(str_phone) );
+				}else {
+					String unUsedNo = PhoneNo.getUnusedPhoneNo();
+					requestStr = requestStr.replace(str_phone, unUsedNo);
 					PhoneNo.renewPhone();
-					PhoneNo.addToAvalidList(unUsedNo,"接口系统:mock-"+String.valueOf(mockid));
+					PhoneNo.addToAvalidList(unUsedNo, "接口系统:mock-" + String.valueOf(mockid));
+					replacedStrs.put(str_phone,unUsedNo);
+
 				}
 			}
 
 			// 替换身份证号
 			if(requestStr.contains(str_idcard)){ // 不存在则不替换
-				String idcardNo = IdCardNo.getUnusedNo();
-				requestStr = requestStr.replace(str_idcard, idcardNo);
-				if(isLastMock){
-					IdCardNo.disableNo(idcardNo,"接口系统:mock-"+String.valueOf(mockid));
-				};
+				if(replacedStrs.containsKey(str_idcard)){
+					requestStr = requestStr.replace(str_idcard,replacedStrs.get(str_idcard) );
+				}else {
+					String idcardNo = IdCardNo.getUnusedNo();
+					requestStr = requestStr.replace(str_idcard, idcardNo);
+					IdCardNo.disableNo(idcardNo, "接口系统:mock-" + String.valueOf(mockid));
+					replacedStrs.put(str_idcard,idcardNo);
+
+				}
 			}
 
 			// 替换当前日期
 			if(requestStr.contains(str_nowdata)){
 				Format format = new SimpleDateFormat("yyyy-MM-dd");
 				requestStr = requestStr.replace(str_nowdata,format.format(new Date()));
-				System.out.println(requestStr);
 			}
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

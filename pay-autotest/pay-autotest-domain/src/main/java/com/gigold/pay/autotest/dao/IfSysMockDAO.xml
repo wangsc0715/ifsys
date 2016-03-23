@@ -20,12 +20,15 @@
 		<result property="rspRefJson" column="RSP_REF_JSON" />
 		<result property="isCase" column="IS_CASE" />
 
-		<!-- 额外的接口信息数据 @chenkuan 2015.12.08 -->
+		<!-- 额外的接口信息数据 @chenkuan 2016.03.23 -->
 		<result property="ifName" column="IF_NAME" />
 		<result property="ifURL" column="IF_URL" />
 		<result property="ifPROTOCOL" column="IF_PROTOCOL" />
 		<result property="ifDESC" column="IF_DESC" />
 		<result property="addressUrl" column="ADDRESS_URL" />
+		<!-- 用例的实际path -->
+		<result property="realRequestPath" column="REAL_REQUEST_PATH" />
+		<result property="requestPath" column="REQUEST_PATH" />
 
 		<!-- 接口关联关系 @chenkuan 2015.12.11 -->
 		<result property="followedId" column="IF_FOLLOWED_ID" />
@@ -217,6 +220,8 @@
 		au.CASE_NAME,
 		au.CHECK_JSON,
 		au.RSP_REF_JSON,
+		au.REAL_REQUEST_PATH,
+		au.REQUEST_PATH,
 		(select rc.RSP_CODE from T_IF_RETRUN_CODE rc where rc.ID=au.RSP_CODE_ID) RSP_CODE,
         (select rc.RSP_CODE_DESC from T_IF_RETRUN_CODE rc where rc.ID=au.RSP_CODE_ID) RSP_CODE_DESC,
 		au.REQUEST_JSON,
@@ -237,6 +242,7 @@
      <![CDATA[ 
 		select ID,
 		CASE_NAME,
+		REQUEST_PATH,
 		IF_ID,
 		RSP_CODE_ID,
 		(select RSP_CODE_DESC from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE_DESC,
