@@ -108,6 +108,7 @@ public class SendResulteAnalysis {
             Map<String,List<IfSysMock>> rstItfces = new TreeMap<>();
             for(IfSysMock ifSysMock:resulteMocks){
                 // 首先,判断结果分类中是否已经初始化过了,若没有则初始化
+                System.out.println(ifSysMock);
                 String key  = String.valueOf(ifSysMock.getIfId());
                 String mockId  = String.valueOf(ifSysMock.getId());
                 if(!rstItfces.containsKey(key)){

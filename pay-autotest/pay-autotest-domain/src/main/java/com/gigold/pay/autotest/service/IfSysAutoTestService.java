@@ -54,7 +54,7 @@ public class IfSysAutoTestService extends Domain {
 
 
 	public void writeBackContent(IfSysMock mock, String responseJson) {
-		if(mock.getRspCode()==null){
+		if(mock.getRspCode().equals("NOCODE")){
 			/**
 			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
 			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
@@ -214,7 +214,7 @@ public class IfSysAutoTestService extends Domain {
 
 			// 替换请求地址中的占位符
 			String realddressUrl = refmock.getRequestPath();
-			if(realddressUrl.isEmpty()){
+			if(realddressUrl==null||realddressUrl.isEmpty()){
 				// 若真实地址不存在则用接口地址
 				realddressUrl = refmock.getAddressUrl();
 			}else{
@@ -305,7 +305,7 @@ public class IfSysAutoTestService extends Domain {
 					String hex = HexNo.getLastHexNo();
 					requestStr = requestStr.replace(str_hex_6,hex );
 					HexNo.renewNo();
-					HexNo.disableNo(hex,"接口系统:mock-"+String.valueOf(mockid));
+					HexNo.disableNo(hex.trim(),"接口系统:mock-"+String.valueOf(mockid));
 					replacedStrs.put(str_hex_6,hex);
 				}
 			}
@@ -347,7 +347,7 @@ public class IfSysAutoTestService extends Domain {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return requestStr;
+		return requestStr.trim();
 	}
 	/**
 	 * 

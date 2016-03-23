@@ -469,6 +469,7 @@
 	    set REAL_RSP_CODE=#{realRspCode},
 	    REAL_RESPONSE_JSON=#{realResponseJson},
 	    REAL_REQUEST_JSON=#{realRequestJson},
+	    REAL_REQUEST_PATH=#{realRequestPath},
 	    TEST_RESULT=#{testResult}
 	    where id=#{id}
 
