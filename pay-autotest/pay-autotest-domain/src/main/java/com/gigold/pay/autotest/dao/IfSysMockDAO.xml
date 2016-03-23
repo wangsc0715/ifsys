@@ -151,6 +151,11 @@
 			<if test="rspCodeId!=null and rspCodeId!=''">
 				RSP_CODE_ID=#{rspCodeId},
 			</if>
+
+			<if test="requestPath!=null and requestPath!=''">
+				REQUEST_PATH=#{requestPath},
+			</if>
+
 			<if test="caseName!=null and caseName!=''">
 				CASE_NAME=#{caseName},
 			</if>
