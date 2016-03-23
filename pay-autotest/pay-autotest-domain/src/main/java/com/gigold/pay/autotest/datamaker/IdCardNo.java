@@ -87,7 +87,7 @@ public class IdCardNo {
     public static void disableNo(String CardNo , String useage) throws Exception {
         DBconnector dBconnector = new DBconnector();
         try {
-            dBconnector.insert("UPDATE T_UI_AVL_IDCARD_NO SET status='N' and useage='"+useage+"' WHERE cardNo='" + CardNo + "'");
+            dBconnector.insert("UPDATE T_UI_AVL_IDCARD_NO SET status='N' , useage='"+useage+"' WHERE cardNo='" + CardNo + "'");
         } finally {
             dBconnector.close();
         }

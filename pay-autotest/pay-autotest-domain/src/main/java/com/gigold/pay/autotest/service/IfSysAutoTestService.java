@@ -165,6 +165,8 @@ public class IfSysAutoTestService extends Domain {
 			}
 			// 设置接口访问的完整地址
 			mock.setAddressUrl(url);
+			// 设置接口访问的主机地址
+			mock.setSysUrl(interFaceInfo.getAddressUrl());
 			// 1、获取该测试用例调用时依赖的其他用例的调用列表
 			List<IfSysMock> invokerOrderList = new ArrayList<IfSysMock>();
 			// 放到第一位
@@ -211,15 +213,22 @@ public class IfSysAutoTestService extends Domain {
 			postData = replaceHolder(postData,refmock.getId(),allRespMap, replacedStrs);
 			// 入库真实的请求参数
 			refmock.setRealRequestJson(postData);
-
+			if(refmock.getId()==1016||refmock.getId()==1017||refmock.getId()==1018||refmock.getId()==1020||refmock.getId()==1021){
+				System.out.println(refmock);
+				System.out.println(refmock);
+				System.out.println(refmock);
+				System.out.println(refmock);
+			}
 			// 替换请求地址中的占位符
 			String realddressUrl = refmock.getRequestPath();
-			if(realddressUrl==null||realddressUrl.isEmpty()){
+			if(StringUtil.isBlank(realddressUrl)){
 				// 若真实地址不存在则用接口地址
 				realddressUrl = refmock.getAddressUrl();
 			}else{
 				// 若存在则直接使用,先要替换占位符
 				realddressUrl = replaceHolder(realddressUrl,refmock.getId(),allRespMap,replacedStrs);
+				// 然后拼接完整的接口地址
+				realddressUrl = getAddressUrl(refmock.getSysUrl(),realddressUrl);
 			}
 			// 入库真实的请求地址
 			refmock.setRealRequestPath(realddressUrl);
@@ -285,7 +294,7 @@ public class IfSysAutoTestService extends Domain {
 					// 取值
 					String bankCardNo = BankCardNo.getUnusedNo();
 					// 替换
-					requestStr = requestStr.replace(str_bankcard_no,replacedStrs.get(str_bankcard_no) );
+					requestStr = requestStr.replace(str_bankcard_no,bankCardNo );
 					// 刷新值
 					BankCardNo.renewNo();
 					// 入库值
@@ -502,6 +511,7 @@ public class IfSysAutoTestService extends Domain {
 			IfSysMock mock = ifSysMockService.getReferByIfId(refer.getRefMockId());
 			if(mock!=null){
 				String url = getAddressUrl(mock.getAddressUrl(), mock.getIfURL());
+				mock.setSysUrl(mock.getAddressUrl());
 				mock.setAddressUrl(url);
 				invokerOrderList.add(mock);
 			}
@@ -581,7 +591,7 @@ public class IfSysAutoTestService extends Domain {
 	public static String gatJsonValByPath(String jsonString,String field){
 		JSONObject json;
 		// 判断传入字符串是否为空
-		if(jsonString.isEmpty()||field.isEmpty())return "";
+		if(jsonString==null||jsonString.isEmpty()||field.isEmpty())return "";
 		try {
 			json = JSONObject.fromObject(jsonString);
 		} catch (Exception e) {

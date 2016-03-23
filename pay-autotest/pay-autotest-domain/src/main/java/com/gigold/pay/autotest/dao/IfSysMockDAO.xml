@@ -254,6 +254,7 @@
 		REAL_RSP_CODE,
 		REAL_RESPONSE_JSON,
 		REAL_REQUEST_JSON,
+		REAL_REQUEST_PATH,
 		TEST_RESULT
 		from T_IF_AUTO_MOCK au
 		where ID=#{id}
@@ -302,6 +303,7 @@
         ii.IF_URL,
         sys.ADDRESS_URL,
 		am.RSP_CODE_ID,
+		am.REQUEST_PATH,
 		(select rc.RSP_CODE from T_IF_RETRUN_CODE rc where
 		rc.ID=am.RSP_CODE_ID) RSP_CODE,
 		am.CASE_NAME,
