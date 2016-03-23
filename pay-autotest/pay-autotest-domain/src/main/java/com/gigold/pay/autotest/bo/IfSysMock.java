@@ -40,6 +40,8 @@ public class IfSysMock {
 	private String rspRefJson;//描述依赖其他用例的字段取值情况，多个字段之间用英文逗号隔开
     private String isCase;//标识该用例是作为依赖，还是作为单独的用例  Y：用例 ；N：依赖
 	private String jrn;
+	private String realRequestPath;//实际的访问地址
+	private String requestPath;//预期的访问地址
 
 	//所属接口信息
 	private String ifName;
@@ -47,6 +49,7 @@ public class IfSysMock {
 	private String ifPROTOCOL;
 	private String ifDESC;
 	private String addressUrl;
+	private String sysUrl;
 
 	//接口关注者信息
 	private int followedId;
@@ -61,6 +64,29 @@ public class IfSysMock {
 	private int ifSysId;
 	private int ifProId;
 
+	public String getSysUrl() {
+		return sysUrl;
+	}
+
+	public void setSysUrl(String sysUrl) {
+		this.sysUrl = sysUrl;
+	}
+
+	public String getRequestPath() {
+		return requestPath;
+	}
+
+	public void setRequestPath(String requestPath) {
+		this.requestPath = requestPath;
+	}
+
+	public String getRealRequestPath() {
+		return realRequestPath;
+	}
+
+	public void setRealRequestPath(String realRequestPath) {
+		this.realRequestPath = realRequestPath;
+	}
 
 	public String getRealRequestJson() {
 		return realRequestJson;

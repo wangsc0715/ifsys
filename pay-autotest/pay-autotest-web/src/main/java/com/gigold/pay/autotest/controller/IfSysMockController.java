@@ -226,6 +226,7 @@ public class IfSysMockController extends BaseController {
 		IfSysMock ifSysMock = null;
 		try {
 			ifSysMock = createBO(dto, IfSysMock.class);
+			ifSysMock.setRequestPath(dto.getRequestPath()); // 设置用例path
 		} catch (PendingException e) {
 			reDto.setRspCd(CodeItem.CREATE_BO_FAILURE);
 			return reDto;
@@ -436,7 +437,7 @@ public class IfSysMockController extends BaseController {
 		ifSysMock.setId(mockid);
 		ifSysMock = ifSysMockService.getMockInfoById(ifSysMock);
 
-		List<IfSysRefer> refers= ifSysReferService.getReferList(mockid);
+		List<IfSysRefer> refers= ifSysReferService.getDeeplyReferList(mockid);
 		List<IfSysFeildRefer> fields = ifSysReferService.queryReferFields(mockid);
 
 		if (ifSysMock != null) {
