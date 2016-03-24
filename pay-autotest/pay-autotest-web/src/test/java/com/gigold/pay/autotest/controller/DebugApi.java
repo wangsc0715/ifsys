@@ -2,11 +2,13 @@ package com.gigold.pay.autotest.controller;
 
 
 import com.gigold.pay.autotest.bo.IfSysFeildRefer;
+import com.gigold.pay.autotest.bo.IfSysSQLCallBack;
 import com.gigold.pay.autotest.bo.InterFaceInfo;
 import com.gigold.pay.autotest.datamaker.ConstField;
 import com.gigold.pay.autotest.service.IfSysReferService;
 import java.util.List;
 
+import com.gigold.pay.autotest.service.IfSysSQLCallBackService;
 import com.gigold.pay.autotest.service.InterFaceService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,12 +21,20 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class DebugApi  {
     @Autowired
     private IfSysReferService ifSysReferService;
+    @Autowired
     private InterFaceService interFaceService;
+    @Autowired
+    private IfSysSQLCallBackService ifSysSQLCallBackService;
+
     @Test
     public void updataReferFields(){
         try {
-            InterFaceInfo interFaceInfo = interFaceService.getInterFaceById(51);
-            System.out.println(interFaceInfo);
+            IfSysSQLCallBack ifSysSQLCallBack = new IfSysSQLCallBack();
+            ifSysSQLCallBack.setDesc("kllalalala");
+            ifSysSQLCallBack.setSql("dsafdsafdsaf");
+            ifSysSQLCallBack.setMockid(727);
+            ifSysSQLCallBackService.updateIfSysSQLCallBack(ifSysSQLCallBack);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

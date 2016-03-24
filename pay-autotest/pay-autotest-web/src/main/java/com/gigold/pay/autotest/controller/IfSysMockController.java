@@ -437,8 +437,10 @@ public class IfSysMockController extends BaseController {
 		ifSysMock.setId(mockid);
 		ifSysMock = ifSysMockService.getMockInfoById(ifSysMock);
 
+		// 获取依赖,字段依赖关系
 		List<IfSysRefer> refers= ifSysReferService.getDeeplyReferList(mockid);
 		List<IfSysFeildRefer> fields = ifSysReferService.queryReferFields(mockid);
+		// 获取sql
 
 		if (ifSysMock != null) {
 			reDto.setMock(ifSysMock);

@@ -2,13 +2,16 @@ package com.gigold.pay.autotest.httpclient;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.gigold.pay.autotest.bo.IfSysMockResponse;
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -16,7 +19,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.params.CoreConnectionPNames;
@@ -61,16 +63,11 @@ public class HttpClientService extends Domain{
 
 	}
 
+
 	/**
-	 * 
-	 * Title: setHeader<br/>
-	 * Description: 设置请求头<br/>
-	 * 
-	 * @author xiebin
-	 * @date 2015年11月10日上午10:54:56
-	 *
-	 * @param httpPost
-	 */
+	 * 设置默认请求头
+	 * @param httpPost 请求
+     */
 	public void setHeader(HttpPost httpPost) {
 		httpPost.setHeader("accept", "*/*");
 		httpPost.setHeader("connection", "Keep-Alive");
@@ -78,17 +75,29 @@ public class HttpClientService extends Domain{
 	}
 
 	/**
-	 * 
-	 * Title: httpPost<br/>
-	 * Description: <br/>
-	 * @author xiebin
-	 * @date 2015年12月5日下午4:47:29
-	 *
-	 * @param url
-	 * @param postData
-	 * @return
-	 */
-	public String httpPost(String url, String postData,CookieStore cookieStore) throws Exception{
+	 * 设置自定义请求头
+	 * @param httpPost 请求
+	 * @param headMap 补充请求头
+     */
+	public void setHeader(HttpPost httpPost, Map<String,String> headMap) {
+		httpPost.setHeader("accept", "*/*");
+		httpPost.setHeader("connection", "Keep-Alive");
+		httpPost.setHeader("Content-Type", "application/json");
+		for(String head:headMap.keySet()){
+			httpPost.setHeader(head,headMap.get(head));
+		}
+	}
+
+	/**
+	 * 请求发送
+	 * @param url 请求地址
+	 * @param postData 请求包体
+	 * @param cookieStore cookie信息
+	 * @param extraHeader 额外的包头信息
+	 * @return 返回结果
+     * @throws Exception
+     */
+	public IfSysMockResponse httpPost(String url, String postData, CookieStore cookieStore, Map<String,String> extraHeader) throws Exception{
 		String responseData = "";
 		DefaultHttpClient httpclient = getHttpClient();
 		List<Cookie> clist= cookieStore.getCookies();
@@ -101,7 +110,8 @@ public class HttpClientService extends Domain{
 		HttpPost httppost = createPostMethed(url);
 		// 设置超时
 		setTimeOut(httpclient);
-		setHeader(httppost);
+		// 设置请求头
+		setHeader(httppost,extraHeader);
 
 		try {
 			setRequestParams(httppost, postData);
@@ -110,6 +120,7 @@ public class HttpClientService extends Domain{
 			e1.printStackTrace();
 		}
 
+		IfSysMockResponse ifSysMockResponse = new IfSysMockResponse();
 		try {
 			HttpResponse response = httpclient.execute(httppost);
 			//获取cookies
@@ -118,6 +129,14 @@ public class HttpClientService extends Domain{
 			if (statusCode == 200) {
 				/* 读返回数据 */
 				responseData = EntityUtils.toString(response.getEntity(), CHARSET);
+				ifSysMockResponse.setResponseStr(responseData);
+				/* 读取返回头 */
+				Header[] headers = response.getAllHeaders();
+				Map<String,String> _headrs = new HashMap<>();
+				for (Header header : headers) {
+					_headrs.put(header.getName(), header.getValue());
+				}
+				ifSysMockResponse.setHeaders(_headrs);
 			} else {
 				debug("服务器响应失败 : 返回状态" + statusCode);
 			}
@@ -125,13 +144,12 @@ public class HttpClientService extends Domain{
 			debug("服务器响应失败");
 		}
 
-		return responseData;
+		return ifSysMockResponse;
 	}
 
 
 	public HttpPost createPostMethed(String url) {
-		HttpPost httpPost = new HttpPost(url);
-		return httpPost;
+		return new HttpPost(url);
 	}
 
 	public HttpGet createGettMethed(String url) {

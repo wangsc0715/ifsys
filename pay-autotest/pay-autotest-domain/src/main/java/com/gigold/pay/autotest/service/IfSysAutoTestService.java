@@ -11,7 +11,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import com.gigold.pay.autotest.bo.IfSysFeildRefer;
+import com.gigold.pay.autotest.bo.*;
 import com.gigold.pay.autotest.dao.IfSysReferDAO;
 import com.gigold.pay.autotest.datamaker.BankCardNo;
 import com.gigold.pay.autotest.datamaker.HexNo;
@@ -22,9 +22,6 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.gigold.pay.autotest.bo.IfSysMock;
-import com.gigold.pay.autotest.bo.IfSysRefer;
-import com.gigold.pay.autotest.bo.InterFaceInfo;
 import com.gigold.pay.autotest.httpclient.HttpClientService;
 import com.gigold.pay.autotest.util.AutoTestUtil;
 import com.gigold.pay.framework.core.Domain;
@@ -53,7 +50,10 @@ public class IfSysAutoTestService extends Domain {
 	IfSysReferService ifSysReferService;
 
 
-	public void writeBackContent(IfSysMock mock, String responseJson) {
+	public void writeBackContent(IfSysMock mock) {
+		// 获得真实返回json
+		String responseJson = mock.getRealResponseJson();
+
 		if(mock.getRspCode().equals("NOCODE")){
 			/**
 			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
@@ -63,7 +63,9 @@ public class IfSysAutoTestService extends Domain {
 			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
 			 * 如果没有定义返回码,则需要用其他的验证方式,字段或者什么其他
 			 */
-			ifSysMockService.writeBackRealRsp(mock,"1",responseJson,"没有返回码");
+			mock.setTestResult("1");
+			mock.setRealRspCode("没有返回码");
+			ifSysMockService.writeBackRealRsp(mock);
 		}else{
 			// 否则使用返回码验证
 			JSONObject jsonObject;
@@ -83,7 +85,8 @@ public class IfSysAutoTestService extends Domain {
 				testResulte="-1";
 			}
 			mock.setTestResult(testResulte);
-			ifSysMockService.writeBackRealRsp(mock,testResulte,responseJson,relRspCode);
+			mock.setRealRspCode(relRspCode);
+			ifSysMockService.writeBackRealRsp(mock);
 		}
 
 	}
@@ -143,14 +146,8 @@ public class IfSysAutoTestService extends Domain {
 	
 
 	/**
-	 * 
-	 * Title: autoTest<br/>
-	 * Description: 自动化测试核心代码 测试用例之间的依赖<b/>
-	 * 
-	 * @author xiebin
-	 * @date 2015年12月10日上午10:50:15
-	 *
-	 * @param interFaceInfo
+	 * 自动化测试核心代码 测试用例之间的依赖
+	 * @param interFaceInfo 每页接口用例信息
 	 */
 	public void autoTest(InterFaceInfo interFaceInfo) {
 		// 获取接口访问的完整地址
@@ -169,36 +166,33 @@ public class IfSysAutoTestService extends Domain {
 			mock.setSysUrl(interFaceInfo.getAddressUrl());
 			// 1、获取该测试用例调用时依赖的其他用例的调用列表
 			List<IfSysMock> invokerOrderList = new ArrayList<IfSysMock>();
-			// 放到第一位
+			// 第一位放入目标接口
 			invokerOrderList.add(mock);
+			// 然后加入依赖用例
 			invokerOrder(invokerOrderList, mock.getId());
 			// 存放依赖的cookies
 			CookieStore cookieStore=new BasicCookieStore();
 			// 2、 按照调用序号依次调用被依赖测试用例
 			invokRefCase(invokerOrderList,cookieStore);
-			// 3、最后调用目标接口
-			//invokCase(mock,cookieStore);
-
 		}
 
 	}
 
+
 	/**
-	 * 
-	 * Title: invokRefCase<br/>
-	 * Description:按调用序号依次调用被依赖测试用例 <br/>
-	 * 
-	 * @author xiebin
-	 * @date 2015年12月22日下午4:51:14
-	 *
-	 * @param invokerOrderList
-	 */
+	 * 按调用序号依次调用被依赖测试用例
+	 * @param invokerOrderList 用例调用列表
+	 * @param cookieStore 用来维持cookie的变量
+     */
 	public void invokRefCase(List<IfSysMock> invokerOrderList,CookieStore cookieStore) {
 		/**
-		 * 1.定义调用列表中所有mock返回的结果
+		 * 初始化持续变量
 		 */
-		Map<Integer,String> allRespMap = new HashMap<>();// 临时变量
-		Map<String,String> replacedStrs = new HashMap<>();// 已替换变量
+		Map<Integer,String> allRespMap = new HashMap<>();// 临时变量,存放各个依赖用例的包体返回
+		Map<Integer,Map> allHeadMap = new HashMap<>();// 临时变量,存放各个依赖用例的头部
+		Map<String,String> replacedStrs = new HashMap<>();// 已替换变量,存放占位符替换的变量
+		Map<String, String> responseHead = null; // 接口返回头信息
+		String responseJson = ""; // 接口返回字符串
 
 		for (int i = invokerOrderList.size() - 1; i >= 0; i--) {
 			IfSysMock refmock = invokerOrderList.get(i);
@@ -209,43 +203,69 @@ public class IfSysAutoTestService extends Domain {
 				return;
 			}
 
-			// 替换请求字符串中的占位符
-			postData = replaceHolder(postData,refmock.getId(),allRespMap, replacedStrs);
-			// 入库真实的请求参数
+			/**
+			 * 请求组装
+			 */
+			// 替换占位符
+			postData = replaceHolder(postData,refmock.getId(),allRespMap,allHeadMap, replacedStrs);
+			// 保存真实请求
 			refmock.setRealRequestJson(postData);
-			if(refmock.getId()==1016||refmock.getId()==1017||refmock.getId()==1018||refmock.getId()==1020||refmock.getId()==1021){
-				System.out.println(refmock);
-				System.out.println(refmock);
-				System.out.println(refmock);
-				System.out.println(refmock);
-			}
-			// 替换请求地址中的占位符
+
+			/**
+			 * 头部组装
+			 */
+			//若存在头部依赖
+			Map<String,String> extraHeaders = new HashMap<>();
+
+			/**
+			 * 地址组装
+			 */
+			// 替换占位符
 			String realddressUrl = refmock.getRequestPath();
 			if(StringUtil.isBlank(realddressUrl)){
 				// 若真实地址不存在则用接口地址
 				realddressUrl = refmock.getAddressUrl();
 			}else{
 				// 若存在则直接使用,先要替换占位符
-				realddressUrl = replaceHolder(realddressUrl,refmock.getId(),allRespMap,replacedStrs);
-				// 然后拼接完整的接口地址
+				realddressUrl = replaceHolder(realddressUrl,refmock.getId(),allRespMap,allHeadMap,replacedStrs);
 				realddressUrl = getAddressUrl(refmock.getSysUrl(),realddressUrl);
 			}
-			// 入库真实的请求地址
+			// 保存真实请求
 			refmock.setRealRequestPath(realddressUrl);
-			// 定义返回
-			String responseJson = "";
+
+
+
+			/**
+			 * 发送请求
+			 */
 			try {
 				// 发送请求
-				responseJson=httpClientService.httpPost(realddressUrl, postData,cookieStore);
-				// 将请求结果记录到临时变量中
-				allRespMap.put(refmock.getId(),responseJson);
+				IfSysMockResponse ifSysMockResponse = httpClientService.httpPost(realddressUrl, postData,cookieStore,extraHeaders);
+				if(ifSysMockResponse==null)throw new Exception("请求返回null");
+				responseJson = ifSysMockResponse.getResponseStr();
+				responseHead = ifSysMockResponse.getHeaders();
 
+				// 记录当次请求结果
+				allRespMap.put(refmock.getId(),responseJson);// 返回json
+				allHeadMap.put(refmock.getId(),responseHead);// 返回头
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
 			}finally {
-				writeBackContent(refmock, responseJson);
+				// 回写真实结果入库
+				if(StringUtil.isNotEmpty(responseJson))refmock.setRealResponseJson(responseJson);
+				if(responseHead!=null){refmock.setRealRequestHead(mapHeadToStr(responseHead));}
+				writeBackContent(refmock);
 			}
 
+			/**
+			 * 回调组装
+			 */
+
+			// 若是最后一个,并在回调sql则执行回调
+
+			/**
+			 * 若 i==0 则执行回调
+			 */
 		}
 	}
 
@@ -254,15 +274,16 @@ public class IfSysAutoTestService extends Domain {
 	 * @param requestStr 原始请求参数
 	 * @param mockid 目标用例
 	 * @param allRespMap 依赖用例的所有返回<用例id,用例返回字符串>
+	 * @param allHeadMap 依赖用例的所有头部返回<用例id,用例头部列表>
 	 * @param replacedStrs 依赖用例的所有返回<占位符,占位符取值>
      * @return 替换后的字符串
      */
-	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap,Map<String,String> replacedStrs){
+	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap,Map<Integer,Map> allHeadMap,Map<String,String> replacedStrs){
 		try {
 			// 1.获取当前接口所依赖的所有字段,
 			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(mockid);
 			for(IfSysFeildRefer referField :referFields){
-				//2.根据返回字段,替换当前报文; 别名 => mockid => feild 依次遍历 allRespMap
+				//2.根据返回字段,替换当前报文; 别名|mockid|feild 依次遍历 allRespMap
 				int nowMockId = referField.getRef_mock_id(); // 当前用例数据的id
 				String path = referField.getRef_feild(); // 当前用例数据所依赖的域
 				// 根据每一个依赖的用例,在临时变量中查询出记录的返回的json
@@ -294,7 +315,7 @@ public class IfSysAutoTestService extends Domain {
 					// 取值
 					String bankCardNo = BankCardNo.getUnusedNo();
 					// 替换
-					requestStr = requestStr.replace(str_bankcard_no,bankCardNo );
+					if(bankCardNo!=null)requestStr = requestStr.replace(str_bankcard_no,bankCardNo );
 					// 刷新值
 					BankCardNo.renewNo();
 					// 入库值
@@ -325,7 +346,7 @@ public class IfSysAutoTestService extends Domain {
 					requestStr = requestStr.replace(str_phone,replacedStrs.get(str_phone) );
 				}else {
 					String unUsedNo = PhoneNo.getUnusedPhoneNo();
-					requestStr = requestStr.replace(str_phone, unUsedNo);
+					if(unUsedNo!=null)requestStr = requestStr.replace(str_phone, unUsedNo);
 					PhoneNo.renewPhone();
 					PhoneNo.addToAvalidList(unUsedNo, "接口系统:mock-" + String.valueOf(mockid));
 					replacedStrs.put(str_phone,unUsedNo);
@@ -339,7 +360,7 @@ public class IfSysAutoTestService extends Domain {
 					requestStr = requestStr.replace(str_idcard,replacedStrs.get(str_idcard) );
 				}else {
 					String idcardNo = IdCardNo.getUnusedNo();
-					requestStr = requestStr.replace(str_idcard, idcardNo);
+					if(idcardNo!=null)requestStr = requestStr.replace(str_idcard, idcardNo);
 					IdCardNo.disableNo(idcardNo, "接口系统:mock-" + String.valueOf(mockid));
 					replacedStrs.put(str_idcard,idcardNo);
 
@@ -358,149 +379,88 @@ public class IfSysAutoTestService extends Domain {
 		}
 		return requestStr.trim();
 	}
-	/**
-	 * 
-	 * Title: invokCase<br/>
-	 * Description: 调用目标测试用例<br/>
-	 * 
-	 * @author xiebin
-	 * @date 2015年12月22日下午4:49:39
-	 *
-	 * @param mock
-	 */
-	public void invokCase(IfSysMock mock,CookieStore cookieStore) {
-		// 期望请求报文
-		String postData = mock.getRequestJson();
-		if(StringUtil.isBlank(postData)){
-			debug("用例请求报文为空----"+mock.getCaseName());
-			return;
-		}
-		//先处理请求报文
-		//postData=preHanlderReuestBody(postData,mock);
-		// 实际请求后，返回的报文（返回码和返回实体）
-		String responseJson = "";
-		try {
-			responseJson = httpClientService.httpPost(mock.getAddressUrl(), postData,cookieStore);
-		} catch (Exception e) {
-			responseJson = "";
-			debug("调用失败 调用目标测试用例过程中出现异常:"+e.getMessage());
-		}finally {
-			// 实际结果回写
-			writeBackContent(mock, responseJson);
-		}
+//	/**
+//	 *
+//	 * Title: invokCase<br/>
+//	 * Description: 调用目标测试用例<br/>
+//	 *
+//	 * @author xiebin
+//	 * @date 2015年12月22日下午4:49:39
+//	 *
+//	 * @param mock
+//	 */
+//	public void invokCase(IfSysMock mock,CookieStore cookieStore) {
+//		// 期望请求报文
+//		String postData = mock.getRequestJson();
+//		if(StringUtil.isBlank(postData)){
+//			debug("用例请求报文为空----"+mock.getCaseName());
+//			return;
+//		}
+//		//先处理请求报文
+//		//postData=preHanlderReuestBody(postData,mock);
+//		// 实际请求后，返回的报文（返回码和返回实体）
+//		String responseJson = "";
+//		try {
+//			responseJson = httpClientService.httpPost(mock.getAddressUrl(), postData,cookieStore);
+//		} catch (Exception e) {
+//			responseJson = "";
+//			debug("调用失败 调用目标测试用例过程中出现异常:"+e.getMessage());
+//		}finally {
+//			// 实际结果回写
+//			writeBackContent(mock, responseJson);
+//		}
+//
+//	}
 
-	}
+//	/**
+//	 *
+//	 * Title: preHanlderReuestBody<br/>
+//	 * Description: 处理请求报文 前置<br/>
+//	 * @author xiebin
+//	 * @date 2016年1月7日下午5:52:28
+//	 *
+//	 * @param postData
+//	 * @param mock
+//	 * @return
+//	 */
+//	public String preHanlderReuestBody(String postData, IfSysMock mock) {
+//		// 如果需要的话需要先完善请求报文
+//		if (!StringUtil.isBlank(mock.getCheckJson())) {
+//			// 1、需要自动生成数据
+//			String checkJoson = mock.getCheckJson();
+//			JSONObject jo = JSONObject.fromObject(checkJoson);
+//			JSONArray jsArry = jo.getJSONArray("caseInfo");
+//			for (int j = 0; j < jsArry.size(); j++) {
+//				JSONObject joInfo = jsArry.getJSONObject(j);
+//				String name = joInfo.getString("name");
+//				String reg = joInfo.getString("reg");
+//				String length = joInfo.getString("length");
+//				// 调用公用方法 根据reg length等条件生成数据
+//				String fieldvalue = AutoTestUtil.proTestDataByReg(reg, length);
+//				postData = postData.replace("#{" + name + "}", fieldvalue);
+//			}
+//		}
+//		// 2、需要依赖其他用例生成请求报文的
+//		// 获取该用例所有被依赖的用例的信息
+//		List<IfSysMock> refMockList = ifSysMockService.getRefMockInfoByMockId(mock.getId());
+//		for (IfSysMock re : refMockList) {
+//			String refjson = re.getRspRefJson();
+//			if (!StringUtil.isBlank(refjson)) {
+//				String rspBody = re.getRealResponseJson();
+//				// 根据refjson 替换 postData
+//				postData = AutoTestUtil.proTestDataByRspBody(postData, refjson, rspBody);
+//			}
+//		}
+//
+//		return postData;
+//	}
 
-	/**
-	 * 
-	 * Title: preHanlderReuestBody<br/>
-	 * Description: 处理请求报文 前置<br/>
-	 * @author xiebin
-	 * @date 2016年1月7日下午5:52:28
-	 *
-	 * @param postData
-	 * @param mock
-	 * @return
-	 */
-	public String preHanlderReuestBody(String postData, IfSysMock mock) {
-		// 如果需要的话需要先完善请求报文
-		if (!StringUtil.isBlank(mock.getCheckJson())) {
-			// 1、需要自动生成数据
-			String checkJoson = mock.getCheckJson();
-			JSONObject jo = JSONObject.fromObject(checkJoson);
-			JSONArray jsArry = jo.getJSONArray("caseInfo");
-			for (int j = 0; j < jsArry.size(); j++) {
-				JSONObject joInfo = jsArry.getJSONObject(j);
-				String name = joInfo.getString("name");
-				String reg = joInfo.getString("reg");
-				String length = joInfo.getString("length");
-				// 调用公用方法 根据reg length等条件生成数据
-				String fieldvalue = AutoTestUtil.proTestDataByReg(reg, length);
-				postData = postData.replace("#{" + name + "}", fieldvalue);
-			}
-		}
-		// 2、需要依赖其他用例生成请求报文的
-		// 获取该用例所有被依赖的用例的信息
-		List<IfSysMock> refMockList = ifSysMockService.getRefMockInfoByMockId(mock.getId());
-		for (IfSysMock re : refMockList) {
-			String refjson = re.getRspRefJson();
-			if (!StringUtil.isBlank(refjson)) {
-				String rspBody = re.getRealResponseJson();
-				// 根据refjson 替换 postData
-				postData = AutoTestUtil.proTestDataByRspBody(postData, refjson, rspBody);
-			}
-		}
-
-		return postData;
-	}
-	
-	
-	
-	/**
-	 * 
-	 * Title: autoTest<br/>
-	 * Description: 自动化测试核心代码 接口哦间的依赖<br/>
-	 * 
-	 * @author xiebin
-	 * @date 2015年12月10日上午10:50:15
-	 *
-	 * @param interFaceInfo
-	 */
-	// public void autoTest(InterFaceInfo interFaceInfo) {
-	// //设置接口访问的完整地址
-	// String url = getAddressUrl(interFaceInfo.getAddressUrl(),
-	// interFaceInfo.getIfUrl());
-	// // 1、获取接口调用时依赖的接口调用列表
-	// List<IfSysMock> invokerOrderList = new ArrayList<IfSysMock>();
-	// invokerOrder(invokerOrderList, interFaceInfo.getId());
-	// // 2、依次调用被依赖的接口
-	// for (int i = invokerOrderList.size() - 1; i >= 0; i--) {
-	// IfSysMock mock = invokerOrderList.get(i);
-	// /**
-	// * 调用HTTP请求
-	// */
-	// // 期望请求报文
-	// String postData = mock.getRequestJson();
-	// // 实际请求后，返回的报文（返回码和返回实体）
-	// try{
-	// httpClientService.httpPost(mock.getAddressUrl(), postData);
-	// }catch(Exception e){
-	// debug("调用失败");
-	// }
-	//
-	// }
-	// // 3、最后调用目标接口
-	// for (IfSysMock mock : interFaceInfo.getMockList()) {
-	// /**
-	// * 调用HTTP请求
-	// */
-	// // 期望请求报文
-	// String postData = mock.getRequestJson();
-	// // 实际请求后，返回的报文（返回码和返回实体）
-	// String responseJson="";
-	// try{
-	// responseJson=httpClientService.httpPost(url, postData);
-	// }catch(Exception e){
-	// responseJson="";
-	// debug("调用失败");
-	// }
-	// // 实际结果回写
-	// writeBackContent(mock, responseJson);
-	//
-	// }
-	// }
-	//
 
 	/**
-	 * 
-	 * Title: invokerOrder<br/>
-	 * Description: 获取该测试用例调用时依赖的其他用例的调用列表<br/>
-	 * 
-	 * @author xiebin
-	 * @date 2015年12月22日下午4:14:44
-	 *
-	 * @param invokerOrderList
-	 */
+	 * 获取该测试用例调用时依赖的其他用例的调用列表
+	 * @param invokerOrderList 接口调用列表
+	 * @param mockId 目标接口ID
+     */
 	public void invokerOrder(List<IfSysMock> invokerOrderList, int mockId) {
 		// 获取被测用例依赖其他用例的列表
 		List<IfSysRefer> referList = ifSysReferService.getReferList(mockId);
@@ -521,42 +481,13 @@ public class IfSysAutoTestService extends Domain {
 		}
 	}
 
-	/**
-	 * 
-	 * Title: invokerOrder<br/>
-	 * Description: 获取接口调用时依赖的接口调用列表 确定接口调用顺序<br/>
-	 * 
-	 * @author xiebin
-	 * @date 2015年12月10日下午4:06:23
-	 *
-	 * @param invokerOrderList
-	 * @param ifId
-	 */
-	// public void invokerOrder(List<IfSysMock> invokerOrderList, int ifId) {
-	// // 获取被测接口依赖其他接口的列表
-	// List<IfSysRefer> referList = ifSysReferService.getReferList(ifId);
-	// // 如果有依赖 遍历依赖 列表
-	// for (int i = referList.size() - 1; i >= 0; i--) {
-	// IfSysRefer refer = referList.get(i);
-	// // 获取被依赖的接口
-	// IfSysMock mock = ifSysMockService.getReferByIfId(refer.getRefId());
-	// String url = getAddressUrl(mock.getAddressUrl(), mock.getIfURL());
-	// mock.setAddressUrl(url);
-	// invokerOrderList.add(mock);
-	// invokerOrder(invokerOrderList, mock.getIfId());
-	// }
-	// }
 
 	/**
-	 * 
-	 * Title: getAddressUrl<br/>
-	 * Description: 获取接口完整地址<br/>
-	 * 
-	 * @author xiebin
-	 * @date 2015年12月10日上午10:43:23
-	 *
-	 * @return
-	 */
+	 * 获取接口完整地址
+	 * @param url 系统地址
+	 * @param action 接口path
+     * @return 返回完整地址
+     */
 	public String getAddressUrl(String url, String action) {
 		String addressUrl = "";
 		if (StringUtil.isNotBlank(url) && StringUtil.isNotBlank(action)) {
@@ -622,12 +553,51 @@ public class IfSysAutoTestService extends Domain {
 				}
 			}else{
 				if(i>=path.length-1){
-					return json.get(path[i]).toString();
+					if(json.get(path[i])!=null){
+						return json.get(path[i]).toString();
+					}else{
+						return "";
+					}
 				}
 				json = JSONObject.fromObject(json.get(path[i]));
 			}
 		}
 		return json.toString();
+	}
+
+	/**
+	 * 头信息转换成字符串
+	 * @param headers map类型的头信息
+	 * @return 字符串类型的头
+     */
+	public String mapHeadToStr(Map<String,String> headers){
+		if(headers!=null){
+			String headStr = "";
+			for(String ahead : headers.keySet()){
+				headStr += ahead+":"+headers.get(ahead)+"\n";
+			}
+			return headStr;
+		}else {
+			return "";
+		}
+	}
+
+	/**
+	 * 头信息转 Map
+	 * @param headers 字符串类型头信息
+	 * @return map 类型头信息
+     */
+	public Map<String,String> strHeadToMap(String headers){
+		Map<String,String> headMap = new HashMap<>();
+		if(StringUtil.isNotEmpty(headers)){
+			String[] headArr = headers.trim().split("\n");
+			for(String aheader:headArr){
+				String key = aheader.substring(0,aheader.indexOf(":"));
+				String val = aheader.substring(aheader.indexOf(":"));
+				headMap.put(key,val);
+			}
+		}
+		return headMap;
 	}
 
 }
