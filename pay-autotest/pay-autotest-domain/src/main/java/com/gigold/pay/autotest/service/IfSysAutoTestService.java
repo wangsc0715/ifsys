@@ -190,7 +190,7 @@ public class IfSysAutoTestService extends Domain {
 		 * 初始化持续变量
 		 */
 		Map<Integer,String> allRespMap = new HashMap<>();// 临时变量,存放各个依赖用例的包体返回
-		Map<Integer,Map> allHeadMap = new HashMap<>();// 临时变量,存放各个依赖用例的头部
+		Map<Integer,Map<String,String>> allHeadMap = new HashMap<>();// 临时变量,存放各个依赖用例的头部
 		Map<String,String> replacedStrs = new HashMap<>();// 已替换变量,存放占位符替换的变量
 		Map<String, String> responseHead = null; // 接口返回头信息
 		String responseJson = ""; // 接口返回字符串
@@ -215,8 +215,15 @@ public class IfSysAutoTestService extends Domain {
 			/**
 			 * 头部组装
 			 */
-			//若存在头部依赖
+			// 获取头部
 			Map<String,String> extraHeaders = new HashMap<>();
+			String reqHead = refmock.getRequestHead();
+			// 替换头部
+			reqHead = replaceHolder(reqHead,refmock.getId(),allRespMap,allHeadMap,replacedStrs);
+
+			if(StringUtil.isNotEmpty(reqHead)){
+				extraHeaders = strHeadToMap(reqHead);
+			}
 
 			/**
 			 * 地址组装
@@ -280,7 +287,7 @@ public class IfSysAutoTestService extends Domain {
 	}
 
 	/**
-	 * 替换接口占位符依赖
+	 * 替换接口占位符依赖,支持报文替代和包头替代
 	 * @param requestStr 原始请求参数
 	 * @param mockid 目标用例
 	 * @param allRespMap 依赖用例的所有返回<用例id,用例返回字符串>
@@ -288,7 +295,7 @@ public class IfSysAutoTestService extends Domain {
 	 * @param replacedStrs 依赖用例的所有返回<占位符,占位符取值>
      * @return 替换后的字符串
      */
-	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap,Map<Integer,Map> allHeadMap,Map<String,String> replacedStrs){
+	public String replaceHolder(String requestStr,int mockid,Map<Integer,String> allRespMap,Map<Integer,Map<String,String>> allHeadMap,Map<String,String> replacedStrs){
 		try {
 			// 1.获取当前接口所依赖的所有字段,
 			List<IfSysFeildRefer> referFields=ifSysReferService.queryReferFields(mockid);
@@ -296,14 +303,29 @@ public class IfSysAutoTestService extends Domain {
 				//2.根据返回字段,替换当前报文; 别名|mockid|feild 依次遍历 allRespMap
 				int nowMockId = referField.getRef_mock_id(); // 当前用例数据的id
 				String path = referField.getRef_feild(); // 当前用例数据所依赖的域
-				// 根据每一个依赖的用例,在临时变量中查询出记录的返回的json
+				String type = referField.getType();
+				// 根据每一个依赖的用例,在临时变量中查询出记录的返回的 json
 				String backJson = allRespMap.get(nowMockId);
-				// 根据每个依赖的域,在返回的json中查询出值
+
+				// 根据每一个依赖的用例,在临时变量中查询出记录的返回的 Head
+				Map<String,String> backHead = allHeadMap.get(nowMockId);
+
+
+				// 得到返回字段
 				String backField = gatJsonValByPath(backJson,path);
 				if(requestStr.contains(referField.getAlias())){
-					requestStr = requestStr.replace(referField.getAlias() ,backField);// 替换别名代表的值
+					// 替换字段
+					if(type!=null && type.equals("BODY")){
+						requestStr = requestStr.replace(referField.getAlias() ,backField);
+					}
+					// 替换包头
+					if(type!=null && type.equals("HEAD")){
+						requestStr = requestStr.replace(referField.getAlias() ,backHead.get(path));
+					}
 					System.out.println(requestStr);
 				}
+
+
 			}
 
 
@@ -449,6 +471,19 @@ public class IfSysAutoTestService extends Domain {
 		return addressUrl;
 	}
 
+	public static String getHeadValuebyKey(String headString ,String key){
+		String[] headsArr = headString.split("\n");
+		for(String head:headsArr){
+			String _key = head.substring(0,head.indexOf(":"));
+			String _val = head.substring(head.indexOf(":"));
+			_key=_key.trim();key=key.trim();
+			if(StringUtil.isNotEmpty(_key)&&_key.equals(key)){
+				return _val;
+			}
+		}
+		return "";
+	}
+
 	/**
 	 * 根据表达式 从json字符串中取值
 	 * @param jsonString json字符串
@@ -544,6 +579,21 @@ public class IfSysAutoTestService extends Domain {
 			cksstr +="; "+cookie.getName()+"="+cookie.getValue();
 		}
 		return cksstr.substring(1);
+	}
+
+	public static void main(String[] a){
+		String head="Accept:*/*\n" +
+				"Accept-Encoding:gzip, deflate, sdch\n" +
+				"Accept-Language:zh-CN,zh;q=0.8,en;q=0.6\n" +
+				"Cache-Control:max-age=0\n" +
+				"Cookie:BAIDUID=8E9CFCBE806221F0FE0C81D3F4BCF053:FG=1; PSTM=1453358278; BIDUPSID=83B667467AB098DF71A38A2732AE19C8; MCITY=-158%3A; IK_CID_77=6; BDUSS=xsZUlDSlZCUlNWeWt4NnJ1RUJyU29kQXFwR2JnQnZHUGhTS0dBSVA4R1diUUJYQUFBQUFBJCQAAAAAAAAAAAEAAAA~pJczAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJbg2FaW4NhWWU; IK_CID_1101=4; IK_CID_85=6; IK_CID_1031=3; IK_CID_84=3; IK_CID_95=1; BDSFRCVID=siLsJeC62lUOzIj4gmFCIGvmcgKaTlQTH6aoQ_MgZiqR89oc2461EG0PfOlQpYDb_7YLogKKLmOTHp5P; H_BDCLCKID_SF=JJkO_D_atKvjDbTnMITHh-F-5fIX5-RLfKbCa4OF5lOTJh0R2hbZ-T07jG7jh4cqBb6JM56F5ncUOqojDTbke6bXeH-qtT_sb5vfstjJan7he5rnhPF3bh5bKP6-35KHJDbMoUK5Jn3VsRcVQnjV-P-U-JOQQl37JD6y3fTE-ljdO-_4yfjS2-DDWtoxJpOZBKJIQUTgHlvSof5vbURvX-ug3-7jtl8EtR-O_C_afCK3fP36qRbEh4_ShMntKI62aKDsQbT1-hcqEIL4hhoc2xFqjMJL0fJA35cL3b3cKxbSVfbSj4Qo0q4Ibn60blDOfCO2oD-Ktl5nhMJIXPvGKhFv-RPfXx7y523i2n6vQpn2Mftu-n5jHj50jHLq3f; IK_CID_80=1; IK_CID_83=3; IK_8E9CFCBE806221F0FE0C81D3F4BCF053=109; IK_CID_74=82; H_PS_PSSID=19292_17747_1459_18240_17944_17001_15593_11924_10633; Hm_lvt_6859ce5aaf00fb00387e6434e4fcc925=1458812164,1458812305,1458813035,1458822806; Hm_lpvt_6859ce5aaf00fb00387e6434e4fcc925=1458822806\n" +
+				"Host:zhidao.baidu.com\n" +
+				"Proxy-Connection:keep-alive\n" +
+				"Referer:http://zhidao.baidu.com/link?url=nsnzNnB7mMc7UESDKT-IdXVJUqTEw8TA2RJTiV00NoZedOuXLfnr7oVZ95yP0aYqo8HrpgFiAd2ZDjd-XoWvNq\n" +
+				"User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36\n" +
+				"X-Requested-With:XMLHttpRequest";
+		String key = "Referer";
+		System.out.println(getHeadValuebyKey(head,key));
 	}
 
 }

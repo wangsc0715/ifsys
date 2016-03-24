@@ -23,8 +23,16 @@ import org.springframework.stereotype.Component;
 public class IfSysFeildRefer {
 	
 	private int id,mockid,ref_mock_id;
-	private String ref_feild,alias,status;
+	private String ref_feild,alias,status,type;
 
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 	public int getId() {
 		return id;
