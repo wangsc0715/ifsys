@@ -20,19 +20,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("prototype")
-public class IfSysFeildRefer {
+public class IfSysSQLCallBack {
 	
-	private int id,mockid,ref_mock_id;
-	private String ref_feild,alias,status,type;
-
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
+	private int id,mockid;
+	private String sql,status,desc;
 
 	public int getId() {
 		return id;
@@ -46,32 +37,16 @@ public class IfSysFeildRefer {
 		return mockid;
 	}
 
-	public void setMockid(int mockid) {
-		this.mockid = mockid;
+	public void setMockid(int mock_id) {
+		this.mockid = mock_id;
 	}
 
-	public int getRef_mock_id() {
-		return ref_mock_id;
+	public String getSql() {
+		return sql;
 	}
 
-	public void setRef_mock_id(int ref_mock_id) {
-		this.ref_mock_id = ref_mock_id;
-	}
-
-	public String getRef_feild() {
-		return ref_feild;
-	}
-
-	public void setRef_feild(String ref_feild) {
-		this.ref_feild = ref_feild;
-	}
-
-	public String getAlias() {
-		return alias;
-	}
-
-	public void setAlias(String alias) {
-		this.alias = alias;
+	public void setSql(String sql) {
+		this.sql = sql;
 	}
 
 	public String getStatus() {
@@ -82,6 +57,11 @@ public class IfSysFeildRefer {
 		this.status = status;
 	}
 
+	public String getDesc() {
+		return desc;
+	}
 
-
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
 }

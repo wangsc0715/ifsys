@@ -22,26 +22,39 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("prototype")
 public class IfSysMock {
-	
-	private  int id;
-	private int ifId;
-	private int rspCodeId;
-	private String rspCode;
+
+	// id相关
+	private int id,ifId,rspCodeId;
+
 	private String rspCodeDesc;
 	private String preCodeDesc;
-	private String requestJson;
-	private String responseJson;
 	private String testResult;
-	private String realRspCode;
-	private String realRequestJson;// 真实请求
-	private String realResponseJson;
 	private String caseName;
 	private String checkJson; //用例数据自动生成规则描述 json格式 有格式要求
 	private String rspRefJson;//描述依赖其他用例的字段取值情况，多个字段之间用英文逗号隔开
     private String isCase;//标识该用例是作为依赖，还是作为单独的用例  Y：用例 ；N：依赖
 	private String jrn;
+
+	// 请求返回码相关
+	private String rspCode;
+	private String realRspCode;
+
+	// 请求地址相关
 	private String realRequestPath;//实际的访问地址
 	private String requestPath;//预期的访问地址
+
+	// 请求体相关
+	private String realRequestJson;// 真实请求
+	private String realResponseJson;
+	private String requestJson;
+	private String responseJson;
+
+	// 请求头相关
+	private String requestHead;
+	private String responseHead;
+	private String realRequestHead;
+	private String realResponseHead;
+
 
 	//所属接口信息
 	private String ifName;
@@ -59,10 +72,43 @@ public class IfSysMock {
 	private String remark;
 	private String email;
 	private String username;
-	
-	
+
+	// 系统产品信息
 	private int ifSysId;
 	private int ifProId;
+
+
+	public String getRequestHead() {
+		return requestHead;
+	}
+
+	public void setRequestHead(String requestHead) {
+		this.requestHead = requestHead;
+	}
+
+	public String getResponseHead() {
+		return responseHead;
+	}
+
+	public void setResponseHead(String responseHead) {
+		this.responseHead = responseHead;
+	}
+
+	public String getRealRequestHead() {
+		return realRequestHead;
+	}
+
+	public void setRealRequestHead(String realRequestHead) {
+		this.realRequestHead = realRequestHead;
+	}
+
+	public String getRealResponseHead() {
+		return realResponseHead;
+	}
+
+	public void setRealResponseHead(String realResponseHead) {
+		this.realResponseHead = realResponseHead;
+	}
 
 	public String getSysUrl() {
 		return sysUrl;

@@ -21,6 +21,7 @@
 		<result property="ref_feild" column="ref_feild" />
 		<result property="alias" column="alias" />
 		<result property="status" column="status" />
+		<result property="type" column="type" />
 	</resultMap>
 
 
@@ -32,7 +33,8 @@
 		a.ref_mock_id,
 		a.ref_feild,
 		a.alias,
-		a.status
+		a.status,
+		a.type
 		from
 		T_IF_REFER_MOCK_FEILD a
 		where a.mockid = #{mockid} and a.status = "Y"
@@ -41,9 +43,9 @@
 	<!-- 用例字段依赖列表 - 插入方法 -->
 	<update id="updataReferFields" parameterType="com.gigold.pay.autotest.bo.IfSysFeildRefer">
 		REPLACE INTO T_IF_REFER_MOCK_FEILD
-			(mockid,ref_mock_id,ref_feild,alias,status)
+			(mockid,ref_mock_id,ref_feild,alias,status,type)
 		value
-			(#{mockid},#{ref_mock_id},#{ref_feild},#{alias},#{status})
+			(#{mockid},#{ref_mock_id},#{ref_feild},#{alias},#{status},#{type})
 	</update>
 
 	<!-- 用例字段依赖列表 删除方法 -->
