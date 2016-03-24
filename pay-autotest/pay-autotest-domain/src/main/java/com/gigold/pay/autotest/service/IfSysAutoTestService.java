@@ -215,12 +215,15 @@ public class IfSysAutoTestService extends Domain {
 			/**
 			 * 头部组装
 			 */
-			// 获取头部
+			// 获取额外头部
 			Map<String,String> extraHeaders = new HashMap<>();
 			String reqHead = refmock.getRequestHead();
-			// 替换头部
-			reqHead = replaceHolder(reqHead,refmock.getId(),allRespMap,allHeadMap,replacedStrs);
-
+			// 判断头部是否存在
+			if(StringUtil.isNotEmpty(reqHead)){
+				// 替换额外头部
+				reqHead = replaceHolder(reqHead,refmock.getId(),allRespMap,allHeadMap,replacedStrs);
+			}
+			// 重组额外头部
 			if(StringUtil.isNotEmpty(reqHead)){
 				extraHeaders = strHeadToMap(reqHead);
 			}
@@ -256,6 +259,7 @@ public class IfSysAutoTestService extends Domain {
 				Map<String,String> reqHeaders = ifSysMockResponse.getRequestHeaders();
 				List<Cookie> cks = cookieStore.getCookies();
 				// 请求头中加入cookie
+				if(cks!=null&&cks.size()>0)
 				reqHeaders.put("Cookie",stringfiyCookiesList(cks));
 				// 回写真实请求头
 				refmock.setRealRequestHead(mapHeadToStr(reqHeaders));
@@ -475,7 +479,7 @@ public class IfSysAutoTestService extends Domain {
 		String[] headsArr = headString.split("\n");
 		for(String head:headsArr){
 			String _key = head.substring(0,head.indexOf(":"));
-			String _val = head.substring(head.indexOf(":"));
+			String _val = head.substring(head.indexOf(":")+1);
 			_key=_key.trim();key=key.trim();
 			if(StringUtil.isNotEmpty(_key)&&_key.equals(key)){
 				return _val;
@@ -564,7 +568,7 @@ public class IfSysAutoTestService extends Domain {
 			String[] headArr = headers.trim().split("\n");
 			for(String aheader:headArr){
 				String key = aheader.substring(0,aheader.indexOf(":"));
-				String val = aheader.substring(aheader.indexOf(":"));
+				String val = aheader.substring(aheader.indexOf(":")+1);
 				headMap.put(key,val);
 			}
 		}
@@ -581,19 +585,19 @@ public class IfSysAutoTestService extends Domain {
 		return cksstr.substring(1);
 	}
 
-	public static void main(String[] a){
-		String head="Accept:*/*\n" +
-				"Accept-Encoding:gzip, deflate, sdch\n" +
-				"Accept-Language:zh-CN,zh;q=0.8,en;q=0.6\n" +
-				"Cache-Control:max-age=0\n" +
-				"Cookie:BAIDUID=8E9CFCBE806221F0FE0C81D3F4BCF053:FG=1; PSTM=1453358278; BIDUPSID=83B667467AB098DF71A38A2732AE19C8; MCITY=-158%3A; IK_CID_77=6; BDUSS=xsZUlDSlZCUlNWeWt4NnJ1RUJyU29kQXFwR2JnQnZHUGhTS0dBSVA4R1diUUJYQUFBQUFBJCQAAAAAAAAAAAEAAAA~pJczAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJbg2FaW4NhWWU; IK_CID_1101=4; IK_CID_85=6; IK_CID_1031=3; IK_CID_84=3; IK_CID_95=1; BDSFRCVID=siLsJeC62lUOzIj4gmFCIGvmcgKaTlQTH6aoQ_MgZiqR89oc2461EG0PfOlQpYDb_7YLogKKLmOTHp5P; H_BDCLCKID_SF=JJkO_D_atKvjDbTnMITHh-F-5fIX5-RLfKbCa4OF5lOTJh0R2hbZ-T07jG7jh4cqBb6JM56F5ncUOqojDTbke6bXeH-qtT_sb5vfstjJan7he5rnhPF3bh5bKP6-35KHJDbMoUK5Jn3VsRcVQnjV-P-U-JOQQl37JD6y3fTE-ljdO-_4yfjS2-DDWtoxJpOZBKJIQUTgHlvSof5vbURvX-ug3-7jtl8EtR-O_C_afCK3fP36qRbEh4_ShMntKI62aKDsQbT1-hcqEIL4hhoc2xFqjMJL0fJA35cL3b3cKxbSVfbSj4Qo0q4Ibn60blDOfCO2oD-Ktl5nhMJIXPvGKhFv-RPfXx7y523i2n6vQpn2Mftu-n5jHj50jHLq3f; IK_CID_80=1; IK_CID_83=3; IK_8E9CFCBE806221F0FE0C81D3F4BCF053=109; IK_CID_74=82; H_PS_PSSID=19292_17747_1459_18240_17944_17001_15593_11924_10633; Hm_lvt_6859ce5aaf00fb00387e6434e4fcc925=1458812164,1458812305,1458813035,1458822806; Hm_lpvt_6859ce5aaf00fb00387e6434e4fcc925=1458822806\n" +
-				"Host:zhidao.baidu.com\n" +
-				"Proxy-Connection:keep-alive\n" +
-				"Referer:http://zhidao.baidu.com/link?url=nsnzNnB7mMc7UESDKT-IdXVJUqTEw8TA2RJTiV00NoZedOuXLfnr7oVZ95yP0aYqo8HrpgFiAd2ZDjd-XoWvNq\n" +
-				"User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36\n" +
-				"X-Requested-With:XMLHttpRequest";
-		String key = "Referer";
-		System.out.println(getHeadValuebyKey(head,key));
-	}
+//	public static void main(String[] a){
+//		String head="Accept:*/*\n" +
+//				"Accept-Encoding:gzip, deflate, sdch\n" +
+//				"Accept-Language:zh-CN,zh;q=0.8,en;q=0.6\n" +
+//				"Cache-Control:max-age=0\n" +
+//				"Cookie:BAIDUID=8E9CFCBE806221F0FE0C81D3F4BCF053:FG=1; PSTM=1453358278; BIDUPSID=83B667467AB098DF71A38A2732AE19C8; MCITY=-158%3A; IK_CID_77=6; BDUSS=xsZUlDSlZCUlNWeWt4NnJ1RUJyU29kQXFwR2JnQnZHUGhTS0dBSVA4R1diUUJYQUFBQUFBJCQAAAAAAAAAAAEAAAA~pJczAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJbg2FaW4NhWWU; IK_CID_1101=4; IK_CID_85=6; IK_CID_1031=3; IK_CID_84=3; IK_CID_95=1; BDSFRCVID=siLsJeC62lUOzIj4gmFCIGvmcgKaTlQTH6aoQ_MgZiqR89oc2461EG0PfOlQpYDb_7YLogKKLmOTHp5P; H_BDCLCKID_SF=JJkO_D_atKvjDbTnMITHh-F-5fIX5-RLfKbCa4OF5lOTJh0R2hbZ-T07jG7jh4cqBb6JM56F5ncUOqojDTbke6bXeH-qtT_sb5vfstjJan7he5rnhPF3bh5bKP6-35KHJDbMoUK5Jn3VsRcVQnjV-P-U-JOQQl37JD6y3fTE-ljdO-_4yfjS2-DDWtoxJpOZBKJIQUTgHlvSof5vbURvX-ug3-7jtl8EtR-O_C_afCK3fP36qRbEh4_ShMntKI62aKDsQbT1-hcqEIL4hhoc2xFqjMJL0fJA35cL3b3cKxbSVfbSj4Qo0q4Ibn60blDOfCO2oD-Ktl5nhMJIXPvGKhFv-RPfXx7y523i2n6vQpn2Mftu-n5jHj50jHLq3f; IK_CID_80=1; IK_CID_83=3; IK_8E9CFCBE806221F0FE0C81D3F4BCF053=109; IK_CID_74=82; H_PS_PSSID=19292_17747_1459_18240_17944_17001_15593_11924_10633; Hm_lvt_6859ce5aaf00fb00387e6434e4fcc925=1458812164,1458812305,1458813035,1458822806; Hm_lpvt_6859ce5aaf00fb00387e6434e4fcc925=1458822806\n" +
+//				"Host:zhidao.baidu.com\n" +
+//				"Proxy-Connection:keep-alive\n" +
+//				"Referer:http://zhidao.baidu.com/link?url=nsnzNnB7mMc7UESDKT-IdXVJUqTEw8TA2RJTiV00NoZedOuXLfnr7oVZ95yP0aYqo8HrpgFiAd2ZDjd-XoWvNq\n" +
+//				"User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36\n" +
+//				"X-Requested-With:XMLHttpRequest";
+//		String key = "Proxy-Connection";
+//		System.out.println(getHeadValuebyKey(head,key));
+//	}
 
 }
