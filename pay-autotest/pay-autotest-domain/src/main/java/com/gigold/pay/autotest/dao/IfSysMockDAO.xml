@@ -181,6 +181,9 @@
 			<if test="responseJson!=null and responseJson!=''">
 				RESPONSE_JSON=#{responseJson},
 			</if>
+			<if test="requestHead!=null and requestHead!=''">
+				REQUEST_HEAD=#{requestHead},
+			</if>
 			<if test="realRspCode!=null and realRspCode!=''">
 				REAL_RSP_CODE=#{realRspCode},
 			</if>
@@ -252,26 +255,31 @@
 	<!-- 根据ID获取测试数据信息 -->
 	<select id="getMockInfoById" parameterType="int" resultMap="ifSysMockResultMap">
      <![CDATA[ 
-		select ID,
-		CASE_NAME,
-		REQUEST_PATH,
-		IF_ID,
-		RSP_CODE_ID,
-		(select RSP_CODE_DESC from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE_DESC,
-		(select RSP_CODE from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE,
-		REQUEST_JSON,
-		CHECK_JSON,
-		RSP_REF_JSON,
-		RESPONSE_JSON,
-		REAL_RSP_CODE,
-		REAL_RESPONSE_JSON,
-		REAL_REQUEST_JSON,
-		REAL_REQUEST_PATH,
-		TEST_RESULT
-		from T_IF_AUTO_MOCK au
-		where ID=#{id}
-		and STATUS='Y'
-		 
+		select
+			ID,
+			CASE_NAME,
+			REQUEST_PATH,
+			IF_ID,
+			RSP_CODE_ID,
+			(select RSP_CODE_DESC from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE_DESC,
+			(select RSP_CODE from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE,
+			REQUEST_JSON,
+			CHECK_JSON,
+			RSP_REF_JSON,
+			RESPONSE_JSON,
+			REAL_RSP_CODE,
+			REAL_RESPONSE_JSON,
+			REAL_REQUEST_JSON,
+			REAL_REQUEST_PATH,
+			RESPONSE_HEAD,
+			REQUEST_HEAD,
+			REAL_REQUEST_HEAD,
+			REAL_RESPONSE_HEAD,
+			TEST_RESULT
+		from
+			T_IF_AUTO_MOCK au
+		where
+			ID=#{id} and STATUS='Y'
       ]]>
 	</select>
 

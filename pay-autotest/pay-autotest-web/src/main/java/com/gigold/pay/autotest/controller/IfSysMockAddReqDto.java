@@ -45,10 +45,24 @@ public class IfSysMockAddReqDto extends RequestDto {
 	private String caseName;
 
 	private String requestPath; // 用例请求地址
+	private String requestHead; // 用例请求头
 
 
 	private String checkJson; //用例数据自动生成规则描述 json格式 有格式要求
 	private String rspRefJson;//描述依赖其他用例的字段取值情况，多个字段之间用英文逗号隔开
+
+
+
+
+
+
+	public String getRequestHead() {
+		return requestHead;
+	}
+
+	public void setRequestHead(String requestHead) {
+		this.requestHead = requestHead;
+	}
 
 	public String getRequestPath() {
 		return requestPath;

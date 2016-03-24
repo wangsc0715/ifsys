@@ -18,6 +18,7 @@ import com.gigold.pay.autotest.datamaker.HexNo;
 import com.gigold.pay.autotest.datamaker.IdCardNo;
 import com.gigold.pay.autotest.datamaker.PhoneNo;
 import org.apache.http.client.CookieStore;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -208,7 +209,7 @@ public class IfSysAutoTestService extends Domain {
 			 */
 			// 替换占位符
 			postData = replaceHolder(postData,refmock.getId(),allRespMap,allHeadMap, replacedStrs);
-			// 保存真实请求
+			// 回写真实请求json
 			refmock.setRealRequestJson(postData);
 
 			/**
@@ -230,9 +231,8 @@ public class IfSysAutoTestService extends Domain {
 				realddressUrl = replaceHolder(realddressUrl,refmock.getId(),allRespMap,allHeadMap,replacedStrs);
 				realddressUrl = getAddressUrl(refmock.getSysUrl(),realddressUrl);
 			}
-			// 保存真实请求
+			// 回写真实请求地址
 			refmock.setRealRequestPath(realddressUrl);
-
 
 
 			/**
@@ -245,15 +245,25 @@ public class IfSysAutoTestService extends Domain {
 				responseJson = ifSysMockResponse.getResponseStr();
 				responseHead = ifSysMockResponse.getHeaders();
 
+				// 拿到真实请求头
+				Map<String,String> reqHeaders = ifSysMockResponse.getRequestHeaders();
+				List<Cookie> cks = cookieStore.getCookies();
+				// 请求头中加入cookie
+				reqHeaders.put("Cookie",stringfiyCookiesList(cks));
+				// 回写真实请求头
+				refmock.setRealRequestHead(mapHeadToStr(reqHeaders));
+
 				// 记录当次请求结果
 				allRespMap.put(refmock.getId(),responseJson);// 返回json
 				allHeadMap.put(refmock.getId(),responseHead);// 返回头
 			} catch (Exception e) {
 				debug("调用失败   调用被依赖测试用例过程中出现异常");
 			}finally {
-				// 回写真实结果入库
+
+				// 回写真实返回json
 				if(StringUtil.isNotEmpty(responseJson))refmock.setRealResponseJson(responseJson);
-				if(responseHead!=null){refmock.setRealRequestHead(mapHeadToStr(responseHead));}
+				// 回写真实返回头
+				if(responseHead!=null){refmock.setRealResponseHead(mapHeadToStr(responseHead));}
 				writeBackContent(refmock);
 			}
 
@@ -379,81 +389,7 @@ public class IfSysAutoTestService extends Domain {
 		}
 		return requestStr.trim();
 	}
-//	/**
-//	 *
-//	 * Title: invokCase<br/>
-//	 * Description: 调用目标测试用例<br/>
-//	 *
-//	 * @author xiebin
-//	 * @date 2015年12月22日下午4:49:39
-//	 *
-//	 * @param mock
-//	 */
-//	public void invokCase(IfSysMock mock,CookieStore cookieStore) {
-//		// 期望请求报文
-//		String postData = mock.getRequestJson();
-//		if(StringUtil.isBlank(postData)){
-//			debug("用例请求报文为空----"+mock.getCaseName());
-//			return;
-//		}
-//		//先处理请求报文
-//		//postData=preHanlderReuestBody(postData,mock);
-//		// 实际请求后，返回的报文（返回码和返回实体）
-//		String responseJson = "";
-//		try {
-//			responseJson = httpClientService.httpPost(mock.getAddressUrl(), postData,cookieStore);
-//		} catch (Exception e) {
-//			responseJson = "";
-//			debug("调用失败 调用目标测试用例过程中出现异常:"+e.getMessage());
-//		}finally {
-//			// 实际结果回写
-//			writeBackContent(mock, responseJson);
-//		}
-//
-//	}
 
-//	/**
-//	 *
-//	 * Title: preHanlderReuestBody<br/>
-//	 * Description: 处理请求报文 前置<br/>
-//	 * @author xiebin
-//	 * @date 2016年1月7日下午5:52:28
-//	 *
-//	 * @param postData
-//	 * @param mock
-//	 * @return
-//	 */
-//	public String preHanlderReuestBody(String postData, IfSysMock mock) {
-//		// 如果需要的话需要先完善请求报文
-//		if (!StringUtil.isBlank(mock.getCheckJson())) {
-//			// 1、需要自动生成数据
-//			String checkJoson = mock.getCheckJson();
-//			JSONObject jo = JSONObject.fromObject(checkJoson);
-//			JSONArray jsArry = jo.getJSONArray("caseInfo");
-//			for (int j = 0; j < jsArry.size(); j++) {
-//				JSONObject joInfo = jsArry.getJSONObject(j);
-//				String name = joInfo.getString("name");
-//				String reg = joInfo.getString("reg");
-//				String length = joInfo.getString("length");
-//				// 调用公用方法 根据reg length等条件生成数据
-//				String fieldvalue = AutoTestUtil.proTestDataByReg(reg, length);
-//				postData = postData.replace("#{" + name + "}", fieldvalue);
-//			}
-//		}
-//		// 2、需要依赖其他用例生成请求报文的
-//		// 获取该用例所有被依赖的用例的信息
-//		List<IfSysMock> refMockList = ifSysMockService.getRefMockInfoByMockId(mock.getId());
-//		for (IfSysMock re : refMockList) {
-//			String refjson = re.getRspRefJson();
-//			if (!StringUtil.isBlank(refjson)) {
-//				String rspBody = re.getRealResponseJson();
-//				// 根据refjson 替换 postData
-//				postData = AutoTestUtil.proTestDataByRspBody(postData, refjson, rspBody);
-//			}
-//		}
-//
-//		return postData;
-//	}
 
 
 	/**
@@ -570,7 +506,7 @@ public class IfSysAutoTestService extends Domain {
 	 * @param headers map类型的头信息
 	 * @return 字符串类型的头
      */
-	public String mapHeadToStr(Map<String,String> headers){
+	public static String mapHeadToStr(Map<String,String> headers){
 		if(headers!=null){
 			String headStr = "";
 			for(String ahead : headers.keySet()){
@@ -587,7 +523,7 @@ public class IfSysAutoTestService extends Domain {
 	 * @param headers 字符串类型头信息
 	 * @return map 类型头信息
      */
-	public Map<String,String> strHeadToMap(String headers){
+	public static Map<String,String> strHeadToMap(String headers){
 		Map<String,String> headMap = new HashMap<>();
 		if(StringUtil.isNotEmpty(headers)){
 			String[] headArr = headers.trim().split("\n");
@@ -598,6 +534,16 @@ public class IfSysAutoTestService extends Domain {
 			}
 		}
 		return headMap;
+	}
+
+	public static String stringfiyCookiesList(List<Cookie> cookieList){
+		String cksstr = "";
+		if(cookieList==null||cookieList.size()<=0)return cksstr;
+
+		for(Cookie cookie : cookieList){
+			cksstr +="; "+cookie.getName()+"="+cookie.getValue();
+		}
+		return cksstr.substring(1);
 	}
 
 }

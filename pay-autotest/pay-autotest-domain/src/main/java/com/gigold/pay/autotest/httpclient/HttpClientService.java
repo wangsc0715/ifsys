@@ -113,6 +113,7 @@ public class HttpClientService extends Domain{
 		// 设置请求头
 		setHeader(httppost,extraHeader);
 
+
 		try {
 			setRequestParams(httppost, postData);
 		} catch (UnsupportedEncodingException e1) {
@@ -121,6 +122,7 @@ public class HttpClientService extends Domain{
 		}
 
 		IfSysMockResponse ifSysMockResponse = new IfSysMockResponse();
+
 		try {
 			HttpResponse response = httpclient.execute(httppost);
 			//获取cookies
@@ -132,17 +134,19 @@ public class HttpClientService extends Domain{
 				ifSysMockResponse.setResponseStr(responseData);
 				/* 读取返回头 */
 				Header[] headers = response.getAllHeaders();
-				Map<String,String> _headrs = new HashMap<>();
-				for (Header header : headers) {
-					_headrs.put(header.getName(), header.getValue());
-				}
-				ifSysMockResponse.setHeaders(_headrs);
+				// 入库返回头
+				ifSysMockResponse.setHeaders(arrHeadToMap(headers));
 			} else {
 				debug("服务器响应失败 : 返回状态" + statusCode);
 			}
 		} catch (IOException e) {
 			debug("服务器响应失败");
 		}
+
+		// 获取所有请求头
+		Header[] requestHeaders = httppost.getAllHeaders();
+		// 记录请求头
+		ifSysMockResponse.setRequestHeaders(arrHeadToMap(requestHeaders));
 
 		return ifSysMockResponse;
 	}
@@ -198,6 +202,19 @@ public class HttpClientService extends Domain{
 		httppost.setEntity(entity);
 	}
 
+	/**
+	 * 将数组类型的head转换为Map类型
+	 * @param headers 数组类型head
+	 * @return map类型head
+     */
+	public static Map<String, String> arrHeadToMap(Header [] headers){
+		Map<String,String> _headrs = new HashMap<>();
+		if (headers==null || headers.length<=0)return _headrs;
+		for (Header header : headers) {
+			_headrs.put(header.getName(), header.getValue());
+		}
+		return _headrs;
+	}
 	
 	
 	
