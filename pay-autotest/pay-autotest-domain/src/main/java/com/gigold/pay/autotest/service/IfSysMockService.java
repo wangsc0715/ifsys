@@ -464,13 +464,11 @@ public class IfSysMockService extends Domain {
 	 * @return
 	 */
 	@IfSysMockHistoryAnnotation("记录测试历史")
-	public boolean writeBackRealRsp(IfSysMock ifSysMock,String testResulte,String realRspJson,String realRspCode) {
+	public boolean writeBackRealRsp(IfSysMock ifSysMock) {
 		boolean flag = false;
  		try {
+			String testResulte = ifSysMock.getTestResult() ;
 			if(testResulte.isEmpty())throw new Exception("回写结果为空");
-			ifSysMock.setTestResult(testResulte);
-			ifSysMock.setRealResponseJson(realRspJson);
-			ifSysMock.setRealRspCode(realRspCode);
 			if (ifSysMockDao.writeBack(ifSysMock) > 0) {
 				flag = true;
 			}
