@@ -267,6 +267,7 @@
 			RSP_CODE_ID,
 			(select RSP_CODE_DESC from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE_DESC,
 			(select RSP_CODE from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE,
+			(select ii.if_url from T_IF_INTERFACE ii where au.IF_ID=ii.id) IF_URL,
 			REQUEST_JSON,
 			CHECK_JSON,
 			RSP_REF_JSON,
