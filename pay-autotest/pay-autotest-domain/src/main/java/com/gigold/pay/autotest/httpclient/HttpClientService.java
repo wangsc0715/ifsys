@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.gigold.pay.autotest.bo.IfSysMockResponse;
+import com.gigold.pay.framework.util.common.StringUtil;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -125,6 +126,7 @@ public class HttpClientService extends Domain{
 
 		try {
 			HttpResponse response = httpclient.execute(httppost);
+
 			//获取cookies
 			cookieStore=httpclient.getCookieStore();
 			int statusCode = response.getStatusLine().getStatusCode();

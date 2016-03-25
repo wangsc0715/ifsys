@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.gigold.pay.autotest.bo.*;
-import com.gigold.pay.autotest.dao.IfSysReferDAO;
 import com.gigold.pay.autotest.datamaker.BankCardNo;
 import com.gigold.pay.autotest.datamaker.HexNo;
 import com.gigold.pay.autotest.datamaker.IdCardNo;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gigold.pay.autotest.httpclient.HttpClientService;
-import com.gigold.pay.autotest.util.AutoTestUtil;
 import com.gigold.pay.framework.core.Domain;
 import com.gigold.pay.framework.util.common.StringUtil;
 
@@ -173,8 +171,10 @@ public class IfSysAutoTestService extends Domain {
 			invokerOrder(invokerOrderList, mock.getId());
 			// 存放依赖的cookies
 			CookieStore cookieStore=new BasicCookieStore();
-			// 2、 按照调用序号依次调用被依赖测试用例
-			invokRefCase(invokerOrderList,cookieStore);
+			// 存放依赖的header
+			Map<String, String> headerStore = new HashMap<>();
+			// 按照调用序号依次调用被依赖测试用例
+			invokRefCase(invokerOrderList,cookieStore,headerStore);
 		}
 
 	}
@@ -185,7 +185,7 @@ public class IfSysAutoTestService extends Domain {
 	 * @param invokerOrderList 用例调用列表
 	 * @param cookieStore 用来维持cookie的变量
      */
-	public void invokRefCase(List<IfSysMock> invokerOrderList,CookieStore cookieStore) {
+	public void invokRefCase(List<IfSysMock> invokerOrderList,CookieStore cookieStore,Map<String,String> headerStore) {
 		/**
 		 * 初始化持续变量
 		 */
@@ -199,34 +199,44 @@ public class IfSysAutoTestService extends Domain {
 			IfSysMock refmock = invokerOrderList.get(i);
 			// 替换请求报文
 			String postData = refmock.getRequestJson();
-			if(StringUtil.isBlank(postData)){
-				debug("用例请求报文为空----"+refmock.getCaseName());
-				return;
-			}
+//			if(StringUtil.isBlank(postData)){
+////				debug("用例请求报文为空----"+refmock.getCaseName());
+////				return;
+//			}
 
 			/**
 			 * 请求组装
 			 */
 			// 替换占位符
-			postData = replaceHolder(postData,refmock.getId(),allRespMap,allHeadMap, replacedStrs);
-			// 回写真实请求json
-			refmock.setRealRequestJson(postData);
+			if(StringUtil.isNotEmpty(postData)){
+				postData = replaceHolder(postData,refmock.getId(),allRespMap,allHeadMap, replacedStrs);
+				// 回写真实请求json
+				refmock.setRealRequestJson(postData);
+			}else{
+				postData="";
+			}
+
 
 			/**
 			 * 头部组装
 			 */
 			// 获取额外头部
-			Map<String,String> extraHeaders = new HashMap<>();
+			Map<String,String> extraHeaders = new TreeMap<>();
+
 			String reqHead = refmock.getRequestHead();
 			// 判断头部是否存在
 			if(StringUtil.isNotEmpty(reqHead)){
 				// 替换额外头部
 				reqHead = replaceHolder(reqHead,refmock.getId(),allRespMap,allHeadMap,replacedStrs);
+				System.out.println(reqHead);
 			}
 			// 重组额外头部
 			if(StringUtil.isNotEmpty(reqHead)){
 				extraHeaders = strHeadToMap(reqHead);
 			}
+			// 合并: 外部头部, 额外头部
+			headerStore.putAll(extraHeaders);
+			extraHeaders = headerStore;
 
 			/**
 			 * 地址组装
@@ -249,8 +259,17 @@ public class IfSysAutoTestService extends Domain {
 			 * 发送请求
 			 */
 			try {
+				if(refmock.getId()==1138){
+					System.out.println(refmock);
+				}
+
 				// 发送请求
 				IfSysMockResponse ifSysMockResponse = httpClientService.httpPost(realddressUrl, postData,cookieStore,extraHeaders);
+
+				if(refmock.getId()==1138){
+					System.out.println(ifSysMockResponse);
+				}
+
 				if(ifSysMockResponse==null)throw new Exception("请求返回null");
 				responseJson = ifSysMockResponse.getResponseStr();
 				responseHead = ifSysMockResponse.getHeaders();
@@ -310,21 +329,31 @@ public class IfSysAutoTestService extends Domain {
 				String type = referField.getType();
 				// 根据每一个依赖的用例,在临时变量中查询出记录的返回的 json
 				String backJson = allRespMap.get(nowMockId);
-
 				// 根据每一个依赖的用例,在临时变量中查询出记录的返回的 Head
 				Map<String,String> backHead = allHeadMap.get(nowMockId);
 
 
 				// 得到返回字段
-				String backField = gatJsonValByPath(backJson,path);
+				String backHeadField ="";
+				String backField = "";
+
+				if(StringUtil.isNotEmpty(backJson))// 空校验
+					backField = gatJsonValByPath(backJson,path);
+				if(backHead!=null) // 空校验
+					backHeadField = backHead.get(path);
+
+				// 分别替换包头和包体依赖
 				if(requestStr.contains(referField.getAlias())){
-					// 替换字段
-					if(type!=null && type.equals("BODY")){
+					// 引用字段
+					if(type!=null && type.toUpperCase().equals("BODY")){
+						if(StringUtil.isNotEmpty(backField))
 						requestStr = requestStr.replace(referField.getAlias() ,backField);
 					}
-					// 替换包头
-					if(type!=null && type.equals("HEAD")){
-						requestStr = requestStr.replace(referField.getAlias() ,backHead.get(path));
+
+					// 引用包头
+					if(type!=null && type.toUpperCase().equals("HEAD")){
+						if(StringUtil.isNotEmpty(backHeadField))
+						requestStr = requestStr.replace(referField.getAlias() ,backHeadField);
 					}
 					System.out.println(requestStr);
 				}
