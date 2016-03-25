@@ -125,21 +125,7 @@ public class HttpClientService extends Domain{
 		IfSysMockResponse ifSysMockResponse = new IfSysMockResponse();
 
 		try {
-
-			HttpResponse response = null;
-			if(StringUtil.isEmpty(postData)){
-				try {
-					response = httpclient.execute(httppost);
-				}catch (Exception e){
-					e.printStackTrace();
-					httppost.getAllHeaders();
-				}
-			}else {
-				response = httpclient.execute(httppost);
-			}
-
-
-
+			HttpResponse response = httpclient.execute(httppost);
 
 			//获取cookies
 			cookieStore=httpclient.getCookieStore();
