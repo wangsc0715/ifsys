@@ -216,7 +216,7 @@ public class IfSysAutoTestService extends Domain {
 			 * 头部组装
 			 */
 			// 获取额外头部
-			Map<String,String> extraHeaders = new HashMap<>();
+			Map<String,String> extraHeaders = new TreeMap<>();
 
 			String reqHead = refmock.getRequestHead();
 			// 判断头部是否存在
@@ -254,9 +254,17 @@ public class IfSysAutoTestService extends Domain {
 			 * 发送请求
 			 */
 			try {
+				if(refmock.getId()==1016||refmock.getId()==1138){
+					System.out.println(refmock);
+				}
+
 				// 发送请求
 				IfSysMockResponse ifSysMockResponse = httpClientService.httpPost(realddressUrl, postData,cookieStore,extraHeaders);
-				System.out.println(ifSysMockResponse);
+
+				if(refmock.getId()==1016||refmock.getId()==1138){
+					System.out.println(ifSysMockResponse);
+				}
+
 				if(ifSysMockResponse==null)throw new Exception("请求返回null");
 				responseJson = ifSysMockResponse.getResponseStr();
 				responseHead = ifSysMockResponse.getHeaders();
@@ -332,13 +340,13 @@ public class IfSysAutoTestService extends Domain {
 				// 分别替换包头和包体依赖
 				if(requestStr.contains(referField.getAlias())){
 					// 引用字段
-					if(type!=null && type.equals("BODY")){
+					if(type!=null && type.toUpperCase().equals("BODY")){
 						if(StringUtil.isNotEmpty(backField))
 						requestStr = requestStr.replace(referField.getAlias() ,backField);
 					}
 
 					// 引用包头
-					if(type!=null && type.equals("HEAD")){
+					if(type!=null && type.toUpperCase().equals("HEAD")){
 						if(StringUtil.isNotEmpty(backHeadField))
 						requestStr = requestStr.replace(referField.getAlias() ,backHeadField);
 					}

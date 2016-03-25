@@ -124,7 +124,22 @@ public class HttpClientService extends Domain{
 		IfSysMockResponse ifSysMockResponse = new IfSysMockResponse();
 
 		try {
-			HttpResponse response = httpclient.execute(httppost);
+
+			HttpResponse response = null;
+			if(extraHeader.size()>0){
+				try {
+					response = httpclient.execute(httppost);
+				}catch (Exception e){
+					e.printStackTrace();
+					httppost.getAllHeaders();
+				}
+			}else {
+				response = httpclient.execute(httppost);
+			}
+
+
+
+
 			//获取cookies
 			cookieStore=httpclient.getCookieStore();
 			int statusCode = response.getStatusLine().getStatusCode();
