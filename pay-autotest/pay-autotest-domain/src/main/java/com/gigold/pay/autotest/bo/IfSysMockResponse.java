@@ -2,6 +2,7 @@ package com.gigold.pay.autotest.bo;
 
 import org.apache.http.Header;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -9,9 +10,9 @@ import java.util.Map;
  * on 16/3/24.
  */
 public class IfSysMockResponse {
-    private String responseStr; // 返回报文
-    private Map<String,String> headers; // 返回头
-    private Map<String,String> requestHeaders; // 请求头
+    private String responseStr =""; // 返回报文
+    private Map<String,String> headers = new HashMap<>(); // 返回头
+    private Map<String,String> requestHeaders=new HashMap<>(); // 请求头
 
 
     public Map<String, String> getRequestHeaders() {
