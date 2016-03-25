@@ -42,10 +42,19 @@
 
 	<!-- 用例字段依赖列表 - 插入方法 -->
 	<update id="updataReferFields" parameterType="com.gigold.pay.autotest.bo.IfSysFeildRefer">
-		REPLACE INTO T_IF_REFER_MOCK_FEILD
-			(mockid,ref_mock_id,ref_feild,alias,status,type)
-		value
-			(#{mockid},#{ref_mock_id},#{ref_feild},#{alias},#{status},#{type})
+		REPLACE INTO
+			T_IF_REFER_MOCK_FEILD
+		SET
+			<if test="id!=null and id!=''">
+				id=#{id},
+			</if>
+			mockid = #{mockid},
+			ref_mock_id = #{ref_mock_id},
+			ref_feild = #{ref_feild},
+			alias = #{alias},
+			status = #{status},
+			type = #{type}
+
 	</update>
 
 	<!-- 用例字段依赖列表 删除方法 -->
