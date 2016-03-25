@@ -9,6 +9,7 @@
   "devDependencies": {
     "gulp-autoprefixer": "^3.1.0",
     "gulp-cache": "^0.4.2",
+    "gulp-cmd-pack": "^1.0.6",
     "gulp-concat": "^2.6.0",
     "gulp-css-spriter": "^0.3.3",
     "gulp-imagemin": "^2.4.0",
