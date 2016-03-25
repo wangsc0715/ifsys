@@ -199,18 +199,23 @@ public class IfSysAutoTestService extends Domain {
 			IfSysMock refmock = invokerOrderList.get(i);
 			// 替换请求报文
 			String postData = refmock.getRequestJson();
-			if(StringUtil.isBlank(postData)){
-				debug("用例请求报文为空----"+refmock.getCaseName());
-				return;
-			}
+//			if(StringUtil.isBlank(postData)){
+////				debug("用例请求报文为空----"+refmock.getCaseName());
+////				return;
+//			}
 
 			/**
 			 * 请求组装
 			 */
 			// 替换占位符
-			postData = replaceHolder(postData,refmock.getId(),allRespMap,allHeadMap, replacedStrs);
-			// 回写真实请求json
-			refmock.setRealRequestJson(postData);
+			if(StringUtil.isNotEmpty(postData)){
+				postData = replaceHolder(postData,refmock.getId(),allRespMap,allHeadMap, replacedStrs);
+				// 回写真实请求json
+				refmock.setRealRequestJson(postData);
+			}else{
+				postData="";
+			}
+
 
 			/**
 			 * 头部组装
@@ -254,14 +259,14 @@ public class IfSysAutoTestService extends Domain {
 			 * 发送请求
 			 */
 			try {
-				if(refmock.getId()==1016||refmock.getId()==1138){
+				if(refmock.getId()==1138){
 					System.out.println(refmock);
 				}
 
 				// 发送请求
 				IfSysMockResponse ifSysMockResponse = httpClientService.httpPost(realddressUrl, postData,cookieStore,extraHeaders);
 
-				if(refmock.getId()==1016||refmock.getId()==1138){
+				if(refmock.getId()==1138){
 					System.out.println(ifSysMockResponse);
 				}
 
