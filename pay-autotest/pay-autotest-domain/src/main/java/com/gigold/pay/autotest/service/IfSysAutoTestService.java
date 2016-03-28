@@ -259,16 +259,9 @@ public class IfSysAutoTestService extends Domain {
 			 * 发送请求
 			 */
 			try {
-				if(refmock.getId()==1138){
-					System.out.println(refmock);
-				}
 
 				// 发送请求
 				IfSysMockResponse ifSysMockResponse = httpClientService.httpPost(realddressUrl, postData,cookieStore,extraHeaders);
-
-				if(refmock.getId()==1138){
-					System.out.println(ifSysMockResponse);
-				}
 
 				if(ifSysMockResponse==null)throw new Exception("请求返回null");
 				responseJson = ifSysMockResponse.getResponseStr();
