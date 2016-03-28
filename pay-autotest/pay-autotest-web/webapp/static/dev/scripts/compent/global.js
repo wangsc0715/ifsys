@@ -507,9 +507,12 @@ define(function(require, exports, module){
 			var _tr = document.createElement("tr");
 			_tr.style.wordWrap = 'break-word';
 			_tr.style.wordBreak = 'break-all';
+			_tr.style.width = "100%";
+			_tr.style.display = "block";
+			_tr.style.marginBottom = "5px";
 			var _key = it.substr(0,it.indexOf(":")).trim();
 			var _val = it.substr(it.indexOf(":")+1).trim();
-			_tr.innerHTML = "<td style='text-align: right;font-weight: bolder'>"+_key+"</td><td style='text-align: center;font-weight: bolder'>:</td><td>"+_val+"</td>";
+			_tr.innerHTML = "<td style='text-align: right;font-weight: bolder;white-space: nowrap;'>"+_key+"</td><td style='text-align: center;font-weight: bolder'>:</td><td>"+_val+"</td>";
 			table.appendChild(_tr);
 		});
 		ele.innerHTML = "";
