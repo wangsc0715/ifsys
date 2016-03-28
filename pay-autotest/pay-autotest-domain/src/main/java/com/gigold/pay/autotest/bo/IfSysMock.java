@@ -34,6 +34,7 @@ public class IfSysMock {
 	private String rspRefJson;//描述依赖其他用例的字段取值情况，多个字段之间用英文逗号隔开
     private String isCase;//标识该用例是作为依赖，还是作为单独的用例  Y：用例 ；N：依赖
 	private String jrn;
+	private String tmSmp;
 
 	// 请求返回码相关
 	private String rspCode;
@@ -77,6 +78,13 @@ public class IfSysMock {
 	private int ifSysId;
 	private int ifProId;
 
+	public String getTmSmp() {
+		return tmSmp;
+	}
+
+	public void setTmSmp(String tmSmp) {
+		this.tmSmp = tmSmp;
+	}
 
 	public String getRequestHead() {
 		return requestHead;
