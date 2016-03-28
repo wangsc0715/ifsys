@@ -179,6 +179,34 @@ public class IfSysAutoTestService extends Domain {
 
 	}
 
+	public void autoTest(int mockid){
+		// 获取接口访问的完整地址
+
+//		IfSysMock mock = ifSysMockService.getMockInfoById();//根据mockid获取;
+//		//判断用例是否有被依赖
+//		List<IfSysRefer> listRef=ifSysReferService.getReferByRefMockId(mock.getId());
+//		//如果用例被其他用例依赖了 则进入下一次循环
+//		if(listRef!=null&&listRef.size()!=0){
+//			return;
+//		}
+//		// 设置接口访问的完整地址
+//		mock.setAddressUrl(mock.getAddressUrl());
+//		// 设置接口访问的主机地址
+//		mock.setSysUrl(interFaceInfo.getAddressUrl());
+//		// 1、获取该测试用例调用时依赖的其他用例的调用列表
+//		List<IfSysMock> invokerOrderList = new ArrayList<IfSysMock>();
+//		// 第一位放入目标接口
+//		invokerOrderList.add(mock);
+//		// 然后加入依赖用例
+//		invokerOrder(invokerOrderList, mock.getId());
+//		// 存放依赖的cookies
+//		CookieStore cookieStore=new BasicCookieStore();
+//		// 存放依赖的header
+//		Map<String, String> headerStore = new HashMap<>();
+//		// 按照调用序号依次调用被依赖测试用例
+//		invokRefCase(invokerOrderList,cookieStore,headerStore);
+	}
+
 
 	/**
 	 * 按调用序号依次调用被依赖测试用例
@@ -228,7 +256,6 @@ public class IfSysAutoTestService extends Domain {
 			if(StringUtil.isNotEmpty(reqHead)){
 				// 替换额外头部
 				reqHead = replaceHolder(reqHead,refmock.getId(),allRespMap,allHeadMap,replacedStrs);
-				System.out.println(reqHead);
 			}
 			// 重组额外头部
 			if(StringUtil.isNotEmpty(reqHead)){
@@ -348,7 +375,6 @@ public class IfSysAutoTestService extends Domain {
 						if(StringUtil.isNotEmpty(backHeadField))
 						requestStr = requestStr.replace(referField.getAlias() ,backHeadField);
 					}
-					System.out.println(requestStr);
 				}
 
 
@@ -531,7 +557,6 @@ public class IfSysAutoTestService extends Domain {
 		field = field.replaceAll("]\\.",".");
 		field = field.replaceAll("]",".");
 		field = field.replaceAll("\\.$","");
-		System.out.println(field);
 		// 逐级查找path对应的值
 		String[] path = field.split("\\.");
 		for(int i = 0; i<path.length;i++){
@@ -541,7 +566,6 @@ public class IfSysAutoTestService extends Domain {
 					// 若下一个位置在path[]中已经超标,
 					// 则当前jsonArray对象已经是最后的位置,
 					// 直接返回即可
-					System.out.println("out");
 					return jsonArr.toString();
 				}else{
 					int idxOfJsonArr = Integer.parseInt(path[i+1]); //path的下一个位置转为整型就是所需值的下标
