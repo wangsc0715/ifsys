@@ -1,7 +1,6 @@
 package com.gigold.pay.autotest.datamaker;
 
 import com.gigold.pay.framework.bootstrap.SystemPropertyConfigure;
-import com.sun.javafx.runtime.SystemProperties;
 
 /**
  * Created by chenkuan

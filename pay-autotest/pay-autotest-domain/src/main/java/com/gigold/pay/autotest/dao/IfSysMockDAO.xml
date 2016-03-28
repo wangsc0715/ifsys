@@ -19,6 +19,7 @@
 		<result property="checkJson" column="CHECK_JSON" />
 		<result property="rspRefJson" column="RSP_REF_JSON" />
 		<result property="isCase" column="IS_CASE" />
+		<result property="tmSmp" column="TM_SMP" />
 
 		<!-- 额外的接口信息数据 @chenkuan 2016.03.23 -->
 		<result property="ifName" column="IF_NAME" />
@@ -280,7 +281,8 @@
 			REQUEST_HEAD,
 			REAL_REQUEST_HEAD,
 			REAL_RESPONSE_HEAD,
-			TEST_RESULT
+			TEST_RESULT,
+			TM_SMP
 		from
 			T_IF_AUTO_MOCK au
 		where
