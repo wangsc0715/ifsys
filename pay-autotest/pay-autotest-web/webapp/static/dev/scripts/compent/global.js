@@ -14,7 +14,7 @@
  */
 define(function(require, exports, module){
 
-	function GiGoldTool(){};
+	function GiGoldTool(){}
 
 	/*格式化日期时间*/
 	GiGoldTool.prototype.date = function(format, date, datePipe, timePipe){
@@ -38,11 +38,11 @@ define(function(require, exports, module){
 			var ret = [];
 			for(var i = 0, len = a.length; i < len; i++){
 				var x = a[i];
-				x = x < 10 ? '0' + x : x
+				x = x < 10 ? '0' + x : x;
 				ret.push(x);
 			}
 			return ret.join(pipe);
-		}
+		};
 
 		switch(format){
 			case 'YM':
@@ -64,6 +64,7 @@ define(function(require, exports, module){
 				ret = GiGoldTool.prototype.date('YMD', oDate, datePipe) + ' ' + GiGoldTool.prototype.date('HI', oDate, '', timePipe);
 				break;
 			case 'YMD':
+				break;
 			default:
 				ret = c([Y, M, D], datePipe);
 		}
@@ -432,30 +433,30 @@ define(function(require, exports, module){
 
 				// 数 美化样式
 				if(typeof json[k] == "number"){
-					styledVal = "<span style='color:#0086b3'> "+styledVal+" </span>"
+					styledVal = "<span style='color:#0086b3'> "+styledVal+" </span>";
 				}
 
 				// 字符串 美化样式
 				if(typeof json[k] == "string"){
-					styledVal = "<span style='color:#239141'> \""+styledVal+"\" </span>"
+					styledVal = "<span style='color:#239141'> \""+styledVal+"\" </span>";
 				}
 
 				// 布尔值 美化样式
 				if(typeof json[k] == "boolean"){
-					styledVal = "<span style='color:#a71d5d'> "+styledVal+" </span>"
+					styledVal = "<span style='color:#a71d5d'> "+styledVal+" </span>";
 				}
 
 				// undefined 美化样式
 				if(typeof json[k] == "undefined"){
-					styledVal = "<span style='color:#969896'> "+styledVal+" </span>"
+					styledVal = "<span style='color:#969896'> "+styledVal+" </span>";
 				}
 
 				// 对象 递归
 				if(typeof json[k] == "object"){
 
-					if(json[k]==null){
+					if(json[k] == null){
 						// null值
-						styledVal = "<span style='color:#aa3022'> null </span>"
+						styledVal = "<span style='color:#aa3022'> null </span>";
 					}else{
 						var eles;
 						if(json instanceof Array){
@@ -551,7 +552,7 @@ define(function(require, exports, module){
 		if(window.localStorage){
 			window.localStorage.setItem(key,value);
 		}
-	}
+	};
 	//提供整个全局公共方法
 	module.exports = {
 		GiGoldTool: GiGoldTool
