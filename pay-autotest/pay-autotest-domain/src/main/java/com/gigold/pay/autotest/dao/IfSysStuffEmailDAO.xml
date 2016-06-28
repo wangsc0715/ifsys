@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gigold.pay.autotest.dao.IfSysStuffEmailDAO">
+
+	<resultMap type="com.gigold.pay.autotest.bo.IfSysStuff" id="IfSysStuff">
+		<id property="id" column="ID" />
+		<result property="loginName" column="LOGIN_NAME" />
+		<result property="email" column="EMAIL" />
+		<result property="userName" column="USERNAME" />
+		<result property="status" column="STATUS" />
+	</resultMap>
+
+	<!-- 获取接口的依赖列表 -->
+	<select id="getStuffByEmail" parameterType="String" resultMap="IfSysStuff">
+     <![CDATA[ 
+        select
+        a.LOGIN_NAME,
+        a.EMAIL,
+        a.USERNAME,
+        a.STATUS
+         from T_IF_USER a where
+         a.EMAIL = #{email}
+      ]]>
+	</select>
+
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 

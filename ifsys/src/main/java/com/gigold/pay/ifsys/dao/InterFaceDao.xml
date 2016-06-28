@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gigold.pay.ifsys.dao.InterFaceDao">
+
+	<resultMap type="com.gigold.pay.ifsys.bo.InterFaceInfo" id="ifResultMap">
+		<id property="id" column="ID" />
+		<result property="ifName" column="IF_NAME" />
+		<result property="ifDesc" column="IF_DESC" />
+		<result property="uid" column="IF_CREATEBY" />
+		<result property="ifCreateTime" column="IF_CREATETIME" />
+		<result property="ifSysId" column="IF_SYS_ID" />
+		<result property="ifProId" column="IF_PRO_ID" />
+		<result property="ifStatus" column="IF_STATUS" />
+		<result property="ifUrl" column="IF_URL" />
+		<result property="ifType" column="IF_TYPE" />
+		<result property="ifProtocol" column="IF_PROTOCOL" />
+		<result property="isValid" column="ISVALID" />
+		<result property="method" column="IF_METHOD" />
+		<result property="methodVersion" column="IF_DUBBO_VERSION" />
+	</resultMap>
+
+	<resultMap type="com.gigold.pay.ifsys.bo.InterFaceInfo" id="joinResultMap">
+		<id property="id" column="ID" />
+		<result property="ifName" column="IF_NAME" />
+		<result property="ifDesc" column="IF_DESC" />
+		<result property="uid" column="IF_CREATEBY" />
+		<result property="ifSysId" column="IF_SYS_ID" />
+		<result property="ifProId" column="IF_PRO_ID" />
+		<result property="sysName" column="IF_SYS_NAME" />
+		<result property="proName" column="IF_PRO_NAME" />
+		<result property="designName" column="USERNAME" />
+	</resultMap>
+
+	<select id="getInterFaceById" parameterType="com.gigold.pay.ifsys.bo.InterFaceInfo"
+		resultMap="ifResultMap">
+        <![CDATA[  
+        select
+        *
+        from T_IF_INTERFACE
+        where ID=#{id} and ISVALID='Y'
+        ]]>
+	</select>
+
+
+	<select id="getInterfaceByProId" parameterType="int" resultMap="ifResultMap">
+        <![CDATA[  
+        select
+        *
+        from T_IF_INTERFACE
+        where IF_PRO_ID=#{ifProId} and ISVALID='Y'
+        ]]>
+	</select>
+
+
+	<select id="getAllInterFaceByPage" resultMap="joinResultMap">
+        <![CDATA[  
+         select
+        inteFace.ID,
+        IF_NAME,
+        IF_DESC,
+        IF_CREATEBY,
+        inteFace.IF_SYS_ID,
+        IF_SYS_NAME,
+        IF_PRO_ID,
+        IF_PRO_NAME,
+        USERNAME
+        from T_IF_INTERFACE inteFace 
+        left join T_IF_SYSTEM  sys on inteFace.IF_SYS_ID=sys.ID
+        left join T_IF_PRO  PRO on inteFace.IF_PRO_ID=PRO.ID
+        left join T_IF_USER  user on inteFace.IF_CREATEBY=user.ID
+        where inteFace.ISVALID='Y'
+        ]]>
+	</select>
+	<!-- 模糊查询 -->
+	<select id="queryInterFaceByPage" parameterType="com.gigold.pay.ifsys.bo.InterFaceInfo"
+		resultMap="joinResultMap">
+		select
+		inteFace.ID,
+		IF_NAME,
+		IF_DESC,
+		IF_CREATEBY,
+		inteFace.IF_SYS_ID,
+		IF_SYS_NAME,
+		IF_PRO_ID,
+		IF_PRO_NAME,
+		USERNAME
+		from T_IF_INTERFACE inteFace
+		left join T_IF_SYSTEM sys on inteFace.IF_SYS_ID=sys.ID
+		left join
+		T_IF_PRO PRO on inteFace.IF_PRO_ID=PRO.ID
+		left join T_IF_USER user on
+		inteFace.IF_CREATEBY=user.ID
+		where (inteFace.IF_NAME like '%${ifName}%'
+		or inteFace.IF_DESC like '%${ifName}%'
+		or IF_SYS_NAME like
+		'%${ifName}%'
+		or IF_PRO_NAME like '%${ifName}%'
+		or USERNAME like
+		'%${ifName}%' )
+		and inteFace.ISVALID='Y'
+		<if test="ifSysId != null and ifSysId!=0">
+			and inteFace.IF_SYS_ID = #{ifSysId}
+		</if>
+		<if test="ifProId != null and ifProId!=0">
+			and inteFace.IF_PRO_ID = #{ifProId}
+		</if>
+	</select>
+
+	<insert id="addInterFace" parameterType="com.gigold.pay.ifsys.bo.InterFaceInfo"
+		useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[  
+        insert into
+        T_IF_INTERFACE(
+        IF_NAME,IF_DESC,
+        IF_CREATEBY,
+        IF_CREATETIME,
+        IF_SYS_ID,
+        IF_PRO_ID,
+        IF_STATUS,
+        IF_URL,
+        IF_TYPE,
+        IF_PROTOCOL,
+        IF_DUBBO_VERSION,
+        IF_METHOD
+        )
+        values(
+        #{ifName},
+        #{ifDesc},
+        #{ifCreateBy},
+        #{ifCreateTime},
+        #{ifSysId},
+        #{ifProId},
+        #{ifStatus},
+        #{ifUrl},
+        #{ifType},
+        #{ifProtocol},
+        #{methodVersion},
+        #{method}
+        )
+    ]]>
+	</insert>
+
+	<delete id="deleteInterFaceById" parameterType="com.gigold.pay.ifsys.bo.InterFaceInfo">
+        <![CDATA[  
+        update
+        T_IF_INTERFACE
+        set ISVALID='N'
+        where ID=#{id}
+        ]]>
+	</delete>
+
+
+	<update id="updateInterFace" parameterType="com.gigold.pay.ifsys.bo.InterFaceInfo">
+		update T_IF_INTERFACE
+		<set>
+		<if test="ifName!=null and ifName!=''">
+			IF_NAME=#{ifName},
+		</if>
+		<if test="ifDesc!=null and ifDesc!=''">
+			IF_DESC=#{ifDesc},
+		</if>
+		<if test="ifProId!=null and ifProId!=''">
+			IF_PRO_ID=#{ifProId},
+		</if>
+		<if test="ifSysId!=null and ifSysId!=''">
+			IF_SYS_ID=#{ifSysId},
+		</if>
+		<if test="ifType!=null and ifType!=''">
+			IF_TYPE=#{ifType},
+		</if>
+		<if test="ifProtocol!=null and ifProtocol!=''">
+			IF_PROTOCOL=#{ifProtocol},
+		</if>
+		<if test="ifUrl!=null and ifUrl!=''">
+			IF_URL=#{ifUrl},
+		</if>
+		<if test="methodVersion!=null and methodVersion!=''">
+			IF_DUBBO_VERSION=#{methodVersion},
+		</if>
+		<if test="method!=null and method!=''">
+			IF_METHOD=#{method},
+		</if>
+		</set>
+		where ID=#{id}
+	</update>
+
+
+
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 

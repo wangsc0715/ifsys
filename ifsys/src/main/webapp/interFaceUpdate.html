@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>独孤九剑－接口修改</title>
+		<link rel="stylesheet" type="text/css" href="info/css/amazeui.min.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+	</head>
+
+	<body>
+		<header data-am-widget="header" class="am-header am-header-default am-titlebar am-no-layout">
+			<h1 class="titleH1">
+				<a>独孤九剑</a>
+			</h1>
+			<ol class="am-breadcrumb" style="margin:0;">
+				<li><a>独孤九剑</a></li>
+				<li><a class="QueryInterface">首页</a></li>
+				<li class="am-active">接口修改</li>
+				<div class="loggxnxi">登陆用户：<span class="userName colorName">11111</span></div>
+			</ol>
+			<div class="am-header-right am-header-nav">
+				<i class="am-header-icon am-icon-bars" title="开发ing..."> </i>
+				<div class="am-dropdown" data-am-dropdown>
+					<button class="am-btn am-btn-primary am-dropdown-toggle menu" data-am-dropdown-toggle>
+						查看功能<span class="am-icon-caret-down"></span>
+					</button>
+					<ul class="am-dropdown-content">
+						<li><a class="QueryInterface">接口查询</a></li>
+						<li><a class="AddInterface">添加接口</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+
+		<div class="am-g am-g-fixed">
+			<form id="interFaceForm">
+				<input id="id" name="id" type="hidden" />
+				<table class="am-table am-table-hover" style="margin-top:60px;">
+					<thead>
+						<th style="text-align: center;" colspan="2">接口基本信息修改</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="am-text-right am-text-secondary">接口名字:</td>
+							<td>
+								<input id="ifName" name="ifName" placeholder="输入接口名" />
+							</td>
+
+						</tr>
+						<tr>
+							<td class="am-text-right am-text-secondary">接口描述信息:</td>
+							<td>
+								<input id="ifDesc" name="ifDesc" placeholder="输入接口描述" />
+							</td>
+						</tr>
+						<tr>
+							<td class="am-text-right am-text-secondary">接口URL/类名:</td>
+							<td>
+								<input style="width:100%" id="ifUrl" name="ifUrl" placeholder="输入接口URL" />
+							</td>
+						</tr>
+						<tr>
+							<td class="am-text-right am-text-secondary">所属系统:</td>
+							<td>
+								<select id="ifSysId" name="ifSysId" data-am-selected="{btnWidth: '20%'}">
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="am-text-right am-text-secondary">所属产品:</td>
+							<td>
+								<select id="ifProId" name="ifProId" data-am-selected="{btnWidth: '20%'}">
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="am-text-right am-text-secondary">接口协议:</td>
+							<td>
+								<select id="ifProtocolId" name="ifProtocol" data-am-selected="{btnWidth: '20%'}">
+									<option value="HTTP" selected>HTTP</option>
+									<option value="FTP">FTP</option>
+									<option value="DUBBO">DUBBO</option>
+								</select>
+							</td>
+						</tr>
+						<tr id="zxc">
+							<td class="am-text-right am-text-secondary">接口请求方式:</td>
+							<td>
+								<select id="ifTypeId" name="ifType" data-am-selected="{btnWidth: '20%'}">
+									<option value="POST" selected>POST</option>
+									<option value="GET">GET</option>
+								</select>
+							</td>
+						</tr>
+						<tr id="wer">
+							<td class="am-text-right am-text-secondary">方法名:</td>
+							<td>
+								<input name="method" id="method" placeholder="输入接口方法名" disabled />
+							</td>
+						</tr>
+						<tr id="asd">
+							<td class="am-text-right am-text-secondary">版本号:</td>
+							<td>
+								<input name="methodVersion" id="methodVersion" placeholder="输入接口版本号" disabled />
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>
+								<button class="am-btn am-btn-success" type="button" id="saveInterFaceBtn" style="width:20%;float: right;">保存</button>
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+			</form>
+
+			<table class="am-table am-table-hover" style="margin-top:60px;">
+				<thead>
+					<th style="text-align: center;" colspan="2">接口请求信息定义</th>
+				</thead>
+				<tbody class="requestDefine">
+					<tr>
+						<td>
+							<form>
+								<div class="show"></div>
+								<input type="hidden" class="fieldId" name="id" value="0">
+								<input type="hidden" name="parentId" value='0'>
+								<input type="hidden" name="fieldFlag" value="1">
+								<input type="hidden" name="operFlag" value="insert">
+								<input type="hidden" class="levelCode" name="level" value=""> 字段名：
+								<input name="fieldName" value='' placeholder="请输入字段名" /> 字段约束：
+								<select name="fieldCheck" data-type='0'>
+									<option value="4">数组</option>
+									<option value="0" selected>请选择</option>
+									<option value="2">邮箱</option>
+								</select>&nbsp;&nbsp;&nbsp;&nbsp; 字段描述(注解)：
+								<input name="fieldDesc" placeholder="请输入字段描述" value=''> <br />
+									例子：
+								<textarea name="fieldReferValue" placeholder="请输入字段例子" class="lzsty" value=''></textarea>
+								<br />
+								<div style="text-align: right;">
+									<button type="button" class="am-btn am-btn-secondary addPropBtn">十</button>
+									<button type="button" class="am-btn am-btn-primary addChildBtn">十Child</button>
+									<button type="button" class="am-btn am-btn-success saveBtn">保存</button>
+									<button type="button" class="am-btn am-btn-danger deleteBtn">删除</button>
+									<button type="button" class="cancleCurBtn am-btn am-btn-warning" style="display: none">取消添加</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<table class="am-table am-table-hover" style="margin-top: 60px;">
+					<thead id="markThead">
+						<th style="text-align: center;" colspan="2">返回码定义</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								<form id="resForm" name="resForm">
+								 <input id="id" name="id" type="hidden" value="">
+									<div class="show"></div>
+									<!-- 字段层级 -->
+									<div>
+										<br> 
+											返回码：<input name="rspCode" placeholder="输入返回码" />
+											返回码描述：<input name="rspCodeDesc" placeholder="输入返回码描述" /> 
+									</div>
+									<div style="text-align: right;">
+										<button type="button" class="addRspBtn  am-btn amContrller am-btn-secondary ">十</button>
+										<button type="button" class="delRspBtn  am-btn am-btn-danger ">删除</button>
+										<button type="button" class="saveRspBtn  am-btn am-btn-success">保存</button>
+										<button type="button" class="cancleRspBtn  am-btn am-btn-warning" style="display: none">取消添加</button>
+
+									</div>
+
+								</form>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+			<table class="am-table am-table-hover" style="margin-top:60px;">
+				<thead>
+					<th style="text-align: center;" colspan="2">接口响应部分定义</th>
+				</thead>
+				<tbody class="responseDefine">
+					<tr>
+						<td>
+							<form>
+								<div class="show"></div>
+								<input type="hidden" class="fieldId" name="id" value="0">
+								<input type="hidden" name="parentId" value='0'>
+								<input type="hidden" name="fieldFlag" value="2">
+								<input type="hidden" name="operFlag" value="insert">
+								<input type="hidden" class="levelCode" name="level" value=""> 字段名：
+								<input name="fieldName" value='' placeholder="请输入字段名" /> 字段约束：
+								<select name="fieldCheck" data-type='0'>
+									<option value="4">数组</option>
+									<option value="0" selected>请选择</option>
+									<option value="2">邮箱</option>
+								</select>&nbsp;&nbsp;&nbsp;&nbsp; 字段描述(注解)：
+								<input name="fieldDesc" placeholder="请输入字段描述" value=''> <br />
+									例子：
+								<textarea name="fieldReferValue" placeholder="请输入字段例子" class="lzsty" value=''></textarea>
+								<br />
+								<div style="text-align: right;">
+									<button type="button" class="am-btn am-btn-secondary addPropBtn">十</button>
+									<button type="button" class="am-btn am-btn-primary addChildBtn">十Child</button>
+									<button type="button" class="am-btn am-btn-success saveBtn">保存</button>
+									<button type="button" class="am-btn am-btn-danger deleteBtn">删除</button>
+									<button type="button" class="cancleCurBtn am-btn am-btn-warning" style="display: none">取消添加</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
+			<input id="ifId" type="hidden" value="">
+			<script type="text/javascript" src="info/js/jquery.min.js"></script>
+			<script src="info/js/amazeui.min.js"></script>
+			<script src="js/plugin/myThirdPlugin.js"></script>
+			<script src="js/plugin/interFaceSys.js"></script>
+			<script type="text/javascript" src="js/interFaceUpDate.js"></script>
+	</body>
+
+</html>

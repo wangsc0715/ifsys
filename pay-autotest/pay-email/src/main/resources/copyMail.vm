@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    .his tr td{width:15px;height:15px;font-size: 0.5em;transition: all .05s ease;text-align:center}
+    .his tr:hover{background: #d1d1d1;transition:none;}
+    .his tr:hover td{background: #d1d1d1;transition:none;}
+    .his tr{height:10px}
+    table { border-collapse: collapse; }
+    td { border: 1px solid #e8e8e8;}
+    .f{background: #ff594d!important; }
+    a{background: #ff594d;display: block}
+    .failed{background: #FF4648 }
+    .failed44{background: #FF4C27  }
+    .failed34{background: #FF792F  }
+    .failed24{background: #FFAE3B  }
+    .failed14{background: #E0FF6C  }
+    .passed{background: #5BFF50  }
+    .normal{background:none}
+    .head{background:grey;color:#eee;font-size:.5rem}
+    .progress{width: 200px;display: block;height: 20px;border: 1px solid grey;}
+    .progress span{display: block;height: 20px;background: #585eaa;}
+
+    .progress-pice{width: 200px;display: block;height: 10px;border: 1px solid grey;}
+    .progress-pice span{display: block;height: 10px;background: #585eaa;}
+
+    .rate span{float:left}
+    small{font-size:0.75em;color:grey}
+</style>
+<body style='width:100%'>
+
+
+你好:<br>
+
+<p style="font-size:24px">1.最近 ${jnrCount} 批测试结果总览:</p>
+<p>纵坐标:接口id,横坐标:批次(从左到右为最新)</p>
+<br>
+#foreach($ifmod in $IfIDmodlMap)
+<p>
+    <p style="font-size:16px">$ifmod.get("sys_name")</p>
+    <p>测试接口数:$ifmod.get("sys_ifCount")</p>
+    <p>测试用例数:$ifmod.get("sys_caseCount")</p>
+    <p class="rate"><span>测试通过率(最新): </span><span class="progress-pice"><span style="width:$ifmod.get("sys_mockPassRate")%"></span></span> $ifmod.get("sys_mockPassRate") %</p>
+    <p class="rate"><span>用例覆盖率(最新): </span><span class="progress-pice"><span style="width:$ifmod.get("sys_CCcoverage")%"></span></span> $ifmod.get("sys_CCcoverage") %</p>
+    <p class="rate"><span>接口覆盖率(最新): </span><span class="progress-pice"><span style="width:$ifmod.get("sys_IFcoverage")%"></span></span> $ifmod.get("sys_IFcoverage") %</p>
+</p>
+<table class='his'>
+    <tr><td class="head" colspan="17" style="background:#585eaa;font-size:.75em;">$ifmod.get("sys_name")</td></tr>
+    ## 根据id- 接口名映射表遍历接口id,以避免重复
+    #foreach( $ifId in $ifmod.get("sys_iflist"))
+    <tr>
+        ## 限制最大名字长度为 9
+        #if($IfIDNameMap[$ifId].length()>=9)
+            #set($ifnamelength = 9)
+        #else
+            #set($ifnamelength = $IfIDNameMap[$ifId].length())
+        #end
+        ## 接口名
+        <td class="head" style="white-space: nowrap;text-overflow: ellipsis;text-align:left;font-size:.75em;" title="$IfIDNameMap[$ifId]">$ifId - $IfIDNameMap[$ifId].substring(0,$ifnamelength)</td>
+        ## 遍历当前接口的每一批数据
+        #foreach( $JNR in $OrderedHeadJNRSet)
+            ## 取当前批次/当前接口/的ifPassRate 来判断样式
+            #set( $passRate = $initedDataSet[$JNR].get($ifId).get("ifPassRate") )
+            #set($passStyle = 'normal')
+
+            #if($initedDataSet[$JNR].get($ifId).get("ifPassRate"))
+                #if($passRate == 1)
+                    #set($passStyle = 'passed')
+                #end
+
+                #if($passRate < 1)
+                    #set($passStyle = 'failed14')
+                #end
+
+                #if($passRate < 0.75)
+                    #set($passStyle = 'failed24')
+                #end
+
+                #if($passRate < 0.5)
+                    #set($passStyle = 'failed34')
+                #end
+
+                #if($passRate < 0.25)
+                    #set($passStyle = 'failed44')
+                #end
+
+                #if($passRate <=0)
+                    #set($passStyle = 'failed')
+                #end
+
+            #else
+                #set($passStyle = 'normal')
+            #end
+
+            ## 没一个方格 - 每一个接口当前批次的测试用例群
+            <td class="$passStyle" title="$ifId&#10;$IfIDNameMap[$ifId]&#10;总共 $!initedDataSet[$JNR].get($ifId).get("ifTestData").size() 条测试数据&#10;单接口通过率:$!initedDataSet[$JNR].get($ifId).get("ifPassRate")">$!initedDataSet[$JNR].get($ifId).get("ifTestData").size()</td>
+        #end
+       <td class="head" style="width:40px;text-align:right;font-size:.75em;"> $!IfIDDsnrMap[$ifId] </td>
+    </tr>
+    #end
+    <tr>
+        <td class="head" style="background:#585eaa;font-size:.75em;" title="批次号">批次</td>
+        #foreach( $JNR in $OrderedHeadJNRSet)
+            <td class="head" style="background:#585eaa;font-size:.75em;" title="$!JNR.substring(0,4)-$!JNR.substring(4,6)-$!JNR.substring(6,8)&#10;$!JNR.substring(8,10):$!JNR.substring(10,12):$!JNR.substring(12,14)">$!JNR.substring(8,10)</td>
+        #end
+        <td class="head" style="background:#585eaa;"></td>
+    </tr>
+</table>
+<br>
+<hr>
+#end
+
+<p style="font-size:24px">2.总体指标</p>
+<p>测试接口数:${ifCount}</p>
+<p>测试用例数:${caseCount}</p>
+<p class="rate"><span>测试通过率(最新): </span><span class="progress"><span style="width:${mockPassRate}%"></span></span> ${mockPassRate} %</p>
+<p class="rate"><span>用例覆盖率(最新): </span><span class="progress"><span style="width:${CCcoverage}%"></span></span> ${CCcoverage} %</p>
+<p class="rate"><span>接口覆盖率(最新): </span><span class="progress"><span style="width:${IFcoverage}%"></span></span> ${IFcoverage} %</p>
+<p><small>用例覆盖率:已测用例数/用例总数</small></p>
+<p><small>接口覆盖率:已测接口数/接口总数</small></p>
+
+<br>祝工作愉快!
+</body>
+</html>

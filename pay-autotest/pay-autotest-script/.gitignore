@@ -1,0 +1,3 @@
+/target/
+src/main/resources/server.properties
+src/main/resources/system.properties

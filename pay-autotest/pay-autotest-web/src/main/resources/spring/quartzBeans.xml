@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-4.1.xsd
+    ">
+      <!--  <bean id="springContextHolder" class="com.gigold.pay.framework.base.SpringContextHolder" />
+        要调用的工作类
+        <bean id="quartzJob" class="com.gigold.pay.scripte.service.IfSysAutoTest"></bean>
+        测试＋发邮件   频率高些
+        <bean id="jobtask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+            调用的类
+            <property name="targetObject">
+                <ref bean="quartzJob"/>
+            </property>
+            调用类中的方法
+            <property name="targetMethod">
+                <value>work</value>
+            </property>
+        </bean>
+        
+        只发邮件
+        <bean id="jobtask1" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+            调用的类
+            <property name="targetObject">
+                <ref bean="quartzJob"/>
+            </property>
+            调用类中的方法
+            <property name="targetMethod">
+                <value>sendAnalyMail</value>
+            </property>
+        </bean>
+        
+        
+        
+        jobtask  定义触发时间
+        <bean id="doTime" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+            <property name="jobDetail">
+                <ref bean="jobtask"/>
+            </property>
+            cron表达式
+            <property name="cronExpression">
+                <value>0 0/5 * * * ?</value>
+            </property>
+        </bean>
+        
+         jobtask1  定义触发时间
+        <bean id="doTime1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+            <property name="jobDetail">
+                <ref bean="jobtask1"/>
+            </property>
+            cron表达式
+            <property name="cronExpression">
+                <value>0 0/10 * * * ?</value>
+            </property>
+        </bean>
+        
+        
+        总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序 
+        <bean id="startQuertz" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+            <property name="triggers">
+                <list>
+                    <ref bean="doTime"/>
+                    <ref bean="doTime1"/>
+                </list>
+            </property>
+        </bean> -->
+    
+</beans>

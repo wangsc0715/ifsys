@@ -1,0 +1,184 @@
+body{
+	background-color: #f5f5f5;
+	font-family: "YaHei Consolas Hybrid";
+}
+ul{
+	list-style: none;
+}
+*{padding:0;margin:0}
+*:focus{
+	outline: none;
+}
+th{
+	font-size:25px;
+}
+.navHint{
+	text-align: center;
+	margin:0;
+	width:220px;
+	height:39px;
+	margin-left:8.5px;
+	display: none;
+}
+input{
+	width:auto !important;
+}
+.colorBlue{
+	color: #0084C7;
+}
+.width90{
+	width:85% !important;
+	display: inline-block !important;
+}
+.textLeft{
+	text-align: left !important;
+	padding-left:20px !important;
+}
+.clear{
+	clear:both;
+}
+.disBlock{
+	display: block !important;
+}
+.disNone{
+	display: none !important;
+}
+.am-g input{
+	color: #0084C7;
+}
+
+.titleH1{
+	display: inline-block;
+	margin:0;
+	padding-left:30px;
+}
+.titleH1 a{
+	color:#fff;
+	font-size:18px;
+}
+
+.titleOption{
+	display: inline-block;
+	position: absolute;
+	right:15em;
+}
+.titleOption .active{
+ 	box-shadow: inset 0 3px 5px rgba(0,0,0,.15);
+ 	background-color: #0a628f;
+ }
+.titleOption a{
+	color: #fff;
+	font-size:1em;
+	display:inline-block;
+	height:45px;
+	padding:0 10px 0 10px;
+}
+.titleOption a:hover{
+	box-shadow: inset 0 3px 5px rgba(0,0,0,.15);
+ 	background-color: #0a628f;
+}
+.loggxnxi{
+	
+	float: right;
+	height:50px;
+}
+.colorName{
+	color:#0e90d2;
+}
+
+.searchBox{
+	position: absolute;
+	right:226px;
+	top:70px;
+}
+.searchBox .am-selected {
+	width:auto;
+}
+.search{
+	border:1px solid #aaa;
+	display:inline-block;
+	padding:5px 5px 5px 10px;
+	border-radius:5px;
+	margin-left:5px;
+}
+.search input{
+	border:none;
+	background:none;
+	border-radius:5px;
+}
+.search button{
+	border:none;
+	background:none;
+	color:#0084C7;
+}
+.search button:hover{
+	color:#19A7F0;
+}
+.logPanel{
+	width:300px;
+	margin:100px auto 0;
+}
+.navMid th,td{
+	vertical-align: middle!important;
+}
+.pageUl{
+	text-align: center;
+}
+.filtrate{
+	padding:40px;
+}
+.filtrate button{
+	font-size:1.1em;
+	margin:5px;
+}
+
+
+
+/*添加接口style*/
+
+.am-table input{
+	height:100%;
+	border:none;
+	background:none;
+}
+.selectTd{
+	text-align: center;
+}
+.selectTd div button{
+	padding:0;
+	border:none;
+	background:none;
+	height:100%;
+}
+.am-table textarea{
+	height:100%;
+	border:none;
+	background:none;
+	width:100%;
+}
+.funBtnBox{
+	text-align: right;
+	
+}
+.funBtnBox button{
+	padding: .5em 1em;
+}
+.maskBox{
+	background:#fff;
+	opacity:0.3;
+	cursor: not-allowed;
+}
+.outputBox{
+	display: inline-block;
+	color:#000;
+}
+.colorTab td{
+	color: #0084C7;
+}
+
+
+.propButton{
+	text-align:right;
+	margin-right:50px;
+}
+

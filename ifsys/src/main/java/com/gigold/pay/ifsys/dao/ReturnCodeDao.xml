@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gigold.pay.ifsys.dao.ReturnCodeDao">
+
+	<resultMap type="com.gigold.pay.ifsys.bo.ReturnCode" id="returnResultMap">
+		<id property="id" column="ID" />
+		<result property="ifId" column="IF_ID" />
+		<result property="rspCode" column="RSP_CODE" />
+		<result property="rspCodeDesc" column="RSP_CODE_DESC" />
+	</resultMap>
+
+
+	<!--新增接口的返回码 -->
+	<insert id="addRetrunCode" parameterType="com.gigold.pay.ifsys.bo.ReturnCode"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		T_IF_RETRUN_CODE(IF_ID,RSP_CODE,RSP_CODE_DESC)
+		values(#{ifId},#{rspCode},#{rspCodeDesc})
+	</insert>
+
+	<!-- 根据接口ID删除返回码 -->
+	<update id="deleteReturnCodeByIfId" parameterType="int">
+        <![CDATA[  
+        update T_IF_RETRUN_CODE
+        set
+        STATUS='N'
+        where IF_ID=#{ifId}
+        ]]>
+	</update>
+	<!-- 根据ID删除返回码 -->
+	<update id="deleteReturnCodeById" parameterType="int">
+        <![CDATA[  
+        update T_IF_RETRUN_CODE
+        set
+        STATUS='N'
+        where ID=#{id}
+        ]]>
+	</update>
+
+	<!-- 修改返回码 -->
+	<update id="updateReturnCodeById" parameterType="com.gigold.pay.ifsys.bo.ReturnCode">
+        update T_IF_RETRUN_CODE
+        <set>
+        <if test="rspCode!=null and rspCode!=''">
+        RSP_CODE=#{rspCode},
+        </if>
+        <if test="rspCodeDesc!=null and rspCodeDesc!=''">
+        RSP_CODE_DESC=#{rspCodeDesc}
+        </if>
+        </set>
+        where ID=#{id}
+	</update>
+
+	<!-- 根据接口ID获取所有返回码列表 -->
+	<select id="getReturnCodeByIfId" parameterType="int" resultMap="returnResultMap">
+	<![CDATA[  
+		select
+		ID,
+		IF_ID,
+		RSP_CODE,
+		RSP_CODE_DESC
+		from T_IF_RETRUN_CODE
+		where IF_ID=#{ifId}
+		and STATUS='Y'
+		 ]]>
+	</select>
+	
+	<!-- 根据ID获取所有返回码 -->
+	<select id="getReturnCodeById" parameterType="int" resultMap="returnResultMap">
+	<![CDATA[  
+		select
+		ID,
+		IF_ID,
+		RSP_CODE,
+		RSP_CODE_DESC
+		from T_IF_RETRUN_CODE
+		where ID=#{id}
+		and STATUS='Y'
+		 ]]>
+	</select>
+	
+
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 

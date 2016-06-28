@@ -1,0 +1,144 @@
+<!doctype html>
+<html class="no-js">
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="description" content="">
+		<meta name="keywords" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>自动测试</title>
+		<link rel="stylesheet" type="text/css" href="assets/css/amazeui.min.css" />
+		<link rel="stylesheet" type="text/css" href="assets/css/app.css" />
+	</head>
+
+	<body>
+		<div class="am-g operFun">
+			<div class="am-cf am-padding">
+				<div class="am-fl am-cf">
+					<strong class="am-text-lg">自动测试</strong>
+				</div>
+			</div>
+			<form id="srearchFrom">
+				<div class="serchBox rightBtn">
+					<select data-am-selected id="ifSysId">
+						<option value="0" selected="selected">选择系统</option>
+					</select>
+					<select data-am-selected disabled id="ifProId">
+						<option value="0" selected="selected">选择产品</option>
+					</select>
+					<input id="ifName" name="ifName" placeholder="输入需要查找的内容" />
+					<i class="am-icon-search" id="search"></i>
+				</div>
+			</form>
+			<div class="am-u-sm-12">
+				<div class="am-cf admin-main ">
+					<div class="admin-content ">
+						<table id="propDateShow" class="am-table am-table-bordered am-table-hover am-table-compact am-table-centered">
+							<thead>
+								<th>序号</th>
+								<th>接口名</th>
+								<th>接口所属系统</th>
+								<th>接口所属产品</th>
+								<th>操作</th>
+							</thead>
+							<tbody id="propDateShowBody">
+
+							</tbody>
+						</table>
+
+						<ul data-am-widget="pagination" class="am-pagination am-pagination-default pageUl">
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+				
+
+		<div class="am-modal am-modal-no-btn" tabindex="-1" id="doc-modal">
+			<div class="am-modal-dialog scollBox">
+				<div class="am-modal-hd">
+					<span class="operName">接口名</span>
+					<a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+				</div>
+				<div class="am-modal-bd modalCd">
+
+				</div>
+				<button type="button" data-ifid class="am-btn am-btn-success addBtn">添加</button>
+			</div>
+
+		</div>
+
+		<div class="am-modal am-modal-no-btn" tabindex="-1" id="doc-modal-rely">
+			<div class="am-modal-dialog">
+				<div class="am-modal-hd">
+					<a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+				</div>
+				<div class="am-modal-bd">
+					<form>
+						<div class="serchBox">
+							<select data-am-selected id="ifmockSysId">
+								<option value="0" selected="selected">选择系统</option>
+							</select>
+							<select data-am-selected disabled id="ifmockProId">
+								<option value="0" selected="selected">选择产品</option>
+							</select>
+							<input id="ifmockName" name="ifName" placeholder="输入需要查找的内容" />
+							<i class="am-icon-search" id="mocksearch"></i>
+						</div>
+					</form>
+					<table id="propDateShowSear" class="am-table am-table-hover am-table-compact am-table-centered">
+
+						<thead>
+							<tr>
+								<td colspan="2" class="am-lg-text-left">查询数据表</td>
+							</tr>
+							<tr>
+								<th>ID</th>
+								<th>测试用例名称</th>
+								<th>接口名</th>
+								<th>接口返回码</th>
+								<th>接口返回码描述信息</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody id="mockDateShowBody">
+
+						</tbody>
+					</table>
+
+					<ul data-am-widget="pagination" class="am-pagination am-pagination-default pageMockUl">
+					</ul>
+
+					<table id="depenDateShow" class="am-table am-table-hover am-table-compact am-table-centered">
+						<thead>
+							<tr>
+								<td class="am-lg-text-left tabName" colspan="2">数据依赖关系表</td>
+							</tr>
+							<tr>
+								<th>MockId</th>
+								<th>依赖接口ID</th>
+								<th>测试用例名称</th>
+								<th>接口名</th>
+								<th>接口返回码</th>
+								<th>接口返回码描述信息</th>
+								<th>调用顺序</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody id="mockDateShowTab">
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="js/plugin/app.js"></script>
+		<script src="assets/js/amazeui.min.js"></script>
+		<script src="assets/js/amazeui.datatables.min.js"></script>
+		<script src="js/autoTest.js"></script>
+	</body>
+
+</html>

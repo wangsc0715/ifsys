@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gigold.pay.ifsys.dao.InterFaceProDao">
+
+	<resultMap type="com.gigold.pay.ifsys.bo.InterFacePro" id="proResultMap">
+		<id property="id" column="ID" />
+		<result property="sysId" column="IF_SYS_ID" />
+		<result property="proName" column="IF_PRO_NAME" />
+		<result property="proDesc" column="IF_PRO_DESC" />
+		<result property="isValid" column="ISVALID" />
+	</resultMap>
+	<select id="getAllProInfo" parameterType="com.gigold.pay.ifsys.bo.InterFacePro"
+		resultMap="proResultMap">
+		<![CDATA[  
+		SELECT *
+		FROM T_IF_PRO 
+		where  ISVALID='Y'
+        ]]>
+	</select>
+	
+	<select id="getProInfoById" parameterType="com.gigold.pay.ifsys.bo.InterFacePro"
+		resultMap="proResultMap">
+		<![CDATA[  
+		SELECT *
+		FROM T_IF_PRO
+		WHERE id=#{id} and  ISVALID='Y'
+		]]>
+	</select>
+
+
+    <select id="getProInfoBySysId" parameterType="com.gigold.pay.ifsys.bo.InterFacePro"
+        resultMap="proResultMap">
+        <![CDATA[  
+        SELECT ID,
+        IF_SYS_ID,
+        IF_PRO_NAME,
+        IF_PRO_DESC
+        FROM T_IF_PRO
+        WHERE IF_SYS_ID=#{sysId} and  ISVALID='Y'
+        ]]>
+    </select>
+
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 

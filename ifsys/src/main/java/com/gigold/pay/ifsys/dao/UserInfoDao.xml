@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gigold.pay.ifsys.dao.UserInfoDao">
+
+	<resultMap type="com.gigold.pay.ifsys.bo.UserInfo" id="userResultMap">
+		<id property="id" column="ID" />
+		<result property="loginName" column="LOGIN_NAME" />
+		<result property="loginPassword" column="LOGIN_PASSWORD" />
+		<result property="email" column="EMAIL" />
+		<result property="userName" column="USERNAME" />
+	</resultMap>
+
+	<resultMap type="com.gigold.pay.ifsys.bo.UserInfo" id="userListResultMap">
+		<id property="id" column="ID" />
+		<result property="loginName" column="LOGIN_NAME" />
+		<result property="loginPassword" column="LOGIN_PASSWORD" />
+		<result property="email" column="EMAIL" />
+		<result property="userName" column="USERNAME" />
+	</resultMap>
+
+
+
+	<select id="getUser" parameterType="int" resultMap="userResultMap">
+	<![CDATA[  
+		select
+		ID,
+		LOGIN_NAME,
+		LOGIN_PASSWORD,
+		EMAIL,
+		USERNAME
+		from T_IF_USER
+		where ID=#{id}
+		 ]]>
+	</select>
+
+	<select id="getList" resultMap="userListResultMap">
+		select
+		ID,
+		LOGIN_NAME,
+		LOGIN_PASSWORD,
+		EMAIL,
+		USERNAME
+		from T_IF_USER
+	</select>
+
+	<select id="login" parameterType="com.gigold.pay.ifsys.bo.UserInfo"
+		resultMap="userResultMap">
+		select
+		ID,
+		LOGIN_NAME,
+		EMAIL,
+		USERNAME
+		from
+		T_IF_USER
+		where LOGIN_NAME=#{loginName} and
+		LOGIN_PASSWORD=#{loginPassword}
+	</select>
+
+
+	<insert id="addUser" parameterType="com.gigold.pay.ifsys.bo.UserInfo"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		T_IF_USER(LOGIN_NAME,LOGIN_PASSWORD,EMAIL,USERNAME)
+		values(#{loginName},#{loginPassword},#{email},#{userName})
+	</insert>
+
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 

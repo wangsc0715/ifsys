@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gigold.pay.autotest.dao.IfSysMockDAO">
+
+	<resultMap type="com.gigold.pay.autotest.bo.IfSysMock" id="ifSysMockResultMap">
+		<id property="id" column="ID" />
+		<result property="ifId" column="IF_ID" />
+		<result property="rspCodeId" column="RSP_CODE_ID" />
+		<result property="rspCode" column="RSP_CODE" />
+		<result property="rspCodeDesc" column="RSP_CODE_DESC" />
+		<result property="preCodeDesc" column="PRE_CODE_DESC" />
+		<result property="requestJson" column="REQUEST_JSON" />
+		<result property="responseJson" column="RESPONSE_JSON" />
+		<result property="realRspCode" column="REAL_RSP_CODE" />
+		<result property="realResponseJson" column="REAL_RESPONSE_JSON" />
+		<result property="realRequestJson" column="REAL_REQUEST_JSON" />
+		<result property="testResult" column="TEST_RESULT" />
+		<result property="caseName" column="CASE_NAME" />
+		<result property="checkJson" column="CHECK_JSON" />
+		<result property="rspRefJson" column="RSP_REF_JSON" />
+		<result property="isCase" column="IS_CASE" />
+		<result property="tmSmp" column="TM_SMP" />
+
+		<!-- 额外的接口信息数据 @chenkuan 2016.03.23 -->
+		<result property="ifName" column="IF_NAME" />
+		<result property="ifURL" column="IF_URL" />
+		<result property="ifPROTOCOL" column="IF_PROTOCOL" />
+		<result property="ifDESC" column="IF_DESC" />
+		<result property="addressUrl" column="ADDRESS_URL" />
+
+		<!-- 用例的实际path -->
+		<result property="realRequestPath" column="REAL_REQUEST_PATH" />
+		<result property="requestPath" column="REQUEST_PATH" />
+
+		<!-- 用例的请求头 -->
+		<result property="requestHead" column="REQUEST_HEAD" />
+		<result property="responseHead" column="RESPONSE_HEAD" />
+		<result property="realRequestHead" column="REAL_REQUEST_HEAD" />
+		<result property="realResponseHead" column="REAL_RESPONSE_HEAD" />
+
+		<!-- 接口关联关系 @chenkuan 2015.12.11 -->
+		<result property="followedId" column="IF_FOLLOWED_ID" />
+		<result property="followId" column="IF_FOLLOW_ID" />
+		<result property="Uid" column="U_ID" />
+		<result property="email" column="EMAIL" />
+		<result property="status" column="STATUS" />
+		<result property="remark" column="REMARK" />
+		<result property="username" column="USERNAME" />
+		
+		<result property="ifSysId" column="IF_SYS_ID" />
+		<result property="ifProId" column="IF_PRO_ID" />
+
+	</resultMap>
+
+	<resultMap type="HashMap" id="HashMap">
+		<id property="id" column="ID" />
+		<result property="caseName" column="CASE_NAME" />
+	</resultMap>
+
+
+<!-- 查询测试用例列表 -->
+	<select id="queryMockByPage" parameterType="com.gigold.pay.autotest.bo.IfSysMock"
+		resultMap="ifSysMockResultMap">
+		select ID,
+		IF_ID,
+		IF_NAME,
+		IF_SYS_ID,
+		IF_PRO_ID,
+		RSP_CODE_ID,
+		RSP_CODE,
+		CASE_NAME,
+		CHECK_JSON,
+		RSP_REF_JSON,
+		RSP_CODE_DESC from
+		(select au.ID,
+		au.IF_ID,
+		au.CASE_NAME,
+		au.CHECK_JSON,
+		au.RSP_REF_JSON,
+		(select IF_NAME from T_IF_INTERFACE ii where ii.ID=au.IF_ID ) IF_NAME,
+		(select IF_SYS_ID from T_IF_INTERFACE ii where ii.ID=au.IF_ID )
+		IF_SYS_ID,
+		(select IF_PRO_ID from T_IF_INTERFACE ii where ii.ID=au.IF_ID ) IF_PRO_ID,
+		au.RSP_CODE_ID,
+		(select rc.RSP_CODE from T_IF_RETRUN_CODE rc where
+		rc.ID=au.RSP_CODE_ID) RSP_CODE,
+		(select rc.RSP_CODE_DESC from T_IF_RETRUN_CODE rc where rc.ID=au.RSP_CODE_ID)
+		RSP_CODE_DESC
+
+		from T_IF_AUTO_MOCK au
+		where
+		STATUS='Y'
+		) tt
+		where
+		tt.IF_NAME like '%${ifName}%'
+		or tt.id like '%${ifName}%'
+		or tt.CASE_NAME like '%${ifName}%'
+		<if test="ifSysId != null and ifSysId!=0">
+			and tt.IF_SYS_ID = #{ifSysId}
+		</if>
+		<if test="ifProId != null and ifProId!=0">
+			and tt.IF_PRO_ID = #{ifProId}
+		</if>
+	</select>
+
+	<select id="getInterfaceMocksById" parameterType="int" resultMap="HashMap">
+		select au.ID,
+		au.CASE_NAME
+		from T_IF_AUTO_MOCK au
+		where IF_ID=#{ifId}
+		and STATUS='Y'
+	</select>
+
+	<!-- 根据ID查询接口关注关系信息 -->
+	<select id="getInterfaceFollowShipById" parameterType="int"
+		resultMap="ifSysMockResultMap">
+		<![CDATA[
+			SELECT
+				a.IF_FOLLOWED_ID,
+				a.IF_FOLLOW_ID,
+				a.U_ID,
+				(select b.EMAIL from T_IF_USER b where b.id=a.U_ID and b.STATUS='Y') EMAIL,
+				(select b.USERNAME from T_IF_USER b where b.id=a.U_ID and b.STATUS='Y') USERNAME,
+				a.STATUS,
+				a.REMARK
+			from T_IF_INVOKER a where
+				a.IF_FOLLOWED_ID = #{id} and a.STATUS = 'Y'
+         ]]>
+	</select>
+
+	<insert id="addIfSysMock" parameterType="com.gigold.pay.autotest.bo.IfSysMock"
+		useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[  
+        insert into
+        T_IF_AUTO_MOCK
+        (
+         IF_ID,
+         CASE_NAME,
+		 CHECK_JSON,
+		 RSP_REF_JSON,
+         RSP_CODE_ID,
+         REQUEST_JSON,
+         RESPONSE_JSON
+        )
+        values(
+        #{ifId},
+        #{caseName},
+        #{checkJson},
+        #{rspRefJson},
+        #{rspCodeId},
+        #{requestJson},
+        #{responseJson})
+    ]]>
+	</insert>
+	<!-- 修改模拟数据 -->
+	<update id="updateIfSysMock" parameterType="com.gigold.pay.autotest.bo.IfSysMock">
+		update T_IF_AUTO_MOCK
+		<set>
+			<if test="rspCodeId!=null and rspCodeId!=''">
+				RSP_CODE_ID=#{rspCodeId},
+			</if>
+
+			<if test="requestPath!=null and requestPath!=''">
+				REQUEST_PATH=#{requestPath},
+			</if>
+
+			<if test="caseName!=null and caseName!=''">
+				CASE_NAME=#{caseName},
+			</if>
+			<if test="checkJson!=null and checkJson!=''">
+				CHECK_JSON=#{checkJson},
+			</if>
+			<if test="rspRefJson!=null and rspRefJson!=''">
+				RSP_REF_JSON=#{rspRefJson},
+			</if>
+			<if test="isCase!=null and isCase!=''">
+				IS_CASE=#{isCase},
+			</if>
+			<if test="requestJson!=null and requestJson!=''">
+				REQUEST_JSON=#{requestJson},
+			</if>
+			<if test="responseJson!=null and responseJson!=''">
+				RESPONSE_JSON=#{responseJson},
+			</if>
+			<if test="requestHead!=null and requestHead!=''">
+				REQUEST_HEAD=#{requestHead},
+			</if>
+			<if test="realRspCode!=null and realRspCode!=''">
+				REAL_RSP_CODE=#{realRspCode},
+			</if>
+			<if test="realResponseJson!=null and realResponseJson!=''">
+				REAL_RESPONSE_JSON=#{realResponseJson},
+			</if>
+			<if test="realRequestJson!=null and realRequestJson!=''">
+				REAL_REQUEST_JSON=#{realRequestJson},
+			</if>
+			<if test="testResult!=null and testResult!=''">
+				TEST_RESULT=#{testResult},
+			</if>
+		</set>
+		where ID =#{id}
+	</update>
+
+
+<!-- 初始化测试数据 每次自动化测试之前都清理一次测试结果-->
+	<update id="initIfSysMock" >
+		update T_IF_AUTO_MOCK
+		set REAL_RSP_CODE='',
+		REAL_RESPONSE_JSON='',
+		REAL_REQUEST_JSON='',
+		TEST_RESULT=''
+	</update>
+
+
+	<!-- 根据ID删除模拟数据 -->
+	<update id="deleteIfSysMockById" parameterType="int">
+		update
+		T_IF_AUTO_MOCK
+		set STATUS='N'
+		where ID =#{id}
+	</update>
+	<!-- 根据IF_ID删除模拟数据 -->
+	<update id="deleteIfSysMockByIfId" parameterType="int">
+		update
+		T_IF_AUTO_MOCK
+		set STATUS='N'
+		where IF_ID =#{ifId}
+	</update>
+	<!-- 根据接口ID获取测试数据信息 编辑页,新增页 -->
+	<select id="getMockInfoByIfId" parameterType="int"
+		resultMap="ifSysMockResultMap">
+     <![CDATA[ 
+		select au.ID,
+		au.IF_ID,
+		au.RSP_CODE_ID,
+		au.CASE_NAME,
+		au.CHECK_JSON,
+		au.RSP_REF_JSON,
+		au.REAL_REQUEST_PATH,
+		au.REAL_REQUEST_HEAD,
+		au.REQUEST_PATH,
+		au.REQUEST_HEAD,
+		(select rc.RSP_CODE from T_IF_RETRUN_CODE rc where rc.ID=au.RSP_CODE_ID) RSP_CODE,
+        (select rc.RSP_CODE_DESC from T_IF_RETRUN_CODE rc where rc.ID=au.RSP_CODE_ID) RSP_CODE_DESC,
+		au.REQUEST_JSON,
+		au.RESPONSE_JSON,
+		au.RESPONSE_HEAD,
+		au.REAL_RESPONSE_HEAD,
+		au.REAL_RSP_CODE,
+		au.REAL_RESPONSE_JSON,
+		au.REAL_REQUEST_JSON,
+		au.TEST_RESULT
+		from T_IF_AUTO_MOCK au
+		where IF_ID=#{ifId}
+		and STATUS='Y'
+		 
+      ]]>
+	</select>
+
+	<!-- 根据ID获取测试数据信息 -->
+	<select id="getMockInfoById" parameterType="int" resultMap="ifSysMockResultMap">
+     <![CDATA[ 
+		select
+			ID,
+			CASE_NAME,
+			REQUEST_PATH,
+			IF_ID,
+			RSP_CODE_ID,
+			(select RSP_CODE_DESC from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE_DESC,
+			(select RSP_CODE from T_IF_RETRUN_CODE cc where au.RSP_CODE_ID=cc.ID) RSP_CODE,
+			(select ii.if_url from T_IF_INTERFACE ii where au.IF_ID=ii.id) IF_URL,
+			REQUEST_JSON,
+			CHECK_JSON,
+			RSP_REF_JSON,
+			RESPONSE_JSON,
+			REAL_RSP_CODE,
+			REAL_RESPONSE_JSON,
+			REAL_REQUEST_JSON,
+			REAL_REQUEST_PATH,
+			RESPONSE_HEAD,
+			REQUEST_HEAD,
+			REAL_REQUEST_HEAD,
+			REAL_RESPONSE_HEAD,
+			TEST_RESULT,
+			TM_SMP
+		from
+			T_IF_AUTO_MOCK au
+		where
+			ID=#{id} and STATUS='Y'
+      ]]>
+	</select>
+
+	<!-- 根据接口ID和返回码ID获取测试数据信息 -->
+	<select id="getMockInfoByIfIdAndRspCdId" parameterType="com.gigold.pay.autotest.bo.IfSysMock"
+		resultMap="ifSysMockResultMap">
+     <![CDATA[ 
+		select ID,
+		IF_ID,
+		RSP_CODE_ID,
+		CHECK_JSON,
+		RSP_REF_JSON,
+		REQUEST_JSON,
+		RESPONSE_JSON,
+		REAL_RSP_CODE,
+		REAL_RESPONSE_JSON,
+		REAL_REQUEST_JSON,
+		TEST_RESULT
+		from T_IF_AUTO_MOCK
+		where IF_ID=#{ifId}
+		and RSP_CODE_ID=#{rspCodeId}
+		and STATUS='Y'
+		 
+      ]]>
+	</select>
+	<!-- 根据接口ID获取依赖接口的测试数据 -->
+	<!-- <select id="getReferByIfId" parameterType="int" resultMap="ifSysMockResultMap"> 
+		<![CDATA[ select am.ID, am.IF_ID, ii.IF_URL, sys.ADDRESS_URL, am.RSP_CODE_ID, 
+		am.REQUEST_JSON, am.RESPONSE_JSON, am.REAL_RSP_CODE, am.REAL_RESPONSE_JSON, 
+		am.TEST_RESULT from T_IF_AUTO_MOCK am ,T_IF_INTERFACE ii ,T_IF_SYSTEM sys 
+		where am.RSP_CODE_ID=( select ID from T_IF_RETRUN_CODE re where IF_ID=#{ifId} 
+		and RSP_CODE='00000' and re.STATUS='Y') and am.IF_ID=ii.ID and ii.IF_SYS_ID=sys.ID 
+		and am.STATUS='Y' ]]> </select> -->
+
+	<!-- 根据测试用例ID获取依赖用例的测试数据 -->
+	<select id="getReferByIfId" parameterType="int" resultMap="ifSysMockResultMap">
+     <![CDATA[ 
+		select 
+		am.ID,
+		am.IF_ID,
+        ii.IF_URL,
+        sys.ADDRESS_URL,
+		am.RSP_CODE_ID,
+		am.REQUEST_PATH,
+		am.REQUEST_HEAD,
+		(select rc.RSP_CODE from T_IF_RETRUN_CODE rc where
+		rc.ID=am.RSP_CODE_ID) RSP_CODE,
+		am.CASE_NAME,
+		am.CHECK_JSON,
+		am.RSP_REF_JSON,
+		am.REQUEST_JSON,
+		am.RESPONSE_JSON,
+		am.REAL_RSP_CODE,
+		am.REAL_RESPONSE_JSON,
+		am.REAL_REQUEST_JSON,
+		am.TEST_RESULT
+        from T_IF_AUTO_MOCK am ,T_IF_INTERFACE ii ,T_IF_SYSTEM sys
+        where am.IF_ID=ii.ID
+        and ii.IF_SYS_ID=sys.ID
+        and am.ID=#{mockId}
+        and am.STATUS='Y' 
+      ]]>
+	</select>
+	
+	<!-- 根据mockId获取被依赖用例信息  xiebin-->
+	<select id="getRefMockInfoByMockId" parameterType="int" resultMap="ifSysMockResultMap">
+     <![CDATA[ 
+	select 
+		am.ID,
+		am.IF_ID,
+		am.RSP_CODE_ID,
+		am.CHECK_JSON,
+		am.RSP_REF_JSON,
+		am.REQUEST_JSON,
+		am.RESPONSE_JSON,
+		am.REAL_RSP_CODE,
+		am.REAL_RESPONSE_JSON,
+		am.REAL_REQUEST_JSON,
+		am.TEST_RESULT
+        from T_IF_AUTO_MOCK am ,T_IF_REFER ii
+        where am.ID=ii.MOCK_ID
+        and am.ID=#{mockId}
+        and am.STATUS='Y' 
+        and ii.STATUS='Y'
+      ]]>
+	</select>
+	
+	
+
+	<!-- 根据筛选条件获取测试数据信息 chenkuan @2015-12-08 -->
+	<select id="filterMocksByStatus" parameterType="String"
+		resultMap="ifSysMockResultMap">
+		<![CDATA[
+		SELECT
+			a.ID,
+			b.IF_NAME,
+			b.IF_DESC,
+			(select e.RSP_CODE_DESC from T_IF_RETRUN_CODE e where e.ID=a.RSP_CODE_ID and e.IF_ID=a.IF_ID) PRE_CODE_DESC,
+			b.IF_URL,
+			b.IF_PROTOCOL,
+			a.CASE_NAME,
+			a.IF_ID,
+			(select c.RSP_CODE from T_IF_RETRUN_CODE c where c.ID=a.RSP_CODE_ID) RSP_CODE,
+			(select d.RSP_CODE_DESC from T_IF_RETRUN_CODE d where d.RSP_CODE=a.REAL_RSP_CODE and d.IF_ID=a.IF_ID and d.STATUS="Y") RSP_CODE_DESC,
+			a.REQUEST_JSON,
+			a.RESPONSE_JSON,
+			a.REAL_RSP_CODE,
+			a.REAL_RESPONSE_JSON,
+			a.REAL_REQUEST_JSON,
+			a.TEST_RESULT,
+			a.TM_SMP
+ 		FROM
+ 			T_IF_AUTO_MOCK a left outer join T_IF_INTERFACE b ON a.IF_ID = b.ID
+ 		WHERE
+ 			a.TEST_RESULT=#{testResult} and STATUS='Y' and not ISNULL(TEST_RESULT)  and b.ISVALID='Y'
+      ]]>
+	</select>
+
+	<!-- 筛选出没有通过的测试数据 chenkuan @2015-12-08 -->
+	<select id="filterMocksByFailed" resultMap="ifSysMockResultMap">
+		<![CDATA[
+		select
+			e.ID,
+			(select f.IF_NAME from T_IF_INTERFACE f where f.id=e.if_id) IF_NAME,
+			(select f.IF_DESC from T_IF_INTERFACE f where f.id=e.if_id) IF_DESC,
+			(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.IF_ID=e.IF_ID and g.STATUS="Y") PRE_CODE_DESC,
+			(select f.IF_URL from T_IF_INTERFACE f where f.id=e.if_id) IF_URL,
+			(select f.IF_PROTOCOL from T_IF_INTERFACE f where f.id=e.if_id) IF_PROTOCOL,
+			e.CASE_NAME,
+			e.IF_ID,
+			(select g.RSP_CODE from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.STATUS="Y") RSP_CODE,
+			(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.RSP_CODE=e.REAL_RSP_CODE and g.IF_ID=e.IF_ID and g.STATUS="Y") RSP_CODE_DESC,
+			e.REQUEST_JSON,
+			e.RESPONSE_JSON,
+			e.REAL_RSP_CODE,
+			e.REAL_RESPONSE_JSON,
+			e.REAL_REQUEST_JSON,
+			e.TEST_RESULT,
+			e.TM_SMP
+		from
+			(select b.MOCK_ID mockid from T_IF_MOCK_HISTORY b where b.JRN in (select c.JRN from (select distinct a.JRN from T_IF_MOCK_HISTORY a order by a.JRN desc limit 1) c )) d
+		left outer join
+			T_IF_AUTO_MOCK e
+		ON
+			d.mockid = e.id
+		WHERE
+			(ISNULL(e.TEST_RESULT) or e.TEST_RESULT!=1)
+      ]]>
+	</select>
+
+	<!-- 筛选所有测试过的数据 chenkuan @2015-12-08 -->
+	<select id="filterAllTestedMocks" resultMap="ifSysMockResultMap">
+		<![CDATA[
+		select
+			e.ID,
+			(select f.IF_NAME from T_IF_INTERFACE f where f.id=e.if_id) IF_NAME,
+			(select f.IF_DESC from T_IF_INTERFACE f where f.id=e.if_id) IF_DESC,
+			(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.IF_ID=e.IF_ID and g.STATUS="Y") PRE_CODE_DESC,
+			(select f.IF_URL from T_IF_INTERFACE f where f.id=e.if_id) IF_URL,
+			(select f.IF_PROTOCOL from T_IF_INTERFACE f where f.id=e.if_id) IF_PROTOCOL,
+			e.CASE_NAME,
+			e.IF_ID,
+			(select g.RSP_CODE from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.STATUS="Y") RSP_CODE,
+			(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.RSP_CODE=e.REAL_RSP_CODE and g.IF_ID=e.IF_ID and g.STATUS="Y") RSP_CODE_DESC,
+			e.REQUEST_JSON,
+			e.RESPONSE_JSON,
+			e.REAL_RSP_CODE,
+			e.REAL_RESPONSE_JSON,
+			e.REAL_REQUEST_JSON,
+			e.TEST_RESULT,
+			e.TM_SMP
+		from
+			(select b.MOCK_ID mockid from T_IF_MOCK_HISTORY b where b.JRN in (select c.JRN from (select distinct a.JRN from T_IF_MOCK_HISTORY a order by a.JRN desc limit 1) c )) d
+		left outer join
+			T_IF_AUTO_MOCK e
+		ON
+			d.mockid = e.id
+ 		WHERE
+ 			not ISNULL(e.TEST_RESULT) and STATUS='Y' and not ISNULL(e.TEST_RESULT)
+      ]]>
+	</select>
+
+	<!-- 返回测试过的用例数据 chenkuan @2015-12-08 -->
+	<select id="getCasesMarks" resultMap="ifSysMockResultMap">
+		<![CDATA[
+		select
+			(select h.IF_SYS_ID from T_IF_INTERFACE h where h.ID=e.IF_ID) IF_SYS_ID,
+			e.IF_ID,
+			e.ID,
+			(select f.IF_NAME from T_IF_INTERFACE f where f.id=e.if_id) IF_NAME,
+			e.CASE_NAME,
+			(select g.RSP_CODE from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.STATUS="Y") RSP_CODE,
+			(select g.RSP_CODE_DESC from T_IF_RETRUN_CODE g where g.ID=e.RSP_CODE_ID and g.IF_ID=e.IF_ID and g.STATUS="Y") PRE_CODE_DESC,
+			(select f.IF_DESC from T_IF_INTERFACE f where f.id=e.if_id) IF_DESC
+		from
+			(select b.MOCK_ID mockid from T_IF_MOCK_HISTORY b where b.JRN in (select c.JRN from (select distinct a.JRN from T_IF_MOCK_HISTORY a order by a.JRN desc limit 1) c )) d
+		left outer join
+			T_IF_AUTO_MOCK e
+		ON
+			d.mockid = e.id
+ 		WHERE
+ 			not ISNULL(e.TEST_RESULT) and e.STATUS='Y' and not ISNULL(e.TEST_RESULT)
+      ]]>
+	</select>
+
+	<!-- 根据ID回写响应报文到测试数据对应的信息中 -->
+	<update id="writeBack" parameterType="com.gigold.pay.autotest.bo.IfSysMock">
+	    <![CDATA[
+	    update T_IF_AUTO_MOCK
+	    set REAL_RSP_CODE=#{realRspCode},
+	    REAL_RESPONSE_JSON=#{realResponseJson},
+	    REAL_REQUEST_JSON=#{realRequestJson},
+	    REAL_RESPONSE_HEAD=#{realResponseHead},
+	    REAL_REQUEST_HEAD=#{realRequestHead},
+	    REAL_REQUEST_PATH=#{realRequestPath},
+	    TEST_RESULT=#{testResult}
+	    where id=#{id}
+
+	    ]]>
+	</update>
+
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gigold.pay.autotest.dao.InterFaceFieldDao">
+
+	<resultMap type="com.gigold.pay.autotest.bo.InterFaceField" id="fieldResultMap">
+		<id property="id" column="ID" />
+		<result property="parentId" column="PARENTID" />
+		<result property="ifId" column="IF_ID" />
+		<result property="fieldName" column="FIELD_NAME" />
+		<result property="fieldDesc" column="FIELD_DESC" />
+		<result property="fieldType" column="FIELD_TYPE" />
+		<result property="fieldCheck" column="FIELD_CHECK" />
+		<result property="fieldFlag" column="FIELD_FLAG" />
+		<result property="fieldReferValue" column="FIELD_REFER_VALUE" />
+		<result property="fieldStatusCode" column="FIELD_STATUS_CODE" />
+		<result property="level" column="FIELD_LEVEL" />
+		<result property="isValid" column="ISVALID" />
+	</resultMap>
+
+
+	<!-- 获得接口定义的所有一级字段 -->
+	<select id="getFirstReqFieldByIfId" parameterType="com.gigold.pay.autotest.bo.InterFaceField"
+		resultMap="fieldResultMap">
+		<![CDATA[  
+		SELECT *
+		FROM T_IF_FIELD
+		where IF_ID=#{ifId} and PARENTID=0 and FIELD_FLAG=#{fieldFlag}  and ISVALID='Y'
+		]]>
+	</select>
+	<!-- 获得接口响应定义的所有一级字段 -->
+	<select id="getFirstResFieldByIfId" parameterType="com.gigold.pay.autotest.bo.InterFaceField"
+		resultMap="fieldResultMap">
+		<![CDATA[  
+		select *
+		from T_IF_FIELD
+		where IF_ID=#{ifId}
+		and PARENTID＝0
+		and
+		FIELD_FLAG＝'0'  and ISVALID='Y'
+		]]>
+	</select>
+	
+	<!-- 获取某个字段的所有子字段 -->
+	<select id="getFieldByparentId" parameterType="com.gigold.pay.autotest.bo.InterFaceField"
+		resultMap="fieldResultMap">
+		<![CDATA[  
+		select *
+        from T_IF_FIELD
+        where PARENTID=#{id} and FIELD_FLAG=#{fieldFlag}  and ISVALID='Y'
+        ]]>
+	</select>
+
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 

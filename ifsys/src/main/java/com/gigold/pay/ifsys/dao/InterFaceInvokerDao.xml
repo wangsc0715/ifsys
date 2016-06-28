@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gigold.pay.ifsys.dao.InterFaceInvokerDao">
+
+	<resultMap type="com.gigold.pay.ifsys.bo.InterFaceInvoker"
+		id="invokerResultMap">
+		<id property="id" column="ID" />
+		<result property="ifFollowId" column="IF_FOLLOW_ID" />
+		<result property="ifFollowedId" column="IF_FOLLOWED_ID" />
+		<result property="uId" column="U_ID" />
+		<result property="tmFollow" column="TM_FOLLOW" />
+		<result property="remark" column="REMARK" />
+		<result property="status" column="STATUS" />
+		<result property="tmSmp" column="TM_SMP" />
+		<!-- 虚拟字段 -->
+		<result property="userName" column="USERNAME" />
+	</resultMap>
+
+	<insert id="addInterFaceInvoker" parameterType="com.gigold.pay.ifsys.bo.InterFaceInvoker"
+		useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[  
+        insert into
+        T_IF_INVOKER
+        (
+         IF_FOLLOW_ID,
+         IF_FOLLOWED_ID,
+         U_ID,
+         REMARK,
+         TM_FOLLOW
+        )
+        values
+        (
+         #{ifFollowId},
+         #{ifFollowedId},
+         #{uId},
+         #{remark},
+         now()
+        )
+    ]]>
+	</insert>
+	<select id="getInvokerList" parameterType="com.gigold.pay.ifsys.bo.InterFaceInvoker"
+		resultMap="invokerResultMap">
+<![CDATA[  
+		select
+		invo.ID,
+		u.USERNAME USERNAME,
+		DATE_FORMAT(invo.TM_FOLLOW,'%Y-%m-%d %H:%i:%s') TM_FOLLOW,
+		invo.REMARK REMARK
+		from T_IF_INVOKER invo ,T_IF_USER u
+		where
+		invo.U_ID=u.ID
+		AND invo.STATUS='Y'
+		AND invo.IF_FOLLOWED_ID=#{ifFollowedId}
+		]]>
+	</select>
+
+	<select id="getInvokerById" parameterType="com.gigold.pay.ifsys.bo.InterFaceInvoker"
+		resultMap="invokerResultMap">
+<![CDATA[  
+		select
+		ID,
+		IF_FOLLOW_ID,
+		IF_FOLLOWED_ID,
+		U_ID,
+		TM_FOLLOW,
+		REMARK
+		from T_IF_INVOKER
+		where STATUS='Y'
+		and ID=#{id}
+		]]>
+	</select>
+	<update id="deleteInvoker" parameterType="long">
+		update T_IF_INVOKER
+		set
+		STATUS='N'
+		where ID=#{id}
+	</update>
+
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 

@@ -1,0 +1,113 @@
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+
+    <style type="text/css">
+        table { border-collapse: collapse; }
+        th,td { border: 1px solid #888; }
+        td{padding:0 5px;}
+        .failed{background:#aa2116;color:#fff}
+        .passed{background:#1d953f;color:#fff}
+        .problem{background:#dea32c;color:#fff}
+
+        .text-failed{color:#aa2116}
+        .text-passed{color:#1d953f}
+        .text-problem{color:#dea32c}
+
+        .unknow{background:#46485f;color:#fff}
+        .title{background:#585eaa;color:#fff}
+        table,td,tr{font-size:12px;}
+        td{text-overflow: ellipsis;white-space: nowrap;overflow: hidden;}
+        .flexJson{width:300px;}
+        .odd{background:#ECEAFF}
+        .evn{background:#fff}
+        .step{color:grey;display:none;}
+        .casetd:hover .step{display:block;}
+    </style>
+</head>
+<body style='width:100%'>
+你好 ${userName}:<br>
+  
+欢迎加入 独孤九剑 接口自动化测试!
+<br>
+当你收到这封邮件的时候，表示你关注的接口出现了点问题...
+
+<br>
+<table>
+    <tr class='title'>
+        <td style='text-align:center'>接口</td>
+        <td style='text-align:center'>测试结果</td>
+        <td style='text-align:center'>用例</td>
+        <td style='text-align:center'>预期</td>
+        <td style='text-align:center'>实际</td>
+        <td style='text-align:center'>地址/访问模式</td>
+
+        ## <td colspan=2 style='text-align:center'>输出参数</td>
+    </tr>
+    #set($trthem = "odd")
+    #foreach( $mockListOfIf in $ifOfmockSetList)
+        #set($IfMocksize = $mockListOfIf.size())
+        #set($isFirst = "true")
+        ## 单双行样式
+        #if($trthem =="odd")
+            #set($trthem ="evn")
+        #elseif($trthem =="evn")
+            #set($trthem = "odd")
+        #end
+        #foreach( $mock in $mockListOfIf)
+            ## 判断结果
+            #if($mock.getTestResult() == '0' )
+                #set($resultStyle = 'failed')
+                #set($result = 'failed')
+            #elseif($mock.getTestResult() == '1' )
+                #set($resultStyle = 'passed')
+                #set($result = 'passed')
+            #elseif($mock.getTestResult() == '-1')
+                #set($resultStyle = 'problem')
+                #set($result = 'problem')
+            #else
+                #set($resultStyle = 'unknow')
+                #set($result = $mock.getTestResult())
+            #end
+
+            ## 比较相等
+            #if($mock.getRealRspCode() != $mock.getRspCode())
+                #set($rspCodeStyle = 'text-problem')
+            #end
+
+            #if($mock.getResponseJson() != $mock.getRealResponseJson())
+                #set($ResponseJsonStyle = 'text-problem')
+            #end
+            <tr class="$trthem">
+                #if($isFirst == "true")
+                    <td rowspan="$IfMocksize" title='$!mockListOfIf[0].getIfDESC()'>
+                        ($!mockListOfIf[0].getIfId())$!mockListOfIf[0].getIfName()<br>
+                    </td>
+                #end
+                <td class='$!{resultStyle}'>$!{result}</td>
+
+                <td class="casetd">#set($idx = 1)
+                    #foreach($step in $StepsMap.get("$mock.getId()"))
+                        <span class="step">$idx. ($!step.getId()) $!step.getCaseName()</span>
+                        #set($idx = $idx+1)
+                    #end
+                    -> ($!mock.getId()) $!mock.getCaseName()
+                </td>
+
+                <td style='text-align:right'>$!mock.getPreCodeDesc() ($!mock.getRspCode())</td>
+                <td class='$!rspCodeStyle'>($!mock.getRealRspCode()) $!mock.getRspCodeDesc()</td>
+                #if($isFirst == "true")
+                    #set($isFirst = "false")
+                    <td rowspan="$IfMocksize" title='$!mockListOfIf[0].getIfDESC()'>
+                        ($!mock.getIfPROTOCOL()) $!mock.getIfURL()
+                    </td>
+                #end
+                ##<td class='flexJson'>预期:<pre>$!mock.getResponseJson()</pre></td>
+                ##<td class='flexJson $!ResponseJsonStyle'>实际:<pre>$!mock.getRealResponseJson()</pre></td>
+            </tr>
+        #end
+    #end
+</table>
+<br>祝工作愉快!
+</body>
+</html>

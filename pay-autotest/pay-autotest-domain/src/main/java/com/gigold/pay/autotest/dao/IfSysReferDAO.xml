@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gigold.pay.autotest.dao.IfSysReferDAO">
+
+	<resultMap type="com.gigold.pay.autotest.bo.IfSysRefer" id="ifSysRefResultMap">
+		<id property="id" column="ID" />
+		<result property="mockId" column="MOCK_ID" />
+		<result property="refMockId" column="REFER_MOCK_ID" />
+		<result property="ordNum" column="ORD_NUM" />
+		<result property="rspCode" column="RSP_CODE" />
+		<result property="rspCodeDesc" column="RSP_CODE_DESC" />
+		<result property="caseName" column="CASE_NAME" />
+		<result property="ifName" column="IF_NAME" />
+	</resultMap>
+
+	<!-- 查询用例字段依赖列表 - 域定义 -->
+	<resultMap type="com.gigold.pay.autotest.bo.IfSysFeildRefer" id="ifSysFieldMap">
+		<id property="id" column="id" />
+		<result property="mockid" column="mockid" />
+		<result property="ref_mock_id" column="ref_mock_id" />
+		<result property="ref_feild" column="ref_feild" />
+		<result property="alias" column="alias" />
+		<result property="status" column="status" />
+		<result property="type" column="type" />
+	</resultMap>
+
+
+	<!-- 用例字段依赖列表 - 查询方法 -->
+	<select id="queryReferFields" parameterType="com.gigold.pay.autotest.bo.IfSysFeildRefer"
+			resultMap="ifSysFieldMap">
+		select a.id,
+		a.mockid,
+		a.ref_mock_id,
+		a.ref_feild,
+		a.alias,
+		a.status,
+		a.type
+		from
+		T_IF_REFER_MOCK_FEILD a
+		where a.mockid = #{mockid} and a.status = "Y"
+	</select>
+
+	<!-- 用例字段依赖列表 - 插入方法 -->
+	<update id="updataReferFields" parameterType="com.gigold.pay.autotest.bo.IfSysFeildRefer">
+		REPLACE INTO
+			T_IF_REFER_MOCK_FEILD
+		SET
+			<if test="id!=null and id!=''">
+				id=#{id},
+			</if>
+			mockid = #{mockid},
+			ref_mock_id = #{ref_mock_id},
+			ref_feild = #{ref_feild},
+			alias = #{alias},
+			status = #{status},
+			type = #{type}
+
+	</update>
+
+	<!-- 用例字段依赖列表 删除方法 -->
+	<delete id="deleteReferField" parameterType="com.gigold.pay.autotest.bo.IfSysFeildRefer">
+		DELETE from T_IF_REFER_MOCK_FEILD  where id = #{id}
+	</delete>
+
+	<!-- 用例字段依赖列表 根据id查询 -->
+	<select id="queryReferFieldById" parameterType="com.gigold.pay.autotest.bo.IfSysFeildRefer">
+		select * from T_IF_REFER_MOCK_FEILD  where id = #{mockid}
+	</select>
+
+	<insert id="addMockRefer" parameterType="com.gigold.pay.autotest.bo.IfSysRefer"
+		useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[  
+        insert into
+        T_IF_REFER
+        (
+         MOCK_ID,
+         REFER_MOCK_ID,
+         ORD_NUM
+        )
+        values(
+        #{mockId},
+        #{refMockId},
+        #{ordNum})
+    ]]>
+	</insert>
+	<!-- 删除依赖关系 -->
+	<update id="deleteMockRefer" parameterType="int">
+		update T_IF_REFER
+		set
+		STATUS='N'
+		where ID =#{id}
+	</update>
+
+	<!-- 修改模拟数据 -->
+	<update id="updateMockRefer" parameterType="com.gigold.pay.autotest.bo.IfSysRefer">
+		update T_IF_REFER
+		<set>
+			<if test="refMockId!=null and refMockId!=''">
+				REFER_MOCK_ID=#{refMockId},
+			</if>
+			<if test="ordNum!=null and ordNum!=''">
+				ORD_NUM=#{ordNum},
+			</if>
+		</set>
+		where ID =#{id}
+	</update>
+
+
+	<!-- 获取测试用例的依赖列表 -->
+	<select id="getReferList" parameterType="int" resultMap="ifSysRefResultMap">
+
+  <![CDATA[ 
+		select ID,
+		MOCK_ID,
+        CASE_NAME,
+		REFER_MOCK_ID,
+		(select RSP_CODE from T_IF_RETRUN_CODE cc where cc.ID=RSP_CODE_ID) RSP_CODE,
+		(select RSP_CODE_DESC from T_IF_RETRUN_CODE cc where
+		cc.ID=RSP_CODE_ID) RSP_CODE_DESC,
+		(select IF_NAME from T_IF_INTERFACE ii where ii.ID=IF_ID) IF_NAME,
+		ORD_NUM
+		from (
+		select
+		ID,
+		MOCK_ID,
+		REFER_MOCK_ID,
+		(select RSP_CODE_ID from T_IF_AUTO_MOCK au where au.ID=REFER_MOCK_ID)
+		RSP_CODE_ID,
+        (select CASE_NAME from T_IF_AUTO_MOCK au where au.ID=REFER_MOCK_ID)
+		CASE_NAME,
+		(select IF_ID from T_IF_AUTO_MOCK au where au.ID=REFER_MOCK_ID) IF_ID,
+		ORD_NUM
+		from T_IF_REFER
+		where MOCK_ID=#{mockId}
+		and STATUS='Y'
+		order by ORD_NUM
+		) tt
+
+
+		]]>
+	</select>
+
+	<!-- 根据ID获取测试用例的依赖 -->
+	<select id="getReferById" parameterType="int" resultMap="ifSysRefResultMap">
+     <![CDATA[ 
+        select 
+        ID,
+        MOCK_ID,
+        REFER_MOCK_ID,
+        ORD_NUM
+        from  T_IF_REFER
+        where STATUS='Y'
+        and ID=#{id}
+      ]]>
+	</select>
+	
+	<!-- 根据被依赖ID获取被依赖用例 -->
+	<select id="getReferByRefMockId" parameterType="int" resultMap="ifSysRefResultMap">
+     <![CDATA[ 
+        select 
+        ID,
+        MOCK_ID,
+        REFER_MOCK_ID,
+        ORD_NUM
+        from  T_IF_REFER
+        where STATUS='Y'
+        and REFER_MOCK_ID=#{refMockId}
+      ]]>
+	</select>
+</mapper>
+ 
+ 
+ 
+ 
+ 
